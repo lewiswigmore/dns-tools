@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% set active_page='dashboard' %}
+{% block title %}Dashboard - DNSTools{% endblock %}
+{% block head_extra %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}
+{% block content %}
+<div x-data="DashboardPage()" x-init="init()" class="space-y-6">
+  <!-- Session Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="panel p-4 rounded-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-[#8b949e] text-sm">Total Lookups Today</p>
+          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.totalLookups"></p>
+        </div>
+        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-search text-[#c9d1d9] text-sm"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel p-4 rounded-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-[#8b949e] text-sm">Success Rate</p>
+          <p class="text-2xl font-bold" :class="stats.successRate >= 90 ? 'text-[#3fb950]' : stats.successRate >= 70 ? 'text-[#d29922]' : 'text-[#f85149]'" x-text="stats.successRate + '%'"></p>
+        </div>
+        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-chart-line text-[#c9d1d9] text-sm"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel p-4 rounded-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-[#8b949e] text-sm">Session Time</p>
+          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.sessionTime"></p>
+        </div>
+        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-clock text-[#c9d1d9] text-sm"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel p-4 rounded-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-[#8b949e] text-sm">Unique Domains</p>
+          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.uniqueDomains"></p>
+        </div>
+        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-globe text-[#c9d1d9] text-sm"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Hourly Activity Chart -->
+    <div class="panel p-6 rounded-xl">
+      <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4">
+        <i class="fas fa-chart-bar mr-2 text-[#58a6ff]"></i>Activity Last 24 Hours
+      </h3>
+      <div class="h-64">
+        <canvas id="hourlyChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Lookup Types Distribution -->
+    <div class="panel p-6 rounded-xl">
+      <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4">
+        <i class="fas fa-list-ul mr-2 text-[#58a6ff]"></i>Lookup Types
+      </h3>
+      <div class="h-64">
+        <!-- Simple type breakdown display -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center p-3 rounded-lg bg-[#0d1117] border border-[#30363d]">
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-[#238636] mr-3"></div>
+              <span class="text-[#c9d1d9]">DNS Lookups</span>
+            </div>
+            <span class="text-[#8b949e]" x-text="getTypeCount('DNS')"></span>
+          </div>
+          <div class="flex justify-between items-center p-3 rounded-lg bg-[#0d1117] border border-[#30363d]">
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-[#58a6ff] mr-3"></div>
+              <span class="text-[#c9d1d9]">MX Lookups</span>
+            </div>
+            <span class="text-[#8b949e]" x-text="getTypeCount('MX')"></span>
+          </div>
+          <div class="flex justify-between items-center p-3 rounded-lg bg-[#0d1117] border border-[#30363d]">
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-[#d29922] mr-3"></div>
+              <span class="text-[#c9d1d9]">DMARC Lookups</span>
+            </div>
+            <span class="text-[#8b949e]" x-text="getTypeCount('DMARC')"></span>
+          </div>
+          <div class="flex justify-between items-center p-3 rounded-lg bg-[#0d1117] border border-[#30363d]">
+            <div class="flex items-center">
+              <div class="w-3 h-3 rounded-full bg-[#a855f7] mr-3"></div>
+              <span class="text-[#c9d1d9]">Header Analysis</span>
+            </div>
+            <span class="text-[#8b949e]" x-text="getTypeCount('Headers')"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="panel p-6 rounded-xl">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-[#c9d1d9]">
+        <i class="fas fa-history mr-2 text-[#58a6ff]"></i>Recent Activity
+      </h3>
+      <a href="/history" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm font-medium">
+        <i class="fas fa-external-link-alt mr-1"></i>View Full History
+      </a>
+    </div>
+    <div class="space-y-2">
+      <template x-for="activity in recentActivity" :key="activity.timestamp">
+        <div class="flex items-center justify-between p-3 rounded-lg border border-[#30363d] bg-[#0d1117]">
+          <div class="flex items-center space-x-3">
+            <div class="flex-1">
+              <p class="text-[#c9d1d9] font-medium" x-text="activity.query"></p>
+              <p class="text-[#8b949e] text-xs" x-text="activity.timeAgo"></p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="pill pill-outline text-xs"
+                 :class="{
+                   'pill-green': activity.type === 'DNS',
+                   'pill-blue': activity.type === 'MX', 
+                   'pill-orange': activity.type === 'DMARC',
+                   'pill-purple': activity.type === 'Headers'
+                 }" x-text="activity.type"></span>
+            <button @click="rerunQuery(activity)" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+      </template>
+      <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-8">
+        <i class="fas fa-chart-line text-3xl mb-2"></i>
+        <p>No activity yet. Start by running some DNS lookups!</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  // Auto-refresh dashboard every 30 seconds
+  setInterval(() => {
+    if (window.dashboardInstance && window.dashboardInstance.refreshStats) {
+      window.dashboardInstance.refreshStats();
+    }
+  }, 30000);
+</script>
+{% endblock %}

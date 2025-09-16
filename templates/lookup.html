@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='lookup' %}
+{% block title %}DNS Lookup - DNSTools{% endblock %}
+{% block content %}
+<div x-data="LookupPage()" x-init="init()" class="space-y-6">
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-edit','Domain Input & Configuration') }}
+    {{ ui.info_banner('fa-shield-alt','Security & Obfuscation Support','This tool handles obfuscated domains (google[.]com, hxxp://example[.]com) used in security research.') }}
+
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Enter domains:</label>
+  <textarea x-model="domains" x-ref="domainsBox" @input="autoGrow && autoGrow($refs.domainsBox)" x-init="autoGrow && autoGrow($refs.domainsBox)" placeholder="example.com
+microsoft.com
+google.com
+contoso.com" class="w-full resize-none overflow-hidden min-h-[100px] px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-sm leading-relaxed text-[#c9d1d9]"></textarea>
+      <p class="mt-2 text-xs text-[#8b949e]">Supports standard & obfuscated formats (e.g. google[.]com, hxxp://example[.]org), and accepts commas, spaces, or newlines.</p>
+    </div>
+
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <label class="block text-sm font-semibold text-[#c9d1d9]"><i class="fas fa-list-check mr-2 text-[#58a6ff]"></i>Record Types:</label>
+        <div class="flex gap-2">
+          <button @click="selectAllRecordTypes" type="button" class="text-xs text-[#58a6ff] hover:text-[#79c0ff] underline">Select All</button>
+          <button @click="clearAllRecordTypes" type="button" class="text-xs text-[#8b949e] hover:text-[#c9d1d9] underline">Clear</button>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2" >
+        <template x-for="type in availableRecordTypes" :key="type">
+          <label class="flex items-center p-2 rounded-lg border border-[#30363d] cursor-pointer bg-[#0d1117] hover:border-[#58a6ff]">
+            <input type="checkbox" :value="type" x-model="selectedRecordTypes" class="mr-2">
+            <span class="text-sm text-[#c9d1d9]" x-text="type"></span>
+          </label>
+        </template>
+      </div>
+    </div>
+
+    <button @click="performLookup" :disabled="loading || !domains.trim() || selectedRecordTypes.length===0" class="w-full py-3 px-6 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition">
+      <span x-show="!loading"><i class="fas fa-search mr-2"></i>Analyze DNS Records</span>
+      <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Processing...</span>
+    </button>
+  </div>
+
+  <div x-show="results && results.length>0" x-transition style="display: none;" class="panel rounded-xl p-6 border border-[#30363d] space-y-4">
+    <div class="flex justify-between items-center">
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">DNS Analysis Results</h2>
+      <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+    </div>
+    <div class="overflow-x-auto rounded-md border border-[#30363d]">
+      <table class="min-w-full text-xs">
+        <thead class="bg-[#161b22]">
+          <tr>
+            <th class="px-4 py-3 text-left">Domain</th>
+            <th class="px-4 py-3 text-left">Status</th>
+            <template x-for="rt in selectedRecordTypes" :key="rt"><th class="px-4 py-3 text-left" x-text="rt+' Records'"></th></template>
+            <th class="px-4 py-3 text-left">Issues</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#30363d]">
+          <template x-for="row in results" :key="row.domain">
+            <tr class="hover:bg-[#161b22]">
+              <td class="px-4 py-3" x-text="row.domain"></td>
+              <td class="px-4 py-3">
+                <span x-show="row.status==='success'" class="pill pill-outline pill-green">Success</span>
+                <span x-show="row.status==='error'" class="pill pill-outline pill-red">Error</span>
+              </td>
+              <template x-for="rt in selectedRecordTypes" :key="rt">
+                <td class="px-4 py-3">
+                  <template x-if="row.records[rt] && row.records[rt].length">
+                    <div class="space-y-1">
+                      <template x-for="rec in row.records[rt]" :key="rec.value">
+                        <div class="flex items-center justify-between bg-[#0d1117] rounded px-2 py-1 border border-[#30363d]">
+                          <span class="font-mono text-[10px]" x-text="rec.value"></span>
+                          <span class="text-[10px] text-[#8b949e]" x-text="'TTL '+rec.ttl"></span>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                  <span x-show="!row.records[rt] || !row.records[rt].length" class="text-[10px] text-[#8b949e]">—</span>
+                </td>
+              </template>
+              <td class="px-4 py-3">
+                <template x-if="row.errors.length">
+                  <div class="space-y-1">
+                    <template x-for="err in row.errors" :key="err"><div class="text-[11px] text-[#f85149]" x-text="err"></div></template>
+                  </div>
+                </template>
+                <span x-show="!row.errors.length" class="text-[10px] text-[#8b949e]">None</span>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}{% endblock %}

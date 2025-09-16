@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% set active_page='intel' %}
+{% block title %}Threat Intelligence (Soon) - DNSTools{% endblock %}
+{% block content %}
+<div class="panel p-8 rounded-xl border border-[#30363d] space-y-4">
+  <h2 class="text-lg font-semibold text-[#c9d1d9]">Threat Intelligence Workspace</h2>
+  <p class="text-sm text-[#8b949e]">Planned capabilities:</p>
+  <ul class="list-disc pl-6 text-sm text-[#8b949e] space-y-1">
+    <li>Bulk IOC (domains/IPs) enrichment</li>
+    <li>Passive DNS aggregation</li>
+    <li>Reputation & blocklist correlation</li>
+    <li>Export to JSON / STIX</li>
+  </ul>
+  <p class="text-sm text-[#8b949e]">Stay tuned.</p>
+</div>
+{% endblock %}

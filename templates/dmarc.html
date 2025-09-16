@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='dmarc' %}
+{% block title %}DMARC Lookup - DNSTools{% endblock %}
+{% block content %}
+<div x-data="DMARCPage()" x-init="init()" class="space-y-6">
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-shield-alt','DMARC Lookup & Configuration') }}
+    {{ ui.info_banner('fa-shield-alt','DMARC Policy Information','DMARC builds on SPF & DKIM to define policy for handling authentication failures and reporting.') }}
+
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for DMARC lookup:</label>
+      <input x-model="domain" type="text" class="w-full px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9]" placeholder="example.com" />
+    </div>
+
+    <button @click="performLookup" :disabled="loading || !domain.trim()" class="w-full py-3 px-6 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition">
+      <span x-show="!loading"><i class="fas fa-search mr-2"></i>Lookup DMARC Policy</span>
+      <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Looking up...</span>
+    </button>
+  </div>
+
+  <div x-show="result" x-transition style="display: none;" class="panel rounded-xl p-6 space-y-4">
+    <h3 class="text-lg font-semibold text-[#c9d1d9]"><i class="fas fa-shield-alt mr-2"></i>DMARC Policy for <span x-text="domain"></span></h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div class="rounded-lg p-4 border border-[#30363d] bg-[#0d1117]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9]">Policy Action</h4>
+        <span class="pill pill-outline" :class="{'pill-green': result && result.policy==='reject','pill-orange': result && result.policy==='quarantine','pill-blue': !result || !result.policy || result.policy==='none'}" x-text="result ? (result.policy||'none') : 'none'"></span>
+      </div>
+      <div class="rounded-lg p-4 border border-[#30363d] bg-[#0d1117]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9]">Alignment</h4>
+        <div class="space-y-1">
+          <div x-show="result && result.adkim" class="text-xs text-[#c9d1d9]">DKIM: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.adkim ? result.adkim : ''"></span></div>
+          <div x-show="result && result.aspf" class="text-xs text-[#c9d1d9]">SPF: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.aspf ? result.aspf : ''"></span></div>
+        </div>
+      </div>
+    </div>
+    <div x-show="result && result.raw" class="mt-4">
+      <h4 class="font-semibold mb-2 text-[#c9d1d9]">Raw DMARC Record</h4>
+      <div class="rounded-lg p-4 font-mono text-[11px] border border-[#30363d] bg-[#0d1117] text-[#8b949e]" x-text="result && result.raw ? result.raw : ''"></div>
+    </div>
+  </div>
+
+  <div x-show="error && error.length>0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl"><p class="text-sm text-[#f85149]" x-text="error"></p></div>
+</div>
+{% endblock %}
+{% block scripts %}{% endblock %}

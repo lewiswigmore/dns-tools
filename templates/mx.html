@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='mx' %}
+{% block title %}MX Lookup - DNSTools{% endblock %}
+{% block content %}
+<div x-data="MXPage()" x-init="init()" class="space-y-6">
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-envelope','MX Lookup & Configuration') }}
+    {{ ui.info_banner('fa-info-circle','MX Record Information','MX records define the mail servers responsible for accepting email on behalf of a domain. Lower priority = higher preference.') }}
+
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for MX lookup:</label>
+      <input x-model="domain" type="text" class="w-full px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9]" placeholder="example.com" />
+    </div>
+
+    <button @click="performLookup" :disabled="loading || !domain.trim()" class="w-full py-3 px-6 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition">
+      <span x-show="!loading"><i class="fas fa-search mr-2"></i>Lookup MX Records</span>
+      <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Looking up...</span>
+    </button>
+  </div>
+
+  <div x-show="results && results.length>0" x-transition style="display: none;" class="panel rounded-xl p-6 space-y-4">
+    <h3 class="text-lg font-semibold text-[#c9d1d9]"><i class="fas fa-envelope mr-2"></i>MX Records for <span x-text="domain"></span></h3>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-[#30363d] text-[#8b949e]">
+            <th class="text-left py-3 px-4">Priority</th>
+            <th class="text-left py-3 px-4">Mail Server</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="r in results" :key="r.exchange">
+            <tr class="border-b border-[#30363d] hover:bg-[#161b22]">
+              <td class="py-3 px-4"><span class="pill pill-outline pill-green" x-text="r.priority"></span></td>
+              <td class="py-3 px-4 font-mono text-[11px]" x-text="r.exchange"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div x-show="error && error.length>0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
+    <p class="text-sm text-[#f85149]" x-text="error"></p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}{% endblock %}

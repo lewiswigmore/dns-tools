@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='history' %}
+{% block title %}Search History - DNSTools{% endblock %}
+{% block content %}
+<div x-data="HistoryPage()" class="space-y-6">
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-history','Search History') }}
+    <p class="text-[#8b949e] mb-6">Review previous lookup queries with detailed analytics.</p>
+    
+    <!-- Filter and Stats Bar -->
+    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">
+      <!-- Search Filter -->
+      <div class="flex-1 max-w-md">
+        <div class="relative">
+          <input type="text" 
+                 x-model="searchFilter" 
+                 @input="applyFilters"
+                 placeholder="Filter by domain, type, or status..."
+                 class="w-full px-4 py-2 pl-10 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#c9d1d9] placeholder-[#8b949e] focus:border-[#58a6ff] focus:outline-none focus:ring-1 focus:ring-[#58a6ff]">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e]"></i>
+          <button x-show="searchFilter.length > 0" 
+                  @click="searchFilter = ''; applyFilters()" 
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] hover:text-[#c9d1d9]">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Type Filter Pills -->
+      <div class="flex flex-wrap gap-2">
+        <button @click="toggleTypeFilter('all')" 
+                :class="typeFilter === 'all' ? 'pill pill-blue' : 'pill pill-outline pill-blue'"
+                class="text-xs">
+          All (<span x-text="history.length"></span>)
+        </button>
+        <button @click="toggleTypeFilter('DNS')" 
+                :class="typeFilter === 'DNS' ? 'pill pill-green' : 'pill pill-outline pill-green'"
+                class="text-xs">
+          DNS (<span x-text="getTypeCount('DNS')"></span>)
+        </button>
+        <button @click="toggleTypeFilter('MX')" 
+                :class="typeFilter === 'MX' ? 'pill pill-orange' : 'pill pill-outline pill-orange'"
+                class="text-xs">
+          MX (<span x-text="getTypeCount('MX')"></span>)
+        </button>
+        <button @click="toggleTypeFilter('DMARC')" 
+                :class="typeFilter === 'DMARC' ? 'pill pill-purple' : 'pill pill-outline pill-purple'"
+                class="text-xs">
+          DMARC (<span x-text="getTypeCount('DMARC')"></span>)
+        </button>
+        <button @click="toggleTypeFilter('Headers')" 
+                :class="typeFilter === 'Headers' ? 'pill pill-yellow' : 'pill pill-outline pill-yellow'"
+                class="text-xs">
+          Headers (<span x-text="getTypeCount('Headers')"></span>)
+        </button>
+      </div>
+      
+      <!-- Clear All Button -->
+      <button @click="clearAll" class="pill pill-outline pill-red text-xs">
+        <i class="fas fa-trash mr-2"></i>Clear All
+      </button>
+    </div>
+    
+    <!-- Results Summary -->
+    <div x-show="history.length > 0" class="text-sm text-[#8b949e]">
+      Showing <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
+      <span x-show="searchFilter.length > 0">matching "<span x-text="searchFilter" class="text-[#c9d1d9]"></span>"</span>
+    </div>
+    
+    <!-- Empty State -->
+    <div x-cloak x-show="history.length===0" class="text-center py-12">
+      <i class="fas fa-history text-5xl text-[#30363d] mb-4"></i>
+      <p class="text-sm text-[#8b949e] mb-4">No history yet. Perform a lookup to populate this list.</p>
+      <a href="{{ url_for('lookup_page') }}" class="pill pill-outline pill-blue"><i class="fas fa-search mr-2"></i>Start Lookup</a>
+    </div>
+    
+    <!-- No Filtered Results -->
+    <div x-cloak x-show="history.length > 0 && filteredHistory.length === 0" class="text-center py-8">
+      <i class="fas fa-filter text-4xl text-[#30363d] mb-4"></i>
+      <p class="text-sm text-[#8b949e] mb-4">No entries match your current filter.</p>
+      <button @click="clearFilters" class="pill pill-outline pill-blue">
+        <i class="fas fa-times mr-2"></i>Clear Filters
+      </button>
+    </div>
+    
+    <!-- History Items -->
+    <div x-cloak x-show="filteredHistory.length > 0" class="space-y-4">
+      <template x-for="(item,i) in filteredHistory" :key="i">
+        <div @click="showPreview(item)" 
+             class="panel p-4 rounded-lg border border-[#30363d] hover:border-[#58a6ff] transition-colors cursor-pointer">
+          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+            <!-- Main Info -->
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <h4 class="font-semibold text-[#c9d1d9] text-lg" x-text="item.query"></h4>
+                <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-xs font-medium"></span>
+              </div>
+              
+              <!-- Enhanced Metadata -->
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs text-[#8b949e]">
+                <div class="flex items-center">
+                  <i class="fas fa-globe w-4 mr-2 text-[#58a6ff]"></i>
+                  <span><span x-text="item.domains"></span> domain<span x-show="item.domains !== 1">s</span></span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-clock w-4 mr-2 text-[#58a6ff]"></i>
+                  <span x-text="formatDuration(item.duration)"></span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-calendar w-4 mr-2 text-[#58a6ff]"></i>
+                  <span x-text="formatDate(item.timestamp)"></span>
+                </div>
+                <div class="flex items-center">
+                  <i class="fas fa-stopwatch w-4 mr-2 text-[#58a6ff]"></i>
+                  <span x-text="getTimeAgo(item.timestamp)"></span>
+                </div>
+              </div>
+              
+              <!-- Record Types Detail -->
+              <div x-show="item.recordTypes && item.recordTypes.length > 0" class="mt-3">
+                <div class="flex items-center gap-2 text-xs">
+                  <i class="fas fa-list w-4 text-[#8b949e]"></i>
+                  <span class="text-[#8b949e]">Record Types:</span>
+                  <div class="flex flex-wrap gap-1">
+                    <template x-for="type in item.recordTypes" :key="type">
+                      <span class="px-2 py-1 bg-[#0d1117] border border-[#30363d] rounded text-[#c9d1d9]" x-text="type"></span>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Status and Actions -->
+            <div class="flex items-center gap-3">
+              <div class="flex flex-col items-end gap-2">
+                <div class="flex items-center gap-2">
+                  <span x-show="item.success" class="pill pill-outline pill-green flex items-center">
+                    <i class="fas fa-check mr-1"></i>Success
+                  </span>
+                  <span x-show="!item.success" class="pill pill-outline pill-red flex items-center">
+                    <i class="fas fa-times mr-1"></i>Failed
+                  </span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button @click.stop="rerun(item)" 
+                          class="pill pill-outline pill-blue text-xs flex items-center"
+                          title="Rerun this query">
+                    <i class="fas fa-redo mr-1"></i>Rerun
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+  
+  <!-- Preview Modal -->
+  <div x-show="previewModal" 
+       x-cloak
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+       @click="closePreview">
+    <div @click.stop 
+         class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between p-6 border-b border-[#30363d]">
+        <div class="flex items-center gap-3">
+          <h3 class="text-xl font-semibold text-[#c9d1d9]">Query Results</h3>
+          <span x-show="previewData" 
+                :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'" 
+                x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'" 
+                class="text-xs font-medium"></span>
+        </div>
+        <button @click="closePreview" 
+                class="text-[#8b949e] hover:text-[#c9d1d9] text-xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto max-h-[60vh]">
+        <div class="space-y-4">
+          <!-- Query Info -->
+          <div class="flex flex-wrap gap-4 text-sm text-[#8b949e] mb-6">
+            <span><i class="fas fa-search mr-2"></i><span x-text="previewData?.query"></span></span>
+            <span><i class="fas fa-calendar mr-2"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
+            <span><i class="fas fa-clock mr-2"></i><span x-text="formatDuration(previewData?.duration)"></span></span>
+          </div>
+          
+          <!-- DNS Results -->
+          <div x-show="getQueryType(previewData?.recordTypes) === 'DNS'" class="space-y-4">
+            <template x-for="result in previewData?.results" :key="result.domain">
+              <div class="panel p-4 rounded-lg border border-[#30363d]">
+                <h4 class="font-semibold text-[#c9d1d9] mb-3" x-text="result.domain"></h4>
+                <div class="space-y-2">
+                  <template x-for="(records, recordType) in result.records" :key="recordType">
+                    <div x-show="records && records.length > 0">
+                      <h5 class="text-sm font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
+                      <div class="space-y-1">
+                        <template x-for="(record, index) in records" :key="'record-' + index">
+                          <div class="text-sm font-mono bg-[#0d1117] p-2 rounded border border-[#30363d] text-[#c9d1d9]" 
+                               x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
+                        </template>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+          
+          <!-- MX Results -->
+          <div x-show="getQueryType(previewData?.recordTypes) === 'MX'" class="space-y-2">
+            <h4 class="font-semibold text-[#c9d1d9] mb-3">MX Records</h4>
+            <template x-for="(record, index) in previewData?.results" :key="'mx-' + index">
+              <div class="text-sm font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9]" 
+                   x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
+            </template>
+          </div>
+          
+          <!-- DMARC Results -->
+          <div x-show="getQueryType(previewData?.recordTypes) === 'DMARC'">
+            <h4 class="font-semibold text-[#c9d1d9] mb-3">DMARC Policy</h4>
+            
+            <div class="space-y-3">
+              <!-- Raw DMARC Record -->
+              <div>
+                <h5 class="text-sm font-medium text-[#58a6ff] mb-2">Raw DMARC Record</h5>
+                <div class="text-sm font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9]">
+                  <span x-text="previewData?.results?.result?.raw || 'No DMARC record found'"></span>
+                </div>
+              </div>
+              
+              <!-- Parsed Policy Details -->
+              <div x-show="previewData?.results?.result?.policy">
+                <h5 class="text-sm font-medium text-[#58a6ff] mb-2">Policy Details</h5>
+                <div class="text-sm bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] space-y-1">
+                  <div class="flex justify-between">
+                    <span class="text-[#8b949e]">Policy:</span>
+                    <span class="font-mono" x-text="previewData?.results?.result?.policy"></span>
+                  </div>
+                  <div x-show="previewData?.results?.result?.adkim" class="flex justify-between">
+                    <span class="text-[#8b949e]">DKIM Alignment:</span>
+                    <span class="font-mono" x-text="previewData?.results?.result?.adkim"></span>
+                  </div>
+                  <div x-show="previewData?.results?.result?.aspf" class="flex justify-between">
+                    <span class="text-[#8b949e]">SPF Alignment:</span>
+                    <span class="font-mono" x-text="previewData?.results?.result?.aspf"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Headers Results -->
+          <div x-show="getQueryType(previewData?.recordTypes) === 'Headers'" class="space-y-4">
+            <h4 class="font-semibold text-[#c9d1d9] mb-3">Email Header Analysis</h4>
+            <template x-for="(result, index) in previewData?.results" :key="'header-' + index">
+              <div class="panel p-4 rounded-lg border border-[#30363d]">
+                <h5 class="font-medium text-[#58a6ff] mb-2" x-text="result.section"></h5>
+                <template x-for="(item, itemIndex) in result.items" :key="'item-' + itemIndex">
+                  <div class="flex justify-between py-1 text-sm">
+                    <span class="text-[#8b949e]" x-text="item.key"></span>
+                    <span class="text-[#c9d1d9] font-mono" x-text="item.value"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="flex items-center justify-between p-6 border-t border-[#30363d]">
+        <div class="text-sm text-[#8b949e]">
+          Click outside or press ESC to close
+        </div>
+        <div class="flex gap-3">
+          <button @click="rerun(previewData)" 
+                  class="pill pill-outline pill-blue">
+            <i class="fas fa-redo mr-2"></i>Rerun Query
+          </button>
+          <button @click="closePreview" 
+                  class="pill pill-outline pill-gray">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+// Close modal on ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && window.historyPageInstance?.previewModal) {
+    window.historyPageInstance.closePreview();
+  }
+});
+</script>
+{% endblock %}

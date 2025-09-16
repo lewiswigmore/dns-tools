@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='resources' %}
+{% block title %}DNS Resources - DNSTools{% endblock %}
+{% block content %}
+<div x-data="ResourcesPage()" class="space-y-6">
+  <!-- DNS Record Types -->
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-book','DNS Record Types') }}
+    <p class="text-[#8b949e] mb-6">Comprehensive reference guide for DNS record types and their purposes.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+      <div @click="showConcept('A Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['A Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-globe text-[#58a6ff] mr-2"></i>A Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Maps a hostname to an IPv4 address. Most common DNS record type.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">example.com → 192.0.2.1</code>
+        <p class="text-xs text-[#8b949e]">TTL: 300-86400 seconds typical</p>
+      </div>
+      
+      <div @click="showConcept('AAAA Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['AAAA Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-network-wired text-[#58a6ff] mr-2"></i>AAAA Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Maps a hostname to an IPv6 address for modern internet infrastructure.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">example.com → 2001:db8::1</code>
+        <p class="text-xs text-[#8b949e]">Essential for IPv6 support</p>
+      </div>
+      
+      <div @click="showConcept('CNAME Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['CNAME Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-link text-[#58a6ff] mr-2"></i>CNAME Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Creates an alias pointing to another domain name (canonical name).</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">www.example.com → example.com</code>
+        <p class="text-xs text-[#8b949e]">Cannot coexist with other records</p>
+      </div>
+      
+      <div @click="showConcept('MX Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['MX Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-envelope text-[#58a6ff] mr-2"></i>MX Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Specifies mail exchange servers and their priority for email delivery.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">10 mail.example.com</code>
+        <p class="text-xs text-[#8b949e]">Lower priority numbers processed first</p>
+      </div>
+      
+      <div @click="showConcept('TXT Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['TXT Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-quote-right text-[#58a6ff] mr-2"></i>TXT Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Stores arbitrary text data, commonly used for verification and email security.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">"v=spf1 include:_spf.google.com ~all"</code>
+        <p class="text-xs text-[#8b949e]">SPF, DKIM, DMARC, domain verification</p>
+      </div>
+      
+      <div @click="showConcept('NS Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['NS Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-server text-[#58a6ff] mr-2"></i>NS Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Defines authoritative name servers responsible for the domain.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">ns1.example.com</code>
+        <p class="text-xs text-[#8b949e]">Critical for DNS delegation</p>
+      </div>
+      
+      <div @click="showConcept('PTR Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['PTR Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-arrow-right text-[#58a6ff] mr-2"></i>PTR Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Reverse DNS lookup - maps IP addresses back to domain names.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">1.2.0.192.in-addr.arpa → example.com</code>
+        <p class="text-xs text-[#8b949e]">Important for email reputation</p>
+      </div>
+      
+      <div @click="showConcept('SRV Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['SRV Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-random text-[#58a6ff] mr-2"></i>SRV Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Service discovery - specifies location of specific services.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">10 5 443 service.example.com</code>
+        <p class="text-xs text-[#8b949e]">Priority, weight, port, target</p>
+      </div>
+      
+      <div @click="showConcept('CAA Record')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['CAA Record'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-shield-alt text-[#58a6ff] mr-2"></i>CAA Record
+        </h4>
+        <p class="text-[#8b949e] mb-2">Certificate Authority Authorization - restricts which CAs can issue certificates.</p>
+        <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9] mb-2">0 issue "letsencrypt.org"</code>
+        <p class="text-xs text-[#8b949e]">Enhances SSL/TLS security</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email Security -->
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-shield-alt','Email Security & Authentication') }}
+    <p class="text-[#8b949e] mb-6">Essential email security protocols to prevent spoofing and improve deliverability.</p>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div @click="showConcept('SPF')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['SPF'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-3 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-envelope-open-text text-[#58a6ff] mr-2"></i>SPF (Sender Policy Framework)
+        </h4>
+        <p class="text-[#8b949e] mb-3">Specifies which mail servers are authorized to send email for your domain.</p>
+        <div class="space-y-2">
+          <h5 class="text-sm font-medium text-[#c9d1d9]">Common SPF Record:</h5>
+          <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9]">v=spf1 include:_spf.google.com ~all</code>
+          <div class="text-xs text-[#8b949e] space-y-1">
+            <p><strong>v=spf1</strong> - SPF version</p>
+            <p><strong>include:</strong> - Include another domain's SPF</p>
+            <p><strong>~all</strong> - Soft fail for unlisted servers</p>
+            <p><strong>-all</strong> - Hard fail (stricter)</p>
+          </div>
+        </div>
+      </div>
+      
+      <div @click="showConcept('DKIM')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['DKIM'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-3 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-key text-[#58a6ff] mr-2"></i>DKIM (DomainKeys Identified Mail)
+        </h4>
+        <p class="text-[#8b949e] mb-3">Cryptographic authentication using public/private key pairs to verify email integrity.</p>
+        <div class="space-y-2">
+          <h5 class="text-sm font-medium text-[#c9d1d9]">DKIM TXT Record:</h5>
+          <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9]">selector._domainkey.example.com</code>
+          <div class="text-xs text-[#8b949e] space-y-1">
+            <p><strong>selector</strong> - Unique identifier</p>
+            <p><strong>Public key</strong> - RSA or Ed25519</p>
+            <p><strong>Email headers</strong> - Signed for integrity</p>
+          </div>
+        </div>
+      </div>
+      
+      <div @click="showConcept('DMARC')" class="panel p-4 rounded-lg concept-container" :class="conceptAnimations['DMARC'] ? 'concept-pulse' : ''">
+        <h4 class="font-semibold mb-3 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-user-shield text-[#58a6ff] mr-2"></i>DMARC (Domain-based Message Authentication)
+        </h4>
+        <p class="text-[#8b949e] mb-3">Policy framework that builds on SPF and DKIM to prevent email spoofing.</p>
+        <div class="space-y-2">
+          <h5 class="text-sm font-medium text-[#c9d1d9]">DMARC Policy Record:</h5>
+          <code class="block bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-xs text-[#c9d1d9]">v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com</code>
+          <div class="text-xs text-[#8b949e] space-y-1">
+            <p><strong>p=none</strong> - Monitor only</p>
+            <p><strong>p=quarantine</strong> - Move to spam</p>
+            <p><strong>p=reject</strong> - Block completely</p>
+            <p><strong>rua=</strong> - Aggregate reports</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel p-4 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-3 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-envelope-circle-check text-[#58a6ff] mr-2"></i>Implementation Best Practices
+        </h4>
+        <div class="space-y-3 text-sm">
+          <div>
+            <h5 class="font-medium text-[#c9d1d9] mb-1">Deployment Order:</h5>
+            <ol class="list-decimal list-inside text-[#8b949e] space-y-1">
+              <li>Configure SPF record</li>
+              <li>Set up DKIM signing</li>
+              <li>Implement DMARC monitoring</li>
+              <li>Gradually enforce policies</li>
+            </ol>
+          </div>
+          <div>
+            <h5 class="font-medium text-[#c9d1d9] mb-1">Monitoring:</h5>
+            <ul class="list-disc list-inside text-[#8b949e] space-y-1">
+              <li>Review DMARC reports regularly</li>
+              <li>Monitor delivery rates</li>
+              <li>Check authentication results</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tools & Resources -->
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-tools','Useful Tools & Resources') }}
+    <p class="text-[#8b949e] mb-6">External tools and documentation for DNS management and troubleshooting.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="panel p-4 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-terminal text-[#58a6ff] mr-2"></i>Command Line Tools
+        </h4>
+        <div class="space-y-2 text-sm">
+          <div>
+            <code class="text-[#c9d1d9]">dig example.com</code>
+            <p class="text-[#8b949e] text-xs">DNS lookup utility</p>
+          </div>
+          <div>
+            <code class="text-[#c9d1d9]">nslookup example.com</code>
+            <p class="text-[#8b949e] text-xs">Name server lookup</p>
+          </div>
+          <div>
+            <code class="text-[#c9d1d9]">host example.com</code>
+            <p class="text-[#8b949e] text-xs">DNS host lookup</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel p-4 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-globe text-[#58a6ff] mr-2"></i>Online DNS Tools
+        </h4>
+        <div class="space-y-2 text-sm">
+          <a href="https://whatsmydns.net" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">whatsmydns.net</a>
+          <a href="https://dnschecker.org" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">dnschecker.org</a>
+          <a href="https://intodns.com" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">intodns.com</a>
+        </div>
+      </div>
+      
+      <div class="panel p-4 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center">
+          <i class="fas fa-book-open text-[#58a6ff] mr-2"></i>Documentation
+        </h4>
+        <div class="space-y-2 text-sm">
+          <a href="https://tools.ietf.org/html/rfc1035" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 1035 - DNS Specification</a>
+          <a href="https://tools.ietf.org/html/rfc7208" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7208 - SPF</a>
+          <a href="https://tools.ietf.org/html/rfc7489" target="_blank" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7489 - DMARC</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About DNSTools -->
+  <div class="panel p-6 rounded-xl space-y-4">
+    {{ ui.section_header('fa-info-circle','About DNSTools') }}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div>
+        <h4 class="font-semibold mb-3 text-[#c9d1d9]">Features</h4>
+        <ul class="space-y-2 text-sm text-[#8b949e]">
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Multi-domain DNS lookups</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>MX record analysis</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>DMARC policy validation</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Email header analysis</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Session-based analytics</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Search history with preview</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-3 text-[#c9d1d9]">Open Source</h4>
+        <p class="text-[#8b949e] text-sm mb-3">DNSTools is open source and available on GitHub. Contributions, bug reports, and feature requests are welcome.</p>
+        <a href="https://github.com/lewiswigmore/dns-tools" target="_blank" 
+           class="inline-flex items-center px-4 py-2 bg-[#21262d] border border-[#30363d] rounded-lg text-[#c9d1d9] hover:bg-[#30363d] transition-colors">
+          <i class="fab fa-github mr-2"></i>View on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Use the concept modal component -->
+  {{ ui.concept_modal() }}
+</div>
+{% endblock %}
