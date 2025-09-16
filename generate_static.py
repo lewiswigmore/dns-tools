@@ -37,12 +37,19 @@ def create_static_site():
         endpoint_map = {
             'static': 'static/',
             'lookup': 'lookup.html',
-            'mx': 'mx.html', 
-            'dmarc': 'dmarc.html',
+            'lookup_page': 'lookup.html',
+            'mx': 'mx.html',
+            'mx_page': 'mx.html',
+            'dmarc': 'dmarc.html', 
+            'dmarc_page': 'dmarc.html',
             'headers': 'headers.html',
+            'headers_page': 'headers.html',
             'history': 'history.html',
+            'history_page': 'history.html',
             'dashboard': 'dashboard.html',
+            'dashboard_page': 'dashboard.html',
             'resources': 'resources.html',
+            'resources_page': 'resources.html',
             'index': 'index.html'
         }
         
