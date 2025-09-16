@@ -20,15 +20,44 @@ def create_static_site():
     
     # Clean and create dist directory
     if dist_dir.exists():
-        shutil.rmtree(dist_dir)
-    dist_dir.mkdir()
+        try:
+            shutil.rmtree(dist_dir)
+        except PermissionError:
+            print(f"Warning: Could not remove {dist_dir}. Continuing with existing directory.")
     
-    # Setup Jinja2 environment
+    if not dist_dir.exists():
+        dist_dir.mkdir()
+    
+    # Setup Jinja2 environment with Flask-like functions
     env = Environment(loader=FileSystemLoader(templates_dir))
+    
+    # Add url_for function for static site
+    def url_for(endpoint, **values):
+        # Map Flask endpoints to static file paths
+        endpoint_map = {
+            'static': 'static/',
+            'lookup': 'lookup.html',
+            'mx': 'mx.html', 
+            'dmarc': 'dmarc.html',
+            'headers': 'headers.html',
+            'history': 'history.html',
+            'dashboard': 'dashboard.html',
+            'resources': 'resources.html',
+            'index': 'index.html'
+        }
+        
+        if endpoint == 'static':
+            filename = values.get('filename', '')
+            return f'static/{filename}'
+        
+        return endpoint_map.get(endpoint, f'{endpoint}.html')
+    
+    # Add the url_for function to Jinja2 environment
+    env.globals['url_for'] = url_for
     
     # Copy static assets
     if static_dir.exists():
-        shutil.copytree(static_dir, dist_dir / 'static')
+        shutil.copytree(static_dir, dist_dir / 'static', dirs_exist_ok=True)
     
     # Pages to generate
     pages = {
