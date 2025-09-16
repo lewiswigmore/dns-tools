@@ -237,22 +237,91 @@ window.dnsClient = new DNSClient();
     dns_client_path = dist_dir / 'static' / 'js' / 'dns-client.js'
     dns_client_path.write_text(dns_client_js, encoding='utf-8')
     
-    # Update the main app.js to use client-side lookups
-    app_js_path = dist_dir / 'static' / 'js' / 'app.js'
-    if app_js_path.exists():
-        content = app_js_path.read_text(encoding='utf-8')
+    # Create GitHub Pages compatible app.js override
+    github_pages_app_js = '''
+/* GitHub Pages compatible app.js - Uses client-side DNS lookups */
+(function(){
+  const HISTORY_KEY = 'dns_history';
+
+  function safeJSONParse(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
+  function loadHistory(){ return safeJSONParse(localStorage.getItem(HISTORY_KEY), []); }
+  function saveHistory(arr){ try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,100))); } catch(e) { console.warn('history save failed', e); } }
+  function addHistory(entry){ 
+    const hist = loadHistory(); 
+    hist.unshift(entry); 
+    saveHistory(hist);
+  }
+  function exportJSON(data, filename='dns_results.json'){ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); }
+  function presetDomains(){ const params=new URLSearchParams(window.location.search); return params.get('domains')||''; }
+  function autoGrow(el){ if(!el) return; el.style.height='auto'; el.style.height = (el.scrollHeight)+'px'; }
+
+  // Lookup component - GitHub Pages version with client-side DNS
+  window.LookupPage = function(){
+    return {
+      domains: presetDomains(),
+      availableRecordTypes:['A','AAAA','CNAME','TXT','NS','MX'],
+      selectedRecordTypes:['A'],
+      results:[],
+      loading:false,
+      autoGrow,
+      init(){},
+      selectAllRecordTypes(){
+        this.selectedRecordTypes = [...this.availableRecordTypes];
+      },
+      clearAllRecordTypes(){
+        this.selectedRecordTypes = [];
+      },
+      async performLookup(){
+        if(this.loading) return; 
+        if(!this.domains.trim()||this.selectedRecordTypes.length===0) return;
         
-        # Replace Flask API calls with client-side calls
-        replacements = {
-            "fetch('/api/lookup'": "window.dnsClient.performLookup(this.domains, this.selectedRecordTypes).then(d => ({ json: () => Promise.resolve(d) })).then(r => r.json()).then(d",
-            "fetch('/api/mx'": "window.dnsClient.performMXLookup(this.domain).then(d => ({ json: () => Promise.resolve(d) })).then(r => r.json()).then(d",
-            "fetch('/api/dmarc'": "window.dnsClient.performDMARCLookup(this.domain).then(d => ({ json: () => Promise.resolve(d) })).then(r => r.json()).then(d"
+        this.loading=true;
+        try {
+          const data = await window.dnsClient.performLookup(this.domains, this.selectedRecordTypes);
+          this.results = data.results; 
+          addHistory({
+            query:this.domains,
+            timestamp:Date.now(),
+            domains:data.stats?.domains_processed||this.results.length,
+            duration:data.stats?.lookup_time||0,
+            success:true,
+            recordTypes:this.selectedRecordTypes,
+            results:data.results,
+            stats:data.stats
+          });
+        } catch (error) {
+          console.error('DNS lookup failed:', error);
+          alert('DNS lookup failed: ' + error.message);
+          addHistory({
+            query:this.domains,
+            timestamp:Date.now(),
+            domains:0,
+            duration:0,
+            success:false,
+            recordTypes:this.selectedRecordTypes
+          });
+        } finally {
+          this.loading = false;
         }
-        
-        for old, new in replacements.items():
-            content = content.replace(old, new)
-        
-        app_js_path.write_text(content, encoding='utf-8')
+      },
+      exportResults(){ exportJSON(this.results, 'dns_lookup_results.json'); }
+    };
+  };
+
+  // Simplified placeholder components for other pages
+  window.MXPage = function(){ return { domain: '', results: [], loading: false, init(){} }; };
+  window.DMARCPage = function(){ return { domain: '', result: null, loading: false, init(){} }; };
+  window.HeadersPage = function(){ return { headers: '', result: null, loading: false, init(){} }; };
+  window.HistoryPage = function(){ return { history: loadHistory(), filteredHistory: [], searchTerm: '', selectedTypes: [], loading: false, init(){ this.filteredHistory = this.history; } }; };
+  window.DashboardPage = function(){ return { stats: {}, loading: false, init(){} }; };
+  window.ResourcesPage = function(){ return { selectedConcept: null, loading: false, init(){} }; };
+
+})();
+'''
+    
+    # Write GitHub Pages compatible app.js
+    app_js_path = dist_dir / 'static' / 'js' / 'app.js'
+    app_js_path.write_text(github_pages_app_js, encoding='utf-8')
     
     print("Created client-side DNS lookup functionality")
 
