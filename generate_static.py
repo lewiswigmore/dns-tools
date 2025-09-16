@@ -90,6 +90,9 @@ def create_static_site():
         except Exception as e:
             print(f"Error generating {output_file}: {e}")
     
+    # Create .nojekyll file to disable Jekyll processing
+    (dist_dir / '.nojekyll').touch()
+    
     # Create client-side API replacements
     create_client_side_apis(dist_dir)
     
