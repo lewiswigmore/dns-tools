@@ -2,6 +2,193 @@
 (function(){
   const HISTORY_KEY = 'dns_history';
 
+  // DNS-over-HTTPS client for static site
+  class DNSClient {
+    constructor() {
+      this.dohServers = [
+        'https://dns.google/resolve',
+        'https://cloudflare-dns.com/dns-query',
+        'https://dns.quad9.net/dns-query'
+      ];
+    }
+    
+    deobfuscateDomain(domain) {
+      // Handle common obfuscation patterns used in security research
+      let deobfuscated = domain
+        .replace(/\[?\.\]?/g, '.') // Replace [.] or . with .
+        .replace(/^hxxp:\/\//, 'http://') // Replace hxxp:// with http://
+        .replace(/^hxxps:\/\//, 'https://') // Replace hxxps:// with https://
+        .replace(/^fxp:\/\//, 'ftp://') // Replace fxp:// with ftp://
+        .replace(/\(/g, '[') // Replace ( with [
+        .replace(/\)/g, ']'); // Replace ) with ]
+      
+      // Remove protocol if present (we only want the domain)
+      deobfuscated = deobfuscated.replace(/^https?:\/\//, '');
+      deobfuscated = deobfuscated.replace(/^ftp:\/\//, '');
+      
+      // Remove path and query parameters
+      deobfuscated = deobfuscated.split('/')[0];
+      deobfuscated = deobfuscated.split('?')[0];
+      
+      return deobfuscated;
+    }
+    
+    isValidDomain(domain) {
+      // Basic domain validation
+      if (!domain || domain.length === 0) return false;
+      if (domain === '.' || domain === '..') return false;
+      if (domain.startsWith('.') && domain.length === 1) return false;
+      if (domain.includes('..')) return false; // Double dots not allowed
+      
+      // Must contain at least one dot (except for localhost-style names)
+      if (!domain.includes('.') && domain !== 'localhost') return false;
+      
+      // Basic regex for domain format
+      const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/;
+      return domainRegex.test(domain);
+    }
+    
+    async performLookup(domains, recordTypes) {
+      const results = [];
+      // Split on newlines, commas, and spaces, then filter out empty entries and invalid domains
+      const domainsArray = [...new Set(domains.split(/[\n,\s]+/)
+        .filter(d => d.trim())
+        .map(d => this.deobfuscateDomain(d.trim()))
+        .filter(d => this.isValidDomain(d)))];
+      
+      for (const domain of domainsArray) {
+        const domainResult = {
+          domain: domain,
+          records: {},
+          errors: []
+        };
+        
+        for (const recordType of recordTypes) {
+          try {
+            const records = await this.queryDNS(domain.trim(), recordType);
+            domainResult.records[recordType] = records;
+          } catch (error) {
+            domainResult.records[recordType] = [];
+            domainResult.errors.push(`${recordType} lookup failed: ${error.message}`);
+            console.warn(`Failed to lookup ${recordType} for ${domain}:`, error);
+          }
+        }
+        
+        // Check if domain has no records at all
+        const hasAnyRecords = Object.values(domainResult.records).some(records => records.length > 0);
+        if (!hasAnyRecords && domainResult.errors.length === 0) {
+          domainResult.errors.push(`No DNS records found - domain may not exist`);
+        }
+        
+        results.push(domainResult);
+      }
+      
+      return {
+        results: results,
+        stats: {
+          domains_processed: results.length,
+          lookup_time: 0.5
+        }
+      };
+    }
+    
+    async queryDNS(domain, recordType) {
+      const dohUrl = `${this.dohServers[0]}?name=${encodeURIComponent(domain)}&type=${recordType}`;
+      
+      try {
+        const response = await fetch(dohUrl, {
+          headers: {
+            'Accept': 'application/dns-json'
+          }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const data = await response.json();
+        
+        if (data.Answer) {
+          return data.Answer.map(answer => {
+            const result = {
+              name: answer.name,
+              type: recordType,
+              value: answer.data,
+              ttl: answer.TTL
+            };
+            
+            // Special parsing for MX records
+            if (recordType === 'MX' && answer.data) {
+              const parts = answer.data.split(' ');
+              if (parts.length >= 2) {
+                result.priority = parseInt(parts[0]);
+                result.exchange = parts.slice(1).join(' ').replace(/\.$/, ''); // Remove trailing dot
+              }
+            }
+            
+            return result;
+          });
+        }
+        
+        return [];
+      } catch (error) {
+        console.warn(`DNS lookup failed for ${domain} ${recordType}:`, error);
+        return [];
+      }
+    }
+    
+    async performMXLookup(domain) {
+      try {
+        const records = await this.queryDNS(domain, 'MX');
+        return { records: records };
+      } catch (error) {
+        return { error: `Failed to lookup MX records for ${domain}` };
+      }
+    }
+    
+    async performDMARCLookup(domain) {
+      try {
+        const dmarcDomain = `_dmarc.${domain}`;
+        const records = await this.queryDNS(dmarcDomain, 'TXT');
+        
+        const dmarcRecord = records.find(r => r.value.startsWith('v=DMARC1'));
+        
+        if (dmarcRecord) {
+          const parsedPolicy = this.parseDMARCPolicy(dmarcRecord.value);
+          return {
+            result: {
+              raw: dmarcRecord.value,
+              policy: parsedPolicy.p || 'none',  // Extract 'p' value for policy
+              adkim: parsedPolicy.adkim,
+              aspf: parsedPolicy.aspf,
+              rua: parsedPolicy.rua,
+              ruf: parsedPolicy.ruf
+            }
+          };
+        } else {
+          return { result: null };
+        }
+      } catch (error) {
+        return { error: `Failed to lookup DMARC record for ${domain}` };
+      }
+    }
+    
+    parseDMARCPolicy(dmarcString) {
+      const policy = {};
+      const parts = dmarcString.split(';');
+      
+      parts.forEach(part => {
+        const [key, value] = part.trim().split('=');
+        if (key && value) {
+          policy[key.trim()] = value.trim();
+        }
+      });
+      
+      return policy;
+    }
+  }
+
+  // Make DNS client available globally
+  window.dnsClient = new DNSClient();
+
   function safeJSONParse(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
   function loadHistory(){ return safeJSONParse(localStorage.getItem(HISTORY_KEY), []); }
   function saveHistory(arr){ try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,100))); } catch(e) { console.warn('history save failed', e); } }
@@ -17,48 +204,90 @@
   }
   function exportJSON(data, filename='dns_results.json'){ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); }
   function presetDomains(){ const params=new URLSearchParams(window.location.search); return params.get('domains')||''; }
+  function presetRecordTypes(){ 
+    const params=new URLSearchParams(window.location.search); 
+    const types = params.get('types');
+    return types ? types.split(',').filter(t => t.trim()) : [];
+  }
   function autoGrow(el){ if(!el) return; el.style.height='auto'; el.style.height = (el.scrollHeight)+'px'; }
 
   // Lookup component
   window.LookupPage = function(){
     return {
       domains: presetDomains(),
-      availableRecordTypes:['A','AAAA','CNAME','TXT','NS','MX'],
+      availableRecordTypes:['A','AAAA','CNAME','TXT','NS'],
       selectedRecordTypes:['A'],
       results:[],
       loading:false,
       autoGrow,
-      init(){},
+      init(){
+        // Set preset record types if provided in URL
+        const presetTypes = presetRecordTypes();
+        if (presetTypes.length > 0) {
+          // Validate that all preset types are in available types
+          const validTypes = presetTypes.filter(type => this.availableRecordTypes.includes(type));
+          if (validTypes.length > 0) {
+            this.selectedRecordTypes = validTypes;
+          }
+        }
+        
+        // Auto-execute if we have preset domains
+        if (this.domains.trim()) {
+          // Auto-execute the lookup
+          setTimeout(() => this.performLookup(), 100);
+        }
+      },
       selectAllRecordTypes(){
         this.selectedRecordTypes = [...this.availableRecordTypes];
       },
       clearAllRecordTypes(){
         this.selectedRecordTypes = [];
       },
-      performLookup(){
-        if(this.loading) return; if(!this.domains.trim()||this.selectedRecordTypes.length===0) return;
+      async performLookup(){
+        if(this.loading) return; 
+        if(!this.domains.trim()||this.selectedRecordTypes.length===0) return;
+        
         this.loading=true;
-        fetch('/api/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domains:this.domains,record_types:this.selectedRecordTypes})})
-          .then(r=>r.json())
-          .then(d=>{ 
-            if(d.results){ 
-              this.results=d.results; 
-              addHistory({query:this.domains,timestamp:Date.now(),domains:d.stats?.domains_processed||this.results.length,duration:d.stats?.lookup_time||0,success:true,recordTypes:this.selectedRecordTypes,results:d.results,stats:d.stats}); 
-              // Refresh dashboard if present
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } else if(d.error){ 
-              alert(d.error);
-              addHistory({query:this.domains,timestamp:Date.now(),domains:0,duration:0,success:false,recordTypes:this.selectedRecordTypes});
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } 
-          })
-          .catch(e=>{
-            alert(e.message);
-            addHistory({query:this.domains,timestamp:Date.now(),domains:0,duration:0,success:false,recordTypes:this.selectedRecordTypes});
-            if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-          })
-          .catch(e=>alert(e.message))
-          .finally(()=>this.loading=false);
+        
+        try {
+          const startTime = Date.now();
+          const response = await window.dnsClient.performLookup(this.domains, this.selectedRecordTypes);
+          const duration = (Date.now() - startTime) / 1000;
+          
+          this.results = response.results || [];
+          
+          // Add to history
+          addHistory({
+            query: this.domains,
+            timestamp: Date.now(),
+            domains: response.stats?.domains_processed || this.results.length,
+            duration: duration,
+            success: true,
+            recordTypes: this.selectedRecordTypes,
+            results: response.results,
+            stats: response.stats
+          });
+          
+          // Refresh dashboard if present
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+          
+        } catch (error) {
+          console.error('Lookup failed:', error);
+          alert('DNS lookup failed: ' + error.message);
+          
+          addHistory({
+            query: this.domains,
+            timestamp: Date.now(),
+            domains: 0,
+            duration: 0,
+            success: false,
+            recordTypes: this.selectedRecordTypes
+          });
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+        } finally {
+          this.loading = false;
+        }
       },
       exportResults(){ exportJSON(this.results); }
     };
@@ -67,30 +296,72 @@
   // MX component
   window.MXPage = function(){
     return {
-      domain:'', results:[], loading:false, error:'',
-      init(){},
-      performLookup(){
-        if(this.loading || !this.domain.trim()) return; this.loading=true; this.error='';
-        fetch('/api/mx',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:this.domain})})
-          .then(r=>r.json())
-          .then(d=>{ 
-            if(d.records){ 
-              this.results=d.records; 
-              addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:true,recordTypes:['MX'],results:d.records}); 
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } else if(d.error){ 
-              this.error=d.error;
-              addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['MX']});
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } 
-          })
-          .catch(e=>{
-            this.error=e.message;
-            addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['MX']});
-            if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-          })
-          .catch(e=>this.error=e.message)
-          .finally(()=>this.loading=false);
+      domain:'', results:[], loading:false, error:'', searchPerformed:false,
+      init(){
+        // Check for domain parameter in URL
+        const params = new URLSearchParams(window.location.search);
+        const domainParam = params.get('domain');
+        if (domainParam) {
+          this.domain = domainParam;
+          // Auto-execute the lookup
+          setTimeout(() => this.performLookup(), 100);
+        }
+      },
+      async performLookup(){
+        if(this.loading || !this.domain.trim()) return;
+        
+        this.loading = true; 
+        this.error = '';
+        this.results = []; // Clear previous results
+        this.searchPerformed = true; // Mark that a search has been performed
+        
+        try {
+          const startTime = Date.now();
+          const response = await window.dnsClient.performMXLookup(this.domain);
+          const duration = (Date.now() - startTime) / 1000;
+          
+          if (response.error) {
+            this.error = response.error;
+            addHistory({
+              query: this.domain,
+              timestamp: Date.now(),
+              domains: 1,
+              duration: duration,
+              success: false,
+              recordTypes: ['MX']
+            });
+          } else {
+            this.results = response.records || [];
+            addHistory({
+              query: this.domain,
+              timestamp: Date.now(),
+              domains: 1,
+              duration: duration,
+              success: true,
+              recordTypes: ['MX'],
+              results: response.records
+            });
+          }
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+          
+        } catch (error) {
+          console.error('MX lookup failed:', error);
+          this.error = error.message;
+          
+          addHistory({
+            query: this.domain,
+            timestamp: Date.now(),
+            domains: 1,
+            duration: 0,
+            success: false,
+            recordTypes: ['MX']
+          });
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+        } finally {
+          this.loading = false;
+        }
       }
     };
   };
@@ -98,32 +369,74 @@
   // DMARC component
   window.DMARCPage = function(){
     return {
-      domain:'', result:null, loading:false, error:'',
-      init(){},
-      performLookup(){
-        if(this.loading || !this.domain.trim()) return; this.loading=true; this.error=''; this.result=null;
-        fetch('/api/dmarc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({domain:this.domain})})
-          .then(r=>r.json())
-          .then(d=>{ 
-            if(d.result!==undefined){ 
-              this.result=d.result; 
-              addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:true,recordTypes:['DMARC'],results:d}); 
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } else if(d.error){ 
-              this.error=d.error;
-              addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['DMARC']});
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } 
-          })
-          .catch(e=>{
-            this.error=e.message;
-            addHistory({query:this.domain,timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['DMARC']});
-            if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-          })
-          .catch(e=>this.error=e.message)
-          .finally(()=>this.loading=false);
+      domain:'', result:null, loading:false, error:'', searchPerformed:false,
+      init(){
+        // Check for domain parameter in URL
+        const params = new URLSearchParams(window.location.search);
+        const domainParam = params.get('domain');
+        if (domainParam) {
+          this.domain = domainParam;
+          // Auto-execute the lookup
+          setTimeout(() => this.performLookup(), 100);
+        }
+      },
+      async performLookup(){
+        if(this.loading || !this.domain.trim()) return;
+        
+        this.loading = true;
+        this.error = '';
+        this.result = null;
+        this.searchPerformed = true; // Mark that a search has been performed
+        
+        try {
+          const startTime = Date.now();
+          const response = await window.dnsClient.performDMARCLookup(this.domain);
+          const duration = (Date.now() - startTime) / 1000;
+          
+          if (response.error) {
+            this.error = response.error;
+            addHistory({
+              query: this.domain,
+              timestamp: Date.now(),
+              domains: 1,
+              duration: duration,
+              success: false,
+              recordTypes: ['DMARC']
+            });
+          } else {
+            this.result = response.result;
+            addHistory({
+              query: this.domain,
+              timestamp: Date.now(),
+              domains: 1,
+              duration: duration,
+              success: true,
+              recordTypes: ['DMARC'],
+              results: response
+            });
+          }
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+          
+        } catch (error) {
+          console.error('DMARC lookup failed:', error);
+          this.error = error.message;
+          
+          addHistory({
+            query: this.domain,
+            timestamp: Date.now(),
+            domains: 1,
+            duration: 0,
+            success: false,
+            recordTypes: ['DMARC']
+          });
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+        } finally {
+          this.loading = false;
+        }
       }
-    };
+    }
   };
 
   // Headers component
@@ -131,30 +444,242 @@
     return {
       headers:'', results:null, loading:false, error:'',
       autoGrow,
-      init(){},
-      analyzeHeaders(){
-        if(this.loading || !this.headers.trim()) return; this.loading=true; this.error=''; this.results=null;
-        fetch('/api/headers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({headers:this.headers})})
-          .then(r=>r.json())
-          .then(d=>{ 
-            if(d.results){ 
-              this.results=d.results; 
-              addHistory({query:'Email Headers',timestamp:Date.now(),domains:1,duration:0,success:true,recordTypes:['Headers'],results:d.results}); 
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } else if(d.error){ 
-              this.error=d.error;
-              addHistory({query:'Email Headers',timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['Headers']});
-              if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-            } 
-          })
-          .catch(e=>{
-            this.error=e.message;
-            addHistory({query:'Email Headers',timestamp:Date.now(),domains:1,duration:0,success:false,recordTypes:['Headers']});
-            if(window.dashboardInstance) window.dashboardInstance.refreshStats();
-          })
-          .catch(e=>this.error=e.message)
-          .finally(()=>this.loading=false);
+      init(){
+        // Check for rerun parameter and stored headers data
+        const params = new URLSearchParams(window.location.search);
+        const isRerun = params.get('rerun');
+        
+        if (isRerun) {
+          const storedHeaders = localStorage.getItem('dns_rerun_headers');
+          if (storedHeaders) {
+            this.headers = storedHeaders;
+            // Clean up the stored data
+            localStorage.removeItem('dns_rerun_headers');
+            // Auto-execute the analysis
+            setTimeout(() => this.analyzeHeaders(), 100);
+          }
+        }
       },
+      async analyzeHeaders(){
+        if(this.loading || !this.headers.trim()) return;
+        
+        this.loading = true;
+        this.error = '';
+        this.results = null;
+        
+        try {
+          const startTime = Date.now();
+          
+          // Simple client-side header analysis
+          const headerLines = this.headers.split('\n');
+          const parsedHeaders = {};
+          let currentHeader = '';
+          let receivedCount = 0;
+          
+          for (let line of headerLines) {
+            const originalLine = line; // Keep original for whitespace detection
+            line = line.trim();
+            if (!line) continue;
+            
+            // Check if this is a header line (starts with header name followed by colon)
+            const isHeaderLine = line.match(/^[a-zA-Z0-9-]+:\s/);
+            // Check if this is a continuation line (starts with whitespace in original)
+            const isContinuationLine = originalLine.match(/^\s+/) && currentHeader;
+            
+            if (isHeaderLine && !isContinuationLine) {
+              const [header, ...valueParts] = line.split(':');
+              const headerName = header.trim().toLowerCase();
+              const headerValue = valueParts.join(':').trim();
+              
+              // Handle multiple Received headers
+              if (headerName === 'received') {
+                currentHeader = `received-${receivedCount}`;
+                receivedCount++;
+                parsedHeaders[currentHeader] = headerValue;
+              } else {
+                currentHeader = headerName;
+                parsedHeaders[currentHeader] = headerValue;
+              }
+            } else if (isContinuationLine || (currentHeader && !isHeaderLine)) {
+              // Continuation line - add to current header
+              parsedHeaders[currentHeader] += ' ' + line;
+            }
+          }
+          
+          const analysis = {
+            headers: parsedHeaders,
+            ...this.parseAuthenticationResults(parsedHeaders),
+            routing: {
+              from: parsedHeaders['from'] || 'Not found',
+              to: parsedHeaders['to'] || 'Not found',
+              subject: parsedHeaders['subject'] || 'Not found',
+              date: parsedHeaders['date'] || 'Not found'
+            },
+            security: this.analyzeSecurityIndicators(parsedHeaders),
+            delivery_path: this.parseDeliveryPath(parsedHeaders)
+          };
+          
+          const duration = (Date.now() - startTime) / 1000;
+          this.results = analysis;
+          
+          // Create a meaningful query preview from the email headers
+          let queryPreview = 'Email Headers';
+          if (analysis.routing) {
+            const subject = analysis.routing.subject;
+            const from = analysis.routing.from;
+            
+            if (subject && subject !== 'Not found') {
+              // Use subject line, truncated if too long
+              queryPreview = subject.length > 60 ? subject.substring(0, 60) + '...' : subject;
+            } else if (from && from !== 'Not found') {
+              // Fall back to from field if no subject
+              const fromMatch = from.match(/<([^>]+)>/) || from.match(/([^\s<>]+@[^\s<>]+)/);
+              if (fromMatch) {
+                queryPreview = 'From: ' + fromMatch[1];
+              } else {
+                queryPreview = 'From: ' + (from.length > 40 ? from.substring(0, 40) + '...' : from);
+              }
+            }
+          }
+          
+          addHistory({
+            query: queryPreview,
+            timestamp: Date.now(),
+            domains: 1,
+            duration: duration,
+            success: true,
+            recordTypes: ['Headers'],
+            results: analysis,
+            originalHeaders: this.headers  // Store original headers for rerun
+          });
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+          
+        } catch (error) {
+          console.error('Header analysis failed:', error);
+          this.error = error.message;
+          
+          addHistory({
+            query: 'Email Headers Analysis (Failed)',
+            timestamp: Date.now(),
+            domains: 1,
+            duration: 0,
+            success: false,
+            recordTypes: ['Headers']
+          });
+          
+          if(window.dashboardInstance) window.dashboardInstance.refreshStats();
+        } finally {
+          this.loading = false;
+        }
+      },
+      
+      parseAuthenticationResults(headers) {
+        const results = {
+          spf: { status: 'unknown', details: '' },
+          dkim: { status: 'unknown', details: '' }, 
+          dmarc: { status: 'unknown', details: '' }
+        };
+        
+        // Check for Authentication-Results header
+        const authHeader = headers['authentication-results'];
+        
+        if (authHeader) {
+          // Parse SPF result - updated regex to handle more formats
+          const spfMatch = authHeader.match(/spf=(\w+)(?:\s+\(([^)]+)\))?/i);
+          if (spfMatch) {
+            results.spf.status = spfMatch[1];
+            results.spf.details = spfMatch[2] || '';
+          }
+          
+          // Parse DKIM result  
+          const dkimMatch = authHeader.match(/dkim=(\w+)(?:\s+\(([^)]+)\))?/i);
+          if (dkimMatch) {
+            results.dkim.status = dkimMatch[1];
+            results.dkim.details = dkimMatch[2] || '';
+          }
+          
+          // Parse DMARC result
+          const dmarcMatch = authHeader.match(/dmarc=(\w+)(?:\s+\(([^)]+)\))?/i);
+          if (dmarcMatch) {
+            results.dmarc.status = dmarcMatch[1];
+            results.dmarc.details = dmarcMatch[2] || '';
+          }
+        }
+        
+        // Also check individual headers as fallback
+        if (headers['received-spf'] && results.spf.status === 'unknown') {
+          const spfMatch = headers['received-spf'].match(/(\w+)/);
+          if (spfMatch) results.spf.status = spfMatch[1];
+        }
+        
+        return results;
+      },
+      
+      analyzeSecurityIndicators(headers) {
+        const warnings = [];
+        let suspicious = false;
+        let tls = false;
+        
+        // Check for TLS usage in Received headers
+        const receivedHeaders = Object.keys(headers)
+          .filter(key => key.startsWith('received'))
+          .map(key => headers[key])
+          .join(' ');
+        
+        if (receivedHeaders.toLowerCase().includes('tls') || receivedHeaders.toLowerCase().includes('ssl')) {
+          tls = true;
+        }
+        
+        // Check for suspicious patterns
+        const from = headers['from'] || '';
+        const replyTo = headers['reply-to'] || '';
+        const returnPath = headers['return-path'] || '';
+        
+        // Mismatched From and Reply-To
+        if (replyTo && from && !replyTo.includes(from.split('@')[1]?.split('>')[0])) {
+          warnings.push('Reply-To domain differs from From domain');
+          suspicious = true;
+        }
+        
+        // Suspicious subject patterns
+        const subject = headers['subject'] || '';
+        if (subject.match(/urgent|action required|verify|suspended|expire/i)) {
+          warnings.push('Subject contains urgency indicators common in phishing');
+          suspicious = true;
+        }
+        
+        return {
+          tls: tls,
+          suspicious: suspicious,
+          warnings: warnings,
+          messageId: headers['message-id'] || 'Not found',
+          returnPath: returnPath || 'Not found'
+        };
+      },
+      
+      parseDeliveryPath(headers) {
+        const path = [];
+        
+        // Extract all Received headers
+        Object.keys(headers).forEach(key => {
+          if (key.startsWith('received')) {
+            const value = headers[key];
+            const serverMatch = value.match(/from\s+([^\s]+)/i);
+            const timestampMatch = value.match(/;\s*(.+)$/);
+            
+            if (serverMatch) {
+              path.push({
+                server: serverMatch[1],
+                timestamp: timestampMatch ? timestampMatch[1].trim() : 'Unknown'
+              });
+            }
+          }
+        });
+        
+        return path.reverse(); // Show in chronological order
+      },
+      
       exportResults(){ if(this.results) exportJSON(this.results, 'email_headers_analysis.json'); }
     };
   };
@@ -275,13 +800,45 @@
       rerun(item){ 
         const type = this.getQueryType(item.recordTypes);
         if (type === 'Headers') {
-          window.location = '/headers';
+          // For headers, store the data in localStorage and redirect
+          if (item.results && item.results.headers) {
+            // Try to reconstruct headers from parsed data or use original if available
+            let headersText = '';
+            
+            // If we have the original headers text stored, use that
+            if (item.originalHeaders) {
+              headersText = item.originalHeaders;
+            } else {
+              // Otherwise, try to reconstruct from parsed headers
+              const headers = item.results.headers;
+              for (const [key, value] of Object.entries(headers)) {
+                if (key.startsWith('received-')) {
+                  headersText += `Received: ${value}\n`;
+                } else {
+                  const capitalizedKey = key.split('-').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join('-');
+                  headersText += `${capitalizedKey}: ${value}\n`;
+                }
+              }
+            }
+            
+            // Store in localStorage temporarily
+            localStorage.setItem('dns_rerun_headers', headersText);
+          }
+          window.location = 'headers.html?rerun=true';
         } else if (type === 'MX') {
-          window.location = '/mx';
+          // Extract domain from query for MX
+          const domain = item.query.trim();
+          window.location = 'mx.html?domain=' + encodeURIComponent(domain);
         } else if (type === 'DMARC') {
-          window.location = '/dmarc';
+          // Extract domain from query for DMARC
+          const domain = item.query.trim();
+          window.location = 'dmarc.html?domain=' + encodeURIComponent(domain);
         } else {
-          window.location = '/lookup?domains=' + encodeURIComponent(item.query);
+          // For DNS lookups, pass domains and record types
+          const recordTypes = item.recordTypes ? item.recordTypes.join(',') : 'A';
+          window.location = 'lookup.html?domains=' + encodeURIComponent(item.query) + '&types=' + encodeURIComponent(recordTypes);
         }
       },
       
@@ -299,6 +856,44 @@
         if (recordTypes.includes('DMARC')) return 'DMARC';
         if (recordTypes.includes('Headers')) return 'Headers';
         return 'DNS';
+      },
+      
+      getDisplayTitle(item) {
+        // Return empty string if item is null/undefined
+        if (!item) return '';
+        
+        // For Headers entries, try to extract a meaningful title from the results
+        if (this.getQueryType(item.recordTypes) === 'Headers' && item.results) {
+          // Check if we have routing information with subject or from
+          if (item.results.routing) {
+            const subject = item.results.routing.subject;
+            const from = item.results.routing.from;
+            
+            if (subject && subject !== 'Not found' && subject.trim()) {
+              // Use subject line, truncated if too long
+              return subject.length > 60 ? subject.substring(0, 60) + '...' : subject;
+            } else if (from && from !== 'Not found' && from.trim()) {
+              // Fall back to from field if no subject
+              const fromMatch = from.match(/<([^>]+)>/) || from.match(/([^\s<>]+@[^\s<>]+)/);
+              if (fromMatch) {
+                return 'From: ' + fromMatch[1];
+              } else {
+                return 'From: ' + (from.length > 40 ? from.substring(0, 40) + '...' : from);
+              }
+            }
+          }
+          
+          // If we can't extract meaningful info, check if it's a failed analysis
+          if (!item.success) {
+            return 'Email Headers Analysis (Failed)';
+          }
+          
+          // Default fallback for headers
+          return 'Email Headers Analysis';
+        }
+        
+        // For all other types, use the original query
+        return item.query || '';
       }
     };
   };
@@ -490,6 +1085,7 @@
               },
               options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                   legend: false
                 }
@@ -580,13 +1176,38 @@
       rerunQuery(activity){
         const type = activity.type.toLowerCase();
         if (type === 'headers') {
-          window.location = '/headers';
+          // For headers, store the data in localStorage if available
+          if (activity.results && activity.results.headers) {
+            let headersText = '';
+            
+            // Try to reconstruct from parsed headers
+            const headers = activity.results.headers;
+            for (const [key, value] of Object.entries(headers)) {
+              if (key.startsWith('received-')) {
+                headersText += `Received: ${value}\n`;
+              } else {
+                const capitalizedKey = key.split('-').map(word => 
+                  word.charAt(0).toUpperCase() + word.slice(1)
+                ).join('-');
+                headersText += `${capitalizedKey}: ${value}\n`;
+              }
+            }
+            
+            // Store in localStorage temporarily
+            localStorage.setItem('dns_rerun_headers', headersText);
+          }
+          window.location = 'headers.html?rerun=true';
         } else if (type === 'mx') {
-          window.location = '/mx';
+          // Extract domain from query for MX
+          const domain = activity.query.trim();
+          window.location = 'mx.html?domain=' + encodeURIComponent(domain);
         } else if (type === 'dmarc') {
-          window.location = '/dmarc';
+          // Extract domain from query for DMARC
+          const domain = activity.query.trim();
+          window.location = 'dmarc.html?domain=' + encodeURIComponent(domain);
         } else {
-          window.location = '/lookup?domains=' + encodeURIComponent(activity.query);
+          // For DNS lookups, pass domains and record types if available
+          window.location = 'lookup.html?domains=' + encodeURIComponent(activity.query);
         }
       },
       
@@ -1596,4 +2217,7 @@ example.com. IN CAA 0 iodef "https://security.example.com/report"</code></pre>
       }
     };
   };
+
+  // Initialize DNS client globally
+  window.dnsClient = new DNSClient();
 })();

@@ -57,18 +57,18 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[100px] px-4 py-3 b
           </tr>
         </thead>
         <tbody class="divide-y divide-[#30363d]">
-          <template x-for="row in results" :key="row.domain">
+          <template x-for="(row, index) in results" :key="row.domain + '_' + index">
             <tr class="hover:bg-[#161b22]">
               <td class="px-4 py-3" x-text="row.domain"></td>
               <td class="px-4 py-3">
                 <span x-show="row.status==='success'" class="pill pill-outline pill-green">Success</span>
                 <span x-show="row.status==='error'" class="pill pill-outline pill-red">Error</span>
               </td>
-              <template x-for="rt in selectedRecordTypes" :key="rt">
+              <template x-for="rt in selectedRecordTypes" :key="'col_' + rt + '_' + index">
                 <td class="px-4 py-3">
                   <template x-if="row.records[rt] && row.records[rt].length">
                     <div class="space-y-1">
-                      <template x-for="rec in row.records[rt]" :key="rec.value">
+                      <template x-for="(rec, recIndex) in row.records[rt]" :key="rt + '_' + index + '_' + recIndex">
                         <div class="flex items-center justify-between bg-[#0d1117] rounded px-2 py-1 border border-[#30363d]">
                           <span class="font-mono text-[10px]" x-text="rec.value"></span>
                           <span class="text-[10px] text-[#8b949e]" x-text="'TTL '+rec.ttl"></span>
@@ -80,12 +80,12 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[100px] px-4 py-3 b
                 </td>
               </template>
               <td class="px-4 py-3">
-                <template x-if="row.errors.length">
+                <template x-if="row.errors && row.errors.length">
                   <div class="space-y-1">
                     <template x-for="err in row.errors" :key="err"><div class="text-[11px] text-[#f85149]" x-text="err"></div></template>
                   </div>
                 </template>
-                <span x-show="!row.errors.length" class="text-[10px] text-[#8b949e]">None</span>
+                <span x-show="!row.errors || !row.errors.length" class="text-[10px] text-[#8b949e]">None</span>
               </td>
             </tr>
           </template>

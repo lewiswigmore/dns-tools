@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DNSTools{% endblock %}</title>
-    <meta name="description" content="DNSTools - DNS Intelligence Platform">
-    <link rel="icon" type="image/svg+xml" href="/static/images/dns-tools-logo-dark.svg" media="(prefers-color-scheme: dark)">
-    <link rel="icon" type="image/svg+xml" href="/static/images/dns-tools-logo-light.svg" media="(prefers-color-scheme: light)">
-    <link rel="alternate icon" href="/static/images/dns-tools-logo-dark.svg">
+    <meta name="description" content="A Web UI for Google DNS - Fast DNS lookups using Google's DNS-over-HTTPS service">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/dns-tools-logo-light.svg') }}" media="(prefers-color-scheme: light)">
+    <link rel="alternate icon" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={darkMode:'class'};</script>
-    <script src="/static/js/dns-client.js" defer></script>
-    <script src="/static/js/app.js" defer></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     {% block head_extra %}{% endblock %}
@@ -52,8 +51,15 @@
     <!-- Sidebar -->
     <aside class="w-64 flex flex-col border-r border-[#30363d] bg-[#0d1117]">
         <div class="p-5 border-b border-[#30363d]">
-            <h1 class="text-lg font-semibold text-white tracking-wide">DNSTools</h1>
-            <p class="text-xs text-[#8b949e]">A DNS Toolkit</p>
+            <div class="flex items-center justify-between mb-1">
+                <h1 class="text-lg font-semibold text-white tracking-wide">DNSTools</h1>
+                <button onclick="toggleInfoModal()" 
+                        class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+                        title="About DNSTools">
+                    <i class="fas fa-info-circle text-sm"></i>
+                </button>
+            </div>
+            <p class="text-xs text-[#8b949e]">A Web UI for Google DNS</p>
         </div>
         <nav class="flex-1 p-3 space-y-1 text-sm font-medium">
             <a href="{{ url_for('dashboard_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dashboard' else 'text-[#c9d1d9]' }}"><i class="fas fa-chart-pie w-5"></i>Dashboard</a>
@@ -79,6 +85,49 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+    <div onclick="event.stopPropagation()" 
+         class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-[#c9d1d9]">About DNSTools</h3>
+            <button onclick="toggleInfoModal()" 
+                    class="text-[#8b949e] hover:text-[#c9d1d9]">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="space-y-3 text-sm text-[#c9d1d9]">
+            <p>DNSTools is a web interface for Google's DNS-over-HTTPS service, providing fast and reliable DNS lookups.</p>
+            
+            <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3">
+                <h4 class="font-medium text-[#58a6ff] mb-2">DNS Queries via:</h4>
+                <ul class="text-xs text-[#8b949e] space-y-1">
+                    <li>• <span class="font-mono">dns.google/resolve</span> (Primary)</li>
+                    <li>• <span class="font-mono">cloudflare-dns.com/dns-query</span> (Fallback)</li>
+                    <li>• <span class="font-mono">dns.quad9.net/dns-query</span> (Fallback)</li>
+                </ul>
+            </div>
+            
+            <p class="text-xs text-[#8b949e]">All queries are made client-side using DNS-over-HTTPS for privacy and security.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleInfoModal() {
+        const modal = document.getElementById('infoModal');
+        modal.classList.toggle('hidden');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('infoModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            toggleInfoModal();
+        }
+    });
+</script>
+
 {% block scripts %}{% endblock %}
 </body>
 </html>

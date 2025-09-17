@@ -64,8 +64,8 @@
       <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4">
         <i class="fas fa-chart-bar mr-2 text-[#58a6ff]"></i>Activity Last 24 Hours
       </h3>
-      <div class="h-64">
-        <canvas id="hourlyChart"></canvas>
+      <div class="h-64 w-full relative">
+        <canvas id="hourlyChart" class="w-full h-full"></canvas>
       </div>
     </div>
     
@@ -116,7 +116,7 @@
       <h3 class="text-lg font-semibold text-[#c9d1d9]">
         <i class="fas fa-history mr-2 text-[#58a6ff]"></i>Recent Activity
       </h3>
-      <a href="/history" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm font-medium">
+      <a href="{{ url_for('history_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm font-medium">
         <i class="fas fa-external-link-alt mr-1"></i>View Full History
       </a>
     </div>

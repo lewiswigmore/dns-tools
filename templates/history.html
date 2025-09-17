@@ -93,7 +93,7 @@
             <!-- Main Info -->
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h4 class="font-semibold text-[#c9d1d9] text-lg" x-text="item.query"></h4>
+                <h4 class="font-semibold text-[#c9d1d9] text-lg" x-text="getDisplayTitle(item)"></h4>
                 <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-xs font-medium"></span>
               </div>
               
@@ -123,7 +123,7 @@
                   <i class="fas fa-list w-4 text-[#8b949e]"></i>
                   <span class="text-[#8b949e]">Record Types:</span>
                   <div class="flex flex-wrap gap-1">
-                    <template x-for="type in item.recordTypes" :key="type">
+                    <template x-for="(type, typeIndex) in item.recordTypes" :key="'type-' + i + '-' + typeIndex">
                       <span class="px-2 py-1 bg-[#0d1117] border border-[#30363d] rounded text-[#c9d1d9]" x-text="type"></span>
                     </template>
                   </div>
@@ -134,14 +134,6 @@
             <!-- Status and Actions -->
             <div class="flex items-center gap-3">
               <div class="flex flex-col items-end gap-2">
-                <div class="flex items-center gap-2">
-                  <span x-show="item.success" class="pill pill-outline pill-green flex items-center">
-                    <i class="fas fa-check mr-1"></i>Success
-                  </span>
-                  <span x-show="!item.success" class="pill pill-outline pill-red flex items-center">
-                    <i class="fas fa-times mr-1"></i>Failed
-                  </span>
-                </div>
                 <div class="flex items-center gap-2">
                   <button @click.stop="rerun(item)" 
                           class="pill pill-outline pill-blue text-xs flex items-center"
@@ -185,22 +177,22 @@
         <div class="space-y-4">
           <!-- Query Info -->
           <div class="flex flex-wrap gap-4 text-sm text-[#8b949e] mb-6">
-            <span><i class="fas fa-search mr-2"></i><span x-text="previewData?.query"></span></span>
+            <span><i class="fas fa-search mr-2"></i><span x-text="previewData ? getDisplayTitle(previewData) : ''"></span></span>
             <span><i class="fas fa-calendar mr-2"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
             <span><i class="fas fa-clock mr-2"></i><span x-text="formatDuration(previewData?.duration)"></span></span>
           </div>
           
           <!-- DNS Results -->
-          <div x-show="getQueryType(previewData?.recordTypes) === 'DNS'" class="space-y-4">
-            <template x-for="result in previewData?.results" :key="result.domain">
+          <div x-show="getQueryType(previewData?.recordTypes) === 'DNS' && previewData?.results && Array.isArray(previewData.results)" class="space-y-4">
+            <template x-for="(result, resultIndex) in (previewData?.results || [])" :key="'dns-result-' + resultIndex">
               <div class="panel p-4 rounded-lg border border-[#30363d]">
                 <h4 class="font-semibold text-[#c9d1d9] mb-3" x-text="result.domain"></h4>
                 <div class="space-y-2">
-                  <template x-for="(records, recordType) in result.records" :key="recordType">
+                  <template x-for="(records, recordType) in result.records" :key="'dns-' + resultIndex + '-' + recordType">
                     <div x-show="records && records.length > 0">
                       <h5 class="text-sm font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
                       <div class="space-y-1">
-                        <template x-for="(record, index) in records" :key="'record-' + index">
+                        <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
                           <div class="text-sm font-mono bg-[#0d1117] p-2 rounded border border-[#30363d] text-[#c9d1d9]" 
                                x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
                         </template>
@@ -213,9 +205,9 @@
           </div>
           
           <!-- MX Results -->
-          <div x-show="getQueryType(previewData?.recordTypes) === 'MX'" class="space-y-2">
+          <div x-show="getQueryType(previewData?.recordTypes) === 'MX' && previewData?.results && Array.isArray(previewData.results)" class="space-y-2">
             <h4 class="font-semibold text-[#c9d1d9] mb-3">MX Records</h4>
-            <template x-for="(record, index) in previewData?.results" :key="'mx-' + index">
+            <template x-for="(record, mxIndex) in (previewData?.results || [])" :key="'mx-record-' + mxIndex">
               <div class="text-sm font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9]" 
                    x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
             </template>
@@ -258,17 +250,87 @@
           <!-- Headers Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'Headers'" class="space-y-4">
             <h4 class="font-semibold text-[#c9d1d9] mb-3">Email Header Analysis</h4>
-            <template x-for="(result, index) in previewData?.results" :key="'header-' + index">
-              <div class="panel p-4 rounded-lg border border-[#30363d]">
-                <h5 class="font-medium text-[#58a6ff] mb-2" x-text="result.section"></h5>
-                <template x-for="(item, itemIndex) in result.items" :key="'item-' + itemIndex">
-                  <div class="flex justify-between py-1 text-sm">
-                    <span class="text-[#8b949e]" x-text="item.key"></span>
-                    <span class="text-[#c9d1d9] font-mono" x-text="item.value"></span>
+            
+            <!-- Authentication Status -->
+            <div x-show="previewData?.results?.spf || previewData?.results?.dkim || previewData?.results?.dmarc" class="panel p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3">Authentication Status</h5>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">SPF:</span>
+                  <span class="pill pill-outline" 
+                        :class="{'pill-green': previewData?.results?.spf?.status === 'pass', 'pill-red': previewData?.results?.spf?.status === 'fail', 'pill-orange': previewData?.results?.spf?.status === 'neutral'}"
+                        x-text="previewData?.results?.spf?.status || 'unknown'"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">DKIM:</span>
+                  <span class="pill pill-outline" 
+                        :class="{'pill-green': previewData?.results?.dkim?.status === 'pass', 'pill-red': previewData?.results?.dkim?.status === 'fail'}"
+                        x-text="previewData?.results?.dkim?.status || 'unknown'"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">DMARC:</span>
+                  <span class="pill pill-outline" 
+                        :class="{'pill-green': previewData?.results?.dmarc?.status === 'pass', 'pill-red': previewData?.results?.dmarc?.status === 'fail'}"
+                        x-text="previewData?.results?.dmarc?.status || 'unknown'"></span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Security Indicators -->
+            <div x-show="previewData?.results?.security" class="panel p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3">Security Indicators</h5>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-center gap-2">
+                  <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-green-500' : 'fa-unlock text-red-500'"></i>
+                  <span x-text="previewData?.results?.security?.tls ? 'TLS Encrypted' : 'No TLS Encryption'"></span>
+                </div>
+                <div x-show="previewData?.results?.security?.warnings?.length > 0">
+                  <h6 class="font-medium text-red-400 mb-1">Security Warnings:</h6>
+                  <template x-for="(warning, warningIndex) in (previewData?.results?.security?.warnings || [])" :key="'warning-' + warningIndex">
+                    <div class="bg-red-900/20 border border-red-700 rounded p-2 text-red-300 text-xs">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>
+                      <span x-text="warning"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Delivery Path -->
+            <div x-show="previewData?.results?.delivery_path?.length > 0" class="panel p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3">Delivery Path</h5>
+              <div class="space-y-1">
+                <template x-for="(hop, hopIndex) in (previewData?.results?.delivery_path || [])" :key="'hop-' + hopIndex">
+                  <div class="bg-[#0d1117] rounded p-2 border border-[#30363d]">
+                    <div class="font-mono text-sm text-[#c9d1d9]" x-text="hop.server"></div>
+                    <div class="text-xs text-[#8b949e]" x-text="hop.timestamp"></div>
                   </div>
                 </template>
               </div>
-            </template>
+            </div>
+            
+            <!-- Routing Information -->
+            <div x-show="previewData?.results?.routing" class="panel p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3">Email Headers</h5>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">From:</span>
+                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.from"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">To:</span>
+                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.to"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">Subject:</span>
+                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.subject"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#8b949e]">Date:</span>
+                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.date"></span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

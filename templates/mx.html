@@ -41,6 +41,10 @@
     </div>
   </div>
 
+  <div x-show="searchPerformed && !loading && !error && (!results || results.length === 0) && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
+    <p class="text-sm text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No MX records found for <span x-text="domain"></span>. This domain may not accept email or may not exist.</p>
+  </div>
+
   <div x-show="error && error.length>0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
     <p class="text-sm text-[#f85149]" x-text="error"></p>
   </div>
