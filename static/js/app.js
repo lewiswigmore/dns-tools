@@ -742,7 +742,7 @@
   // History component
   window.HistoryPage = function(){
     return {
-      history: loadHistory(),
+      history: [],
       filteredHistory: [],
       searchFilter: '',
       typeFilter: 'all',
@@ -751,6 +751,7 @@
       
       init() {
         window.historyPageInstance = this;
+        this.history = loadHistory() || []; // Ensure we always have an array
         this.applyFilters();
       },
       
@@ -799,6 +800,7 @@
       },
       
       getTypeCount(type) {
+        if (!this.history || !Array.isArray(this.history)) return 0;
         if (type === 'all') return this.history.length;
         return this.history.filter(item => this.getQueryType(item.recordTypes) === type).length;
       },
@@ -1040,7 +1042,17 @@
       },
       
       refreshStats(){
-        const history = loadHistory();
+        const history = loadHistory() || [];
+        if (!Array.isArray(history)) {
+          // Reset stats to defaults if history is invalid
+          this.stats.totalLookups = 0;
+          this.stats.successRate = 0;
+          this.stats.uniqueDomains = 0;
+          this.recentActivity = [];
+          this.updateSessionTime();
+          return;
+        }
+        
         const today = new Date().toDateString();
         const todayHistory = history.filter(h => new Date(h.timestamp).toDateString() === today);
         
@@ -1267,7 +1279,8 @@
       },
       
       getTypeCount(type) {
-        const history = loadHistory();
+        const history = loadHistory() || [];
+        if (!Array.isArray(history)) return 0;
         return history.filter(item => {
           const itemType = this.getQueryType(item.recordTypes);
           return itemType === type;
