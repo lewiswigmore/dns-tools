@@ -1,5 +1,7 @@
 # DNS Tools
 
+[![Web UI](https://img.shields.io/badge/GitHub_Pages-Open_Site-blue)](https://lewiswigmore.github.io/dns-tools/)
+
 A web-based DNS analysis platform for performing DNS lookups, MX record analysis, DMARC policy checking, and email header analysis.
 
 ## Features
@@ -32,14 +34,10 @@ This project includes a static site generator for GitHub Pages deployment:
 The interface provides separate tools for different types of DNS analysis:
 
 - **DNS Lookup**: Query multiple domains for various record types
-- **MX Records**: Analyze mail server configurations
+- **MX Records**: Analyse mail server configurations
 - **DMARC**: Check domain's DMARC policy implementation
 - **Email Headers**: Parse and analyze email headers for authentication results
 
 ## Technology
 
 Built with Flask and Alpine.js. Uses DNS-over-HTTPS for client-side lookups in the static version.
-
-## Rate Limiting
-
-The application includes basic rate limiting (10 requests per minute) to prevent abuse.
