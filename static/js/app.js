@@ -2,6 +2,36 @@
 (function(){
   const HISTORY_KEY = 'dns_history';
 
+  // Safe localStorage wrapper for GitHub Pages compatibility
+  const safeStorage = {
+    getItem: (key) => {
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        console.warn('localStorage.getItem failed:', e);
+        return null;
+      }
+    },
+    setItem: (key, value) => {
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e) {
+        console.warn('localStorage.setItem failed:', e);
+        return false;
+      }
+    },
+    removeItem: (key) => {
+      try {
+        localStorage.removeItem(key);
+        return true;
+      } catch (e) {
+        console.warn('localStorage.removeItem failed:', e);
+        return false;
+      }
+    }
+  };
+
   // DNS-over-HTTPS client for static site
   class DNSClient {
     constructor() {
@@ -190,16 +220,41 @@
   window.dnsClient = new DNSClient();
 
   function safeJSONParse(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
-  function loadHistory(){ return safeJSONParse(localStorage.getItem(HISTORY_KEY), []); }
-  function saveHistory(arr){ try { localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,100))); } catch(e) { console.warn('history save failed', e); } }
+  function loadHistory(){ 
+    try {
+      const stored = safeStorage.getItem(HISTORY_KEY);
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('Failed to load history:', e);
+      return [];
+    }
+  }
+  function saveHistory(arr){ 
+    try { 
+      safeStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0,100))); 
+    } catch(e) { 
+      console.warn('history save failed', e); 
+    } 
+  }
   function addHistory(entry){ 
-    const hist = loadHistory(); 
-    hist.unshift(entry); 
-    saveHistory(hist);
-    
-    // Update last activity timestamp for session tracking
-    if (window.dashboardInstance && window.dashboardInstance.updateLastActivity) {
-      window.dashboardInstance.updateLastActivity();
+    try {
+      const hist = loadHistory(); 
+      if (!Array.isArray(hist)) {
+        console.warn('History is not an array, resetting');
+        saveHistory([entry]);
+        return;
+      }
+      hist.unshift(entry); 
+      saveHistory(hist);
+      
+      // Update last activity timestamp for session tracking
+      if (window.dashboardInstance && window.dashboardInstance.updateLastActivity) {
+        window.dashboardInstance.updateLastActivity();
+      }
+    } catch (e) {
+      console.warn('Failed to add history entry:', e);
     }
   }
   function exportJSON(data, filename='dns_results.json'){ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; a.click(); }
