@@ -77,7 +77,11 @@
 </div>
 <script>
     // Immediately hide loader if we've already visited in this session
-    if (sessionStorage.getItem('dt_session_active')) {
+    // UNLESS we are on the root path (force load on root)
+    const path = window.location.pathname;
+    const isRoot = path === '/' || path.endsWith('/dns-tools/') || path.endsWith('/index.html');
+
+    if (sessionStorage.getItem('dt_session_active') && !isRoot) {
         document.getElementById('global-loader').style.display = 'none';
     }
 </script>
@@ -189,6 +193,15 @@
             // Subsequent visits: Cleanup immediately
             loader.remove();
         }
+    });
+
+    // Prevent navigation to current page
+    document.querySelectorAll('aside nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (link.href === window.location.href) {
+                e.preventDefault();
+            }
+        });
     });
 </script>
 
