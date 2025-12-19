@@ -1,4 +1,4 @@
-import { KNOWLEDGE_BASE } from './intel.js';
+import { KNOWLEDGE_BASE } from '../data/index.js';
 
 export function CommandPalette() {
     return {
@@ -7,6 +7,7 @@ export function CommandPalette() {
         selectedIndex: 0,
         items: [],
         allActions: [],
+        inactivityTimer: null,
 
         init() {
             // Define static navigation actions
@@ -47,13 +48,19 @@ export function CommandPalette() {
             
             // Listen for keyboard shortcuts
             window.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k' && !e.repeat) {
                     e.preventDefault();
                     this.toggle();
                 }
                 if (e.key === 'Escape' && this.open) {
                     this.close();
                 }
+                if (this.open) this.resetTimer();
+            });
+
+            // Listen for mouse movement
+            window.addEventListener('mousemove', () => {
+                if (this.open) this.resetTimer();
             });
 
             // Listen for custom open event
@@ -61,6 +68,7 @@ export function CommandPalette() {
                 this.open = true;
                 this.query = '';
                 this.filterItems();
+                this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
                 });
@@ -72,15 +80,34 @@ export function CommandPalette() {
             if (this.open) {
                 this.query = '';
                 this.filterItems();
+                this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
                 });
+            } else {
+                this.clearTimer();
             }
         },
 
         close() {
             this.open = false;
             this.selectedIndex = 0;
+            this.clearTimer();
+        },
+
+        resetTimer() {
+            this.clearTimer();
+            // Auto-close after 15 seconds of inactivity
+            this.inactivityTimer = setTimeout(() => {
+                this.close();
+            }, 15000);
+        },
+
+        clearTimer() {
+            if (this.inactivityTimer) {
+                clearTimeout(this.inactivityTimer);
+                this.inactivityTimer = null;
+            }
         },
 
         filterItems() {
