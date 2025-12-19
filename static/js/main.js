@@ -19,6 +19,25 @@ window.HistoryPage = HistoryPage;
 window.DashboardPage = DashboardPage;
 window.ResourcesPage = ResourcesPage;
 
+// Register with Alpine if it's already loaded, otherwise wait for alpine:init
+const registerComponents = () => {
+    if (window.Alpine) {
+        window.Alpine.data('LookupPage', LookupPage);
+        window.Alpine.data('MXPage', MXPage);
+        window.Alpine.data('DMARCPage', DMARCPage);
+        window.Alpine.data('HeadersPage', HeadersPage);
+        window.Alpine.data('HistoryPage', HistoryPage);
+        window.Alpine.data('DashboardPage', DashboardPage);
+        window.Alpine.data('ResourcesPage', ResourcesPage);
+    }
+};
+
+if (window.Alpine) {
+    registerComponents();
+} else {
+    document.addEventListener('alpine:init', registerComponents);
+}
+
 console.log('DNS Tools modules loaded');
 
 // Global Keyboard Shortcuts

@@ -34,7 +34,10 @@
              placeholder="Enter domain to lookup (e.g. google.com)..." 
              class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58] text-sm">
       <button @click="performQuickLookup()" 
-              class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-sm text-sm">
+              :disabled="!quickLookupDomain.trim()"
+              disabled
+              class="bg-[#30363d] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-sm text-sm"
+              :class="quickLookupDomain.trim() ? 'bg-[#238636]' : 'bg-[#30363d]'">
         <i class="fas fa-search mr-2"></i>Lookup
       </button>
     </div>
@@ -177,7 +180,7 @@
           <div class="p-3 rounded-lg border border-[#30363d] bg-[#0d1117] flex flex-col gap-2 relative group">
             <div class="flex items-center justify-between">
               <span class="text-xs font-medium text-[#c9d1d9]" x-text="provider.name"></span>
-              <span class="w-2 h-2 rounded-full" 
+              <span class="w-2 h-2 rounded-full bg-[#8b949e]" 
                     :class="{
                       'bg-[#3fb950] shadow-[0_0_8px_#3fb950]': provider.status === 'online',
                       'bg-[#f85149] shadow-[0_0_8px_#f85149]': provider.status === 'offline' || provider.status === 'error',
