@@ -1,36 +1,49 @@
 {% extends 'base.html' %}
 {% import 'components.html' as ui %}
 {% set active_page='resources' %}
-{% block title %}DNS Resources - DNSTools{% endblock %}
+{% block title %}Content Library - DNSTools{% endblock %}
 {% block content %}
 <div x-data="ResourcesPage()" class="space-y-4">
   
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
-      <h2 class="text-lg font-semibold text-[#c9d1d9]" x-text="pageTitle"></h2>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">Content Library</h2>
       <p class="text-xs text-[#8b949e]">Reference guide and educational materials</p>
     </div>
     
-    <!-- Complexity Filter -->
-    <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d]">
-        <button @click="complexityFilter = 'All'" 
-                :class="complexityFilter === 'All' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
-                class="px-3 py-1 rounded text-xs font-medium transition-colors">All</button>
-        <button @click="complexityFilter = 'Beginner'" 
-                :class="complexityFilter === 'Beginner' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
-                class="px-3 py-1 rounded text-xs font-medium transition-colors">Beginner</button>
-        <button @click="complexityFilter = 'Intermediate'" 
-                :class="complexityFilter === 'Intermediate' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
-                class="px-3 py-1 rounded text-xs font-medium transition-colors">Intermediate</button>
-        <button @click="complexityFilter = 'Advanced'" 
-                :class="complexityFilter === 'Advanced' ? 'bg-[#f85149] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
-                class="px-3 py-1 rounded text-xs font-medium transition-colors">Advanced</button>
+    <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <!-- Search -->
+        <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
+            <input type="text" 
+                   x-model="searchQuery" 
+                   placeholder="Search library..." 
+                   class="bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58] w-full md:w-48">
+        </div>
+
+        <!-- Complexity Filter -->
+        <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar">
+            <div class="flex min-w-max">
+                <button @click="complexityFilter = 'All'" 
+                        :class="complexityFilter === 'All' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                        class="px-3 py-1 rounded text-xs font-medium transition-colors">All</button>
+                <button @click="complexityFilter = 'Beginner'" 
+                        :class="complexityFilter === 'Beginner' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                        class="px-3 py-1 rounded text-xs font-medium transition-colors">Beginner</button>
+                <button @click="complexityFilter = 'Intermediate'" 
+                        :class="complexityFilter === 'Intermediate' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                        class="px-3 py-1 rounded text-xs font-medium transition-colors">Intermediate</button>
+                <button @click="complexityFilter = 'Advanced'" 
+                        :class="complexityFilter === 'Advanced' ? 'bg-[#f85149] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                        class="px-3 py-1 rounded text-xs font-medium transition-colors">Advanced</button>
+            </div>
+        </div>
     </div>
   </div>
 
   <!-- Concepts Grid -->
   <div class="panel p-4 rounded-xl space-y-3" x-show="filteredKnowledgeBase.length > 0">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
       <template x-for="item in filteredKnowledgeBase" :key="item.id">
         <div @click="showConcept(item.title)" 
              class="panel p-3 rounded-lg concept-container cursor-pointer hover:border-[#58a6ff] transition-colors border border-[#30363d]"
@@ -56,87 +69,6 @@
             </div>
         </div>
       </template>
-    </div>
-  </div>
-
-  <!-- Tools & Resources -->
-  <div class="panel p-4 rounded-xl space-y-3">
-    {{ ui.section_header('fa-tools','Useful Tools & Resources') }}
-    <p class="text-[#8b949e] mb-4 text-xs">External tools and documentation for DNS management and troubleshooting.</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="panel p-3 rounded-lg border border-[#30363d]">
-        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
-          <i class="fas fa-terminal text-[#58a6ff] mr-2"></i>Command Line Tools
-        </h4>
-        <div class="space-y-2 text-xs">
-          <div>
-            <code class="text-[#c9d1d9]">dig example.com</code>
-            <p class="text-[#8b949e] text-[10px]">DNS lookup utility</p>
-          </div>
-          <div>
-            <code class="text-[#c9d1d9]">nslookup example.com</code>
-            <p class="text-[#8b949e] text-[10px]">Name server lookup</p>
-          </div>
-          <div>
-            <code class="text-[#c9d1d9]">host example.com</code>
-            <p class="text-[#8b949e] text-[10px]">DNS host lookup</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="panel p-3 rounded-lg border border-[#30363d]">
-        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
-          <i class="fas fa-globe text-[#58a6ff] mr-2"></i>Online DNS Tools
-        </h4>
-        <div class="space-y-2 text-xs">
-          <a href="https://whatsmydns.net" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">whatsmydns.net</a>
-          <a href="https://dnschecker.org" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">dnschecker.org</a>
-          <a href="https://intodns.com" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">intodns.com</a>
-        </div>
-      </div>
-      
-      <div class="panel p-3 rounded-lg border border-[#30363d]">
-        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
-          <i class="fas fa-book-open text-[#58a6ff] mr-2"></i>Documentation
-        </h4>
-        <div class="space-y-2 text-xs">
-          <a href="https://tools.ietf.org/html/rfc1035" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 1035 - DNS Specification</a>
-          <a href="https://tools.ietf.org/html/rfc7208" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7208 - SPF</a>
-          <a href="https://tools.ietf.org/html/rfc7489" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7489 - DMARC</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- About DNSTools -->
-  <div class="panel p-4 rounded-xl space-y-3">
-    <div class="flex items-center mb-3">
-      <div class="w-8 h-8 flex items-center justify-center mr-3 rounded-md bg-[#21262d] border border-[#30363d] text-[#58a6ff]">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <h2 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h2>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div>
-        <h4 class="font-semibold mb-2 text-[#c9d1d9] text-sm">Features</h4>
-        <ul class="space-y-1 text-xs text-[#8b949e]">
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Multi-domain DNS lookups</li>
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>MX record analysis</li>
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>DMARC policy validation</li>
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Email header analysis</li>
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Session-based analytics</li>
-          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Search history with preview</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-semibold mb-2 text-[#c9d1d9] text-sm">Open Source</h4>
-        <p class="text-[#8b949e] text-xs mb-3"><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is open source and available on GitHub. Contributions, bug reports, and feature requests are welcome.</p>
-        <a href="https://github.com/lewiswigmore/dns-tools" target="_blank" rel="noopener noreferrer"
-           class="inline-flex items-center px-3 py-1.5 bg-[#21262d] border border-[#30363d] rounded-lg text-[#c9d1d9] hover:bg-[#30363d] transition-colors text-xs">
-          <i class="fab fa-github mr-2"></i>View on GitHub
-        </a>
-      </div>
     </div>
   </div>
 
