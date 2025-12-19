@@ -6,16 +6,32 @@
 {% endblock %}
 {% block content %}
 <div x-data="DashboardPage()" x-init="init()" class="space-y-4">
+  <!-- DNS Tip Banner -->
+  <div class="bg-[#58a6ff1a] border border-[#58a6ff33] rounded-xl p-3 flex items-center gap-3 animate-fade-in">
+    <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#58a6ff] text-white">
+      <i class="fas fa-lightbulb"></i>
+    </div>
+    <div class="flex-1">
+      <p class="text-[10px] font-bold text-[#58a6ff] uppercase tracking-wider mb-0.5">DNS Tip</p>
+      <p class="text-xs text-[#c9d1d9]" x-text="currentTip"></p>
+    </div>
+    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+      <i class="fas fa-sync-alt text-xs"></i>
+    </button>
+  </div>
+
   <!-- Quick Lookup -->
   <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22]">
-    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center">
-      <i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Quick Lookup
+    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+      <i class="fas fa-globe text-[#58a6ff]"></i>
+      Quick Lookup
+      <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Perform a standard A-record DNS lookup instantly"></i>
     </h3>
     <div class="flex gap-3">
       <input type="text" 
              x-model="quickLookupDomain" 
              @keyup.enter="performQuickLookup()" 
-             placeholder="Enter domain to lookup (e.g., google.com)..." 
+             placeholder="Enter domain to lookup (e.g. google.com)..." 
              class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58] text-sm">
       <button @click="performQuickLookup()" 
               class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-sm text-sm">
@@ -29,7 +45,10 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.1s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs">Total Lookups Today</p>
+          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+            Total Lookups Today
+            <i class="fas fa-info-circle text-[10px] cursor-help" title="Total number of DNS, MX, DMARC, and Header queries performed in the last 24 hours"></i>
+          </p>
           <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.totalLookups"></p>
         </div>
         <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
@@ -41,7 +60,10 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.2s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs">Success Rate</p>
+          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+            Success Rate
+            <i class="fas fa-info-circle text-[10px] cursor-help" title="Percentage of queries that returned a successful response from the DoH provider"></i>
+          </p>
           <p class="text-xl font-bold" :class="stats.successRate >= 90 ? 'text-[#3fb950]' : stats.successRate >= 70 ? 'text-[#d29922]' : 'text-[#f85149]'" x-text="stats.successRate + '%'"></p>
         </div>
         <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
@@ -68,7 +90,10 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.4s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs">Avg Response Time</p>
+          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+            Avg Response Time
+            <i class="fas fa-info-circle text-[10px] cursor-help" title="Average time taken for the DoH provider to respond to your queries"></i>
+          </p>
           <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.avgResponseTime"></p>
         </div>
         <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
@@ -82,8 +107,10 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <!-- Hourly Activity Chart -->
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.5s">
-      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3">
-        <i class="fas fa-chart-bar mr-2 text-[#58a6ff]"></i>Activity Last 24 Hours
+      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+        <i class="fas fa-chart-bar text-[#58a6ff]"></i>
+        Activity Last 24 Hours
+        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Visual representation of your query volume over the past 24 hours"></i>
       </h3>
       <div class="h-48 w-full relative">
         <canvas id="hourlyChart" class="w-full h-full"></canvas>
@@ -92,8 +119,10 @@
     
     <!-- Lookup Types Distribution -->
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.6s">
-      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3">
-        <i class="fas fa-chart-pie mr-2 text-[#58a6ff]"></i>Lookup Types
+      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+        <i class="fas fa-chart-pie text-[#58a6ff]"></i>
+        Lookup Types
+        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Distribution of different query types performed in this session"></i>
       </h3>
       <div class="h-48 relative">
         <canvas id="typeChart"></canvas>
@@ -101,11 +130,110 @@
     </div>
   </div>
 
+  <!-- Insights & Health -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- Top Domains -->
+    <div class="panel p-4 rounded-xl lg:col-span-1">
+      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+        <i class="fas fa-list-ol text-[#58a6ff]"></i>
+        Top Domains
+        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most frequently queried domains across all sessions"></i>
+      </h3>
+      <div class="space-y-2">
+        <template x-for="(item, index) in topDomains" :key="item.domain">
+          <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <span class="text-[10px] font-bold text-[#8b949e] w-4" x-text="(index + 1) + '.'"></span>
+              <span class="text-[#c9d1d9] text-xs truncate" x-text="item.domain"></span>
+            </div>
+            <span class="text-[10px] font-mono text-[#58a6ff] bg-[#58a6ff1a] px-1.5 py-0.5 rounded" x-text="item.count + 'x'"></span>
+          </div>
+        </template>
+        <div x-show="topDomains.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
+          No data yet
+        </div>
+      </div>
+    </div>
+
+    <!-- Provider Health -->
+    <div class="panel p-4 rounded-xl lg:col-span-2">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
+          <i class="fas fa-heartbeat text-[#f85149]"></i>
+          Provider Health
+          <div class="relative group">
+            <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help"></i>
+            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-[#161b22] border border-[#30363d] rounded-lg text-[10px] text-[#8b949e] hidden group-hover:block z-10 shadow-xl">
+              Checks connectivity to DoH providers. "Blocked" usually means your browser, extension (e.g. uBlock), or network is preventing access to 3rd party DNS APIs.
+            </div>
+          </div>
+        </h3>
+        <button @click="checkProviderHealth()" class="text-[#8b949e] hover:text-[#58a6ff] transition-colors" title="Refresh Health Status">
+          <i class="fas fa-sync-alt text-xs" :class="{'fa-spin': providerStatus.some(p => p.status === 'checking')}"></i>
+        </button>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <template x-for="provider in providerStatus" :key="provider.name">
+          <div class="p-3 rounded-lg border border-[#30363d] bg-[#0d1117] flex flex-col gap-2 relative group">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-[#c9d1d9]" x-text="provider.name"></span>
+              <span class="w-2 h-2 rounded-full" 
+                    :class="{
+                      'bg-[#3fb950] shadow-[0_0_8px_#3fb950]': provider.status === 'online',
+                      'bg-[#f85149] shadow-[0_0_8px_#f85149]': provider.status === 'offline' || provider.status === 'error',
+                      'bg-[#8b949e] animate-pulse': provider.status === 'checking'
+                    }"></span>
+            </div>
+            <div class="flex items-end justify-between">
+              <span class="text-[10px] text-[#8b949e]" x-text="provider.status === 'online' ? 'Latency' : 'Status'"></span>
+              <span class="text-xs font-mono" 
+                    :class="provider.status === 'online' ? 'text-[#3fb950]' : 'text-[#f85149]'"
+                    x-text="provider.status === 'online' ? provider.latency + 'ms' : (provider.message || provider.status)"></span>
+            </div>
+            <!-- Status Tooltip -->
+            <div x-show="provider.status !== 'online' && provider.status !== 'checking'" 
+                 class="absolute top-full left-0 right-0 mt-1 p-2 bg-[#21262d] border border-[#30363d] rounded text-[10px] text-[#c9d1d9] z-20 hidden group-hover:block shadow-lg">
+              <p x-text="provider.message"></p>
+              <p class="text-[#8b949e] mt-1">Check browser console for CSP/CORS errors.</p>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="panel p-4 rounded-xl">
+    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+      <i class="fas fa-tools text-[#58a6ff]"></i>
+      Quick Actions
+    </h3>
+    <div class="flex flex-wrap gap-3">
+      <button @click="if(confirm('Clear all search history?')) { localStorage.removeItem('dns_history'); refreshStats(); }" 
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#f85149] hover:bg-[#f851491a] transition-colors text-xs font-medium">
+        <i class="fas fa-trash-alt"></i>
+        Clear History
+      </button>
+      <button @click="const blob = new Blob([localStorage.getItem('dns_history')], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'dnstools_history.json'; a.click();"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#58a6ff] hover:bg-[#58a6ff1a] transition-colors text-xs font-medium">
+        <i class="fas fa-download"></i>
+        Export Data
+      </button>
+      <button onclick="toggleInfoModal()"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#c9d1d9] hover:bg-[#30363d] transition-colors text-xs font-medium">
+        <i class="fas fa-info-circle"></i>
+        About DNSTools
+      </button>
+    </div>
+  </div>
+
   <!-- Recent Activity -->
   <div class="panel p-4 rounded-xl">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-base font-semibold text-[#c9d1d9]">
-        <i class="fas fa-history mr-2 text-[#58a6ff]"></i>Recent Activity
+      <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
+        <i class="fas fa-history text-[#58a6ff]"></i>
+        Recent Activity
+        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most recent queries from this session. Click the redo icon to run them again."></i>
       </h3>
       <a href="{{ url_for('history_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs font-medium">
         <i class="fas fa-external-link-alt mr-1"></i>View Full History
