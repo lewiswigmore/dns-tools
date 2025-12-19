@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='tools' %}
+{% block title %}Tools & Resources - DNSTools{% endblock %}
+{% block content %}
+<div class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">Tools & Resources</h2>
+      <p class="text-xs text-[#8b949e]">External utilities and project information</p>
+    </div>
+  </div>
+
+  <!-- Tools & Resources -->
+  <div class="panel p-4 rounded-xl space-y-3">
+    {{ ui.section_header('fa-tools','Useful Tools & Resources') }}
+    <p class="text-[#8b949e] mb-4 text-xs">External tools and documentation for DNS management and troubleshooting.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="panel p-3 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
+          <i class="fas fa-terminal text-[#58a6ff] mr-2"></i>Command Line Tools
+        </h4>
+        <div class="space-y-2 text-xs">
+          <div>
+            <code class="text-[#c9d1d9]">dig example.com</code>
+            <p class="text-[#8b949e] text-[10px]">DNS lookup utility</p>
+          </div>
+          <div>
+            <code class="text-[#c9d1d9]">nslookup example.com</code>
+            <p class="text-[#8b949e] text-[10px]">Name server lookup</p>
+          </div>
+          <div>
+            <code class="text-[#c9d1d9]">host example.com</code>
+            <p class="text-[#8b949e] text-[10px]">DNS host lookup</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="panel p-3 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
+          <i class="fas fa-globe text-[#58a6ff] mr-2"></i>Online DNS Tools
+        </h4>
+        <div class="space-y-2 text-xs">
+          <a href="https://whatsmydns.net" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">whatsmydns.net</a>
+          <a href="https://dnschecker.org" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">dnschecker.org</a>
+          <a href="https://intodns.com" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">intodns.com</a>
+        </div>
+      </div>
+      
+      <div class="panel p-3 rounded-lg border border-[#30363d]">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] flex items-center text-sm">
+          <i class="fas fa-book-open text-[#58a6ff] mr-2"></i>Documentation
+        </h4>
+        <div class="space-y-2 text-xs">
+          <a href="https://tools.ietf.org/html/rfc1035" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 1035 - DNS Specification</a>
+          <a href="https://tools.ietf.org/html/rfc7208" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7208 - SPF</a>
+          <a href="https://tools.ietf.org/html/rfc7489" target="_blank" rel="noopener noreferrer" class="block text-[#58a6ff] hover:text-[#79c0ff]">RFC 7489 - DMARC</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About DNSTools -->
+  <div class="panel p-4 rounded-xl space-y-3">
+    <div class="flex items-center mb-3">
+      <div class="w-8 h-8 flex items-center justify-center mr-3 rounded-md bg-[#21262d] border border-[#30363d] text-[#58a6ff]">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <h2 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h2>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] text-sm">Features</h4>
+        <ul class="space-y-1 text-xs text-[#8b949e]">
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Multi-domain DNS lookups</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>MX record analysis</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>DMARC policy validation</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Email header analysis</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Session-based analytics</li>
+          <li class="flex items-center"><i class="fas fa-check text-[#238636] mr-2"></i>Search history with preview</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] text-sm">Open Source</h4>
+        <p class="text-[#8b949e] text-xs mb-3"><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is open source and available on GitHub. Contributions, bug reports, and feature requests are welcome.</p>
+        <a href="https://github.com/lewiswigmore/dns-tools" target="_blank" rel="noopener noreferrer"
+           class="inline-flex items-center px-3 py-1.5 bg-[#21262d] border border-[#30363d] rounded-lg text-[#c9d1d9] hover:bg-[#30363d] transition-colors text-xs">
+          <i class="fab fa-github mr-2"></i>View on GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
