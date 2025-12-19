@@ -193,8 +193,17 @@
                       <h5 class="text-sm font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
                       <div class="space-y-1">
                         <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
-                          <div class="text-sm font-mono bg-[#0d1117] p-2 rounded border border-[#30363d] text-[#c9d1d9]" 
-                               x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
+                          <div class="flex items-center justify-between bg-[#0d1117] p-2 rounded border border-[#30363d] group">
+                            <div class="text-sm font-mono text-[#c9d1d9] truncate max-w-[400px]" 
+                                 x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
+                            <button x-data="{ copied: false }" 
+                                    @click="copyToClipboard(typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
+                                    class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
+                                    :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                                    :title="copied ? 'Copied!' : 'Copy value'">
+                              <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                            </button>
+                          </div>
                         </template>
                       </div>
                     </div>
@@ -208,8 +217,17 @@
           <div x-show="getQueryType(previewData?.recordTypes) === 'MX' && previewData?.results && Array.isArray(previewData.results)" class="space-y-2">
             <h4 class="font-semibold text-[#c9d1d9] mb-3">MX Records</h4>
             <template x-for="(record, mxIndex) in (previewData?.results || [])" :key="'mx-record-' + mxIndex">
-              <div class="text-sm font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9]" 
-                   x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
+              <div class="flex items-center justify-between bg-[#0d1117] p-3 rounded border border-[#30363d] group">
+                <div class="text-sm font-mono text-[#c9d1d9]" 
+                     x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
+                <button x-data="{ copied: false }" 
+                        @click="copyToClipboard(typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
+                        class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
+                        :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                        :title="copied ? 'Copied!' : 'Copy value'">
+                  <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                </button>
+              </div>
             </template>
           </div>
           
@@ -337,8 +355,15 @@
       
       <!-- Modal Footer -->
       <div class="flex items-center justify-between p-6 border-t border-[#30363d]">
-        <div class="text-sm text-[#8b949e]">
-          Click outside or press ESC to close
+        <div class="flex gap-2">
+          <button x-data="{ copied: false }" 
+                  @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
+                  class="pill pill-outline pill-blue transition-all duration-200"
+                  :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+            <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+            <span x-text="copied ? 'Copied!' : 'Copy All'"></span>
+          </button>
+          <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
         </div>
         <div class="flex gap-3">
           <button @click="rerun(previewData)" 
