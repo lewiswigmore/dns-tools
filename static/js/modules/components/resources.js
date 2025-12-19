@@ -1,4 +1,4 @@
-import { KNOWLEDGE_BASE } from './intel.js';
+import { KNOWLEDGE_BASE } from '../data/index.js';
 
 export function ResourcesPage() {
     return {
@@ -11,9 +11,20 @@ export function ResourcesPage() {
       knowledgeBase: KNOWLEDGE_BASE,
       complexityFilter: 'All',
       categoryFilter: 'All',
+      searchQuery: '',
       
       get filteredKnowledgeBase() {
         let items = this.knowledgeBase;
+
+        // Filter by Search Query
+        if (this.searchQuery) {
+            const query = this.searchQuery.toLowerCase();
+            items = items.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.summary.toLowerCase().includes(query) ||
+                item.tags.some(tag => tag.toLowerCase().includes(query))
+            );
+        }
 
         // Filter by Category (from URL or selection)
         if (this.categoryFilter !== 'All') {
@@ -40,7 +51,7 @@ export function ResourcesPage() {
       },
 
       get pageTitle() {
-          return this.categoryFilter === 'Security' ? 'Knowledge Base' : 'All Concepts';
+          return this.categoryFilter === 'Security' ? 'Knowledge Base' : 'Content Library';
       },
 
       init() {
