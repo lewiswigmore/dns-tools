@@ -11,14 +11,14 @@
     <link rel="alternate icon" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={darkMode:'class'};</script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     {% block head_extra %}{% endblock %}
     <style>
         [x-cloak]{display:none!important}
         body{font-family:'Segoe UI','Roboto',sans-serif;background:#0d1117;color:#c9d1d9;font-size:0.875rem}
-        .logo-font{font-family:'Space Grotesk',sans-serif;letter-spacing:0.3em;text-transform:uppercase}
+        .logo-font{font-family:'Outfit',sans-serif;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:linear-gradient(to bottom right, #fff 30%, #8b949e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -55,6 +55,18 @@
         .quota-low{background:#f85149}
         .divider{border-top:1px solid #30363d}
         
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Responsive Table */
+        @media (max-width: 768px) {
+            .responsive-table thead { display: none; }
+            .responsive-table tr { display: block; margin-bottom: 1rem; border: 1px solid #30363d; border-radius: 8px; background: #161b22; }
+            .responsive-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border-bottom: 1px solid #30363d; text-align: right; }
+            .responsive-table td:last-child { border-bottom: none; }
+            .responsive-table td::before { content: attr(data-label); font-weight: 600; text-align: left; color: #8b949e; font-size: 0.75rem; }
+        }
+
         /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
@@ -126,27 +138,22 @@
 
     <!-- Sidebar -->
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
-           class="fixed inset-y-0 left-0 left-0 z-50 flex flex-col w-56 transition-transform duration-300 ease-in-out border-r border-[#30363d] bg-[#0d1117] md:relative md:translate-x-0">
+           class="fixed inset-y-0 left-0 z-50 flex flex-col w-64 transition-transform duration-300 ease-in-out border-r border-[#30363d] bg-[#0d1117] md:relative md:translate-x-0">
         <div class="p-4 border-b border-[#30363d]">
             <div class="flex items-center justify-between mb-1">
                 <h1 class="text-[10px] font-bold text-white logo-font">DNSTools</h1>
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 md:gap-3">
                     <button @click="$dispatch('open-command-palette')" 
-                            class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+                            class="p-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
                             title="Search (Cmd+K)">
                         <i class="fas fa-search text-xs"></i>
                     </button>
                     <button @click="$store.settings.toggle()" 
-                            class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+                            class="p-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
                             title="Settings">
                         <i class="fas fa-cog text-xs"></i>
                     </button>
-                    <button onclick="toggleInfoModal()" 
-                            class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
-                            title="About DNSTools">
-                        <i class="fas fa-info-circle text-xs"></i>
-                    </button>
-                    <button @click="mobileMenuOpen = false" class="text-[#8b949e] md:hidden">
+                    <button @click="mobileMenuOpen = false" class="p-1.5 text-[#8b949e] md:hidden">
                         <i class="fas fa-times text-sm"></i>
                     </button>
                 </div>
@@ -166,6 +173,7 @@
                 <a href="{{ url_for('mx_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4 mr-2"></i>MX Lookup</a>
                 <a href="{{ url_for('dmarc_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4 mr-2"></i>DMARC Lookup</a>
                 <a href="{{ url_for('headers_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
+                <a href="{{ url_for('tools_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='tools' else 'text-[#c9d1d9]' }}"><i class="fas fa-external-link-alt w-4 mr-2"></i>External Resources</a>
             </div>
 
             <!-- Threat Intelligence -->
@@ -179,7 +187,7 @@
             <div class="space-y-0.5">
                 <p class="px-3 text-[10px] font-bold text-[#6e7681] uppercase tracking-wider mb-2 mt-2">Insights</p>
                 <a href="{{ url_for('history_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='history' else 'text-[#c9d1d9]' }}"><i class="fas fa-history w-4 mr-2"></i>History</a>
-                <a href="{{ url_for('resources_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' and not request.args.get('category') else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4 mr-2"></i>All Concepts</a>
+                <a href="{{ url_for('resources_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' and not request.args.get('category') else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4 mr-2"></i>Content Library</a>
                 <a href="#" @click.prevent="$dispatch('open-onboarding'); mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover text-[#c9d1d9]"><i class="fas fa-question-circle w-4 mr-2"></i>Tour & Help</a>
             </div>
         </nav>
@@ -230,7 +238,7 @@
          @click="close()"></div>
 
     <!-- Modal -->
-    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+    <div class="fixed inset-0 z-10 overflow-y-auto p-0 sm:p-6 md:p-20">
         <div x-show="open" 
              @click.stop
              x-transition:enter="ease-out duration-300"
@@ -239,22 +247,25 @@
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
-             class="mx-auto max-w-xl transform divide-y divide-[#30363d] overflow-hidden rounded-xl bg-[#161b22] shadow-2xl ring-1 ring-black ring-opacity-5 transition-all border border-[#30363d]">
+             class="mx-auto max-w-xl h-full sm:h-auto transform divide-y divide-[#30363d] overflow-hidden rounded-none sm:rounded-xl bg-[#161b22] shadow-2xl ring-1 ring-black ring-opacity-5 transition-all border-0 sm:border border-[#30363d]">
             
-            <div class="relative">
+            <div class="relative flex items-center">
                 <i class="fas fa-search absolute top-3.5 left-4 h-5 w-5 text-[#8b949e]"></i>
                 <input type="text" 
                        id="cmd-palette-input"
-                       class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-[#c9d1d9] placeholder-[#8b949e] focus:ring-0 sm:text-sm focus:outline-none" 
+                       class="h-12 w-full border-0 bg-transparent pl-11 pr-12 text-[#c9d1d9] placeholder-[#8b949e] focus:ring-0 sm:text-sm focus:outline-none" 
                        placeholder="Search tools, concepts, and history..." 
                        x-model="query"
                        @input="filterItems()"
                        @keydown.arrow-down.prevent="selectNext()"
                        @keydown.arrow-up.prevent="selectPrev()"
                        @keydown.enter.prevent="executeSelected()">
+                <button @click="close()" class="absolute right-4 text-[#8b949e] sm:hidden">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
-            <ul x-show="items.length > 0" class="max-h-96 scroll-py-3 overflow-y-auto p-3" id="options" role="listbox">
+            <ul x-show="items.length > 0" class="max-h-[calc(100vh-120px)] sm:max-h-96 scroll-py-3 overflow-y-auto p-3" id="options" role="listbox">
                 <template x-for="(item, index) in items" :key="item.id">
                     <li :id="'cmd-item-' + index"
                         @click="execute(item)"
@@ -281,7 +292,7 @@
                 <p class="mt-2 text-[#8b949e]">No components found for this search term. Please try again.</p>
             </div>
             
-            <div class="flex flex-wrap items-center bg-[#0d1117] py-2.5 px-4 text-xs text-[#8b949e] border-t border-[#30363d]">
+            <div class="hidden sm:flex flex-wrap items-center bg-[#0d1117] py-2.5 px-4 text-xs text-[#8b949e] border-t border-[#30363d]">
                 <span class="mx-1 flex h-5 w-5 items-center justify-center rounded border border-[#30363d] bg-[#161b22] font-sans font-medium text-[#c9d1d9]">↑</span>
                 <span class="mx-1 flex h-5 w-5 items-center justify-center rounded border border-[#30363d] bg-[#161b22] font-sans font-medium text-[#c9d1d9]">↓</span>
                 <span class="mx-1">to navigate</span>
@@ -318,7 +329,7 @@
          x-transition:leave="transition ease-in-out duration-300 transform"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full"
-         class="relative w-full max-w-xs bg-[#161b22] border-l border-[#30363d] shadow-xl flex flex-col h-full">
+         class="relative w-full sm:max-w-xs bg-[#161b22] border-l border-[#30363d] shadow-xl flex flex-col h-full">
         
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[#30363d]">
@@ -494,10 +505,10 @@
     init() { 
         // Check if we are on the root/dashboard page
         const isRoot = window.location.pathname === '/' || window.location.pathname.endsWith('/index.html');
-        // Auto-onboarding disabled per user request
-        // if (isRoot && !localStorage.getItem('dnstools_onboarding_seen')) {
-        //     setTimeout(() => this.open = true, 1500); 
-        // }
+        // Auto-onboarding enabled
+        if (isRoot && !localStorage.getItem('dnstools_onboarding_seen')) {
+            setTimeout(() => this.open = true, 1500); 
+        }
         window.addEventListener('open-onboarding', () => { this.open = true; this.step = 1; });
     },
     finish() {
@@ -520,7 +531,7 @@ x-cloak>
                 <div class="w-16 h-16 bg-[#58a6ff1a] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#58a6ff33]">
                     <i class="fas fa-globe text-2xl text-[#58a6ff]"></i>
                 </div>
-                <h2 class="text-xl font-bold text-white mb-2">Welcome to DNSTools</h2>
+                <h2 class="text-xl font-bold text-white mb-2">Welcome to <span class="logo-font">DNSTools</span></h2>
                 <p class="text-[#8b949e] text-sm">Your privacy-focused, client-side DNS analysis workspace.</p>
             </div>
             <div class="space-y-3 mb-6">
