@@ -25,6 +25,29 @@
 </div>
 {% endmacro %}
 
+{% macro help_card(title, icon, items) %}
+<div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] h-full">
+  <h3 class="text-sm font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
+    <i class="fas {{ icon }} text-[#58a6ff]"></i>
+    {{ title }}
+  </h3>
+  <ul class="space-y-2">
+    {% for item in items %}
+    <li class="flex items-start gap-2 text-[11px] text-[#8b949e]">
+      <i class="fas fa-check text-[#3fb950] mt-0.5 flex-shrink-0"></i>
+      <span>{{ item }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="mt-4 pt-3 border-t border-[#30363d]">
+    <a href="{{ url_for('resources_page') }}" class="text-[10px] text-[#58a6ff] hover:underline flex items-center gap-1">
+      <i class="fas fa-book"></i>
+      Learn more in Resources
+    </a>
+  </div>
+</div>
+{% endmacro %}
+
 {% macro concept_modal() %}
 <!-- Concept Detail Modal -->
 <div x-show="conceptModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" @click="closeConcept" style="display: none;">
