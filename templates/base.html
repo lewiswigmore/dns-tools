@@ -100,19 +100,32 @@
             </div>
             <p class="text-[10px] text-[#8b949e]">A Web UI for Google DNS</p>
         </div>
-        <nav class="flex-1 p-2 space-y-0.5 text-xs font-medium">
-            <a href="{{ url_for('dashboard_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dashboard' else 'text-[#c9d1d9]' }}"><i class="fas fa-chart-pie w-4"></i>Dashboard</a>
-            <a href="{{ url_for('lookup_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='lookup' else 'text-[#c9d1d9]' }}"><i class="fas fa-search w-4"></i>DNS Lookup</a>
-            <a href="{{ url_for('mx_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4"></i>MX Lookup</a>
-            <a href="{{ url_for('dmarc_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4"></i>DMARC Lookup</a>
-            <a href="{{ url_for('headers_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4"></i>Email Headers</a>
-            <a href="{{ url_for('history_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='history' else 'text-[#c9d1d9]' }}"><i class="fas fa-history w-4"></i>History</a>
-            <a href="{{ url_for('resources_page') }}" class="block px-3 py-1.5 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4"></i>Resources</a>
-            <div class="flex items-center justify-between px-3 py-1.5 rounded-md text-[#8b949e] cursor-not-allowed">
-              <span class="flex items-center">
-                <i class="fas fa-shield-virus w-4 mr-2"></i>Threat Intel
-              </span>
-              <span class="pill pill-outline pill-orange text-[10px] py-0.5 px-1.5 flex items-center justify-center">soon</span>
+        <nav class="flex-1 p-3 space-y-4 text-xs font-medium">
+            <!-- Overview -->
+            <div>
+                <a href="{{ url_for('dashboard_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dashboard' else 'text-[#c9d1d9]' }}"><i class="fas fa-chart-pie w-4 mr-2"></i>Dashboard</a>
+            </div>
+
+            <!-- Tools -->
+            <div class="space-y-0.5">
+                <p class="px-3 text-[10px] font-bold text-[#6e7681] uppercase tracking-wider mb-2 mt-2">Tools</p>
+                <a href="{{ url_for('lookup_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='lookup' else 'text-[#c9d1d9]' }}"><i class="fas fa-search w-4 mr-2"></i>DNS Lookup</a>
+                <a href="{{ url_for('mx_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4 mr-2"></i>MX Lookup</a>
+                <a href="{{ url_for('dmarc_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4 mr-2"></i>DMARC Lookup</a>
+                <a href="{{ url_for('headers_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
+            </div>
+
+            <!-- Insights -->
+            <div class="space-y-0.5">
+                <p class="px-3 text-[10px] font-bold text-[#6e7681] uppercase tracking-wider mb-2 mt-2">Insights</p>
+                <a href="{{ url_for('history_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='history' else 'text-[#c9d1d9]' }}"><i class="fas fa-history w-4 mr-2"></i>History</a>
+                <a href="{{ url_for('resources_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4 mr-2"></i>Resources</a>
+                <div class="flex items-center justify-between px-3 py-2 rounded-md text-[#8b949e] cursor-not-allowed opacity-60">
+                    <span class="flex items-center">
+                        <i class="fas fa-shield-virus w-4 mr-2"></i>Threat Intel
+                    </span>
+                    <span class="pill pill-outline pill-orange text-[9px] py-0.5 px-1.5 flex items-center justify-center">soon</span>
+                </div>
             </div>
         </nav>
         <div class="p-3 border-t border-[#30363d] text-[10px] space-y-3">
@@ -126,7 +139,7 @@
         </div>
     </aside>
     <!-- Main -->
-    <main class="flex-1 overflow-auto p-4 space-y-4 bg-[#0d1117]">
+    <main class="flex-1 overflow-auto p-6 space-y-4 bg-[#0d1117]">
         {% block content %}{% endblock %}
     </main>
 </div>
