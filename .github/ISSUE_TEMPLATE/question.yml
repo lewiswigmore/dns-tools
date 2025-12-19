@@ -40,7 +40,7 @@ body:
     attributes:
       label: Domain Example (Optional)
       description: If your question relates to a specific domain, you can share it here
-      placeholder: e.g., example.com
+      placeholder: e.g. example.com
 
   - type: textarea
     id: what-tried

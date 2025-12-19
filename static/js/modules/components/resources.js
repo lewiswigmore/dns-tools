@@ -287,7 +287,7 @@ example.com. IN MX 10 mail3.example.com.</code></pre>
             <p>Delegation is the process of handing off responsibility for a portion of the DNS namespace. This requires two sets of consistent NS records:</p>
             
             <h5>In the Parent Zone:</h5>
-            <p>TLD servers (e.g., .com) contain NS records pointing to the domain's authoritative servers. This is how resolvers are referred "down" the hierarchy.</p>
+            <p>TLD servers (e.g. .com) contain NS records pointing to the domain's authoritative servers. This is how resolvers are referred "down" the hierarchy.</p>
             
             <h5>In the Child Zone:</h5>
             <p>The domain's zone file must also contain the same NS records, declaring its own authority. This consistency is mandatory for valid DNS configuration.</p>
@@ -295,7 +295,7 @@ example.com. IN MX 10 mail3.example.com.</code></pre>
             <h4>Glue Records: Preventing Circular Dependencies</h4>
             <div style="background: #21262d; border-left: 3px solid #f79000; padding: 12px; margin: 16px 0;">
               <p><strong>⚠️ Critical Concept:</strong></p>
-              <p>When a name server for a domain is a subdomain of that domain (e.g., ns1.example.com serving example.com), a circular dependency occurs. To resolve ns1.example.com, you need to query example.com's name server - but that's ns1.example.com itself!</p>
+              <p>When a name server for a domain is a subdomain of that domain (e.g. ns1.example.com serving example.com), a circular dependency occurs. To resolve ns1.example.com, you need to query example.com's name server - but that's ns1.example.com itself!</p>
               
               <p><strong>Solution: Glue Records</strong></p>
               <p>The parent TLD server provides A/AAAA records alongside the NS delegation, "gluing" the name server's hostname to its IP address and breaking the circular reference.</p>
@@ -638,7 +638,7 @@ example.com. IN CAA 0 iodef "https://security.example.com/report"</code></pre>
             
             <h5>Components:</h5>
             <ul>
-              <li><strong>Selector:</strong> Unique identifier (e.g., "google", "mail", "2023") allowing multiple keys</li>
+              <li><strong>Selector:</strong> Unique identifier (e.g. "google", "mail", "2023") allowing multiple keys</li>
               <li><strong>v=DKIM1:</strong> Version tag</li>
               <li><strong>k=rsa:</strong> Key type (RSA is standard, Ed25519 is emerging)</li>
               <li><strong>p=...:</strong> The public key data (Base64 encoded)</li>

@@ -63,7 +63,7 @@ body:
     attributes:
       label: Domain(s) Tested
       description: What domain(s) were you testing when the bug occurred?
-      placeholder: e.g., google.com, example.org
+      placeholder: e.g. google.com, example.org
 
   - type: dropdown
     id: browsers

@@ -14,6 +14,21 @@ export function DashboardPage() {
       },
       quickLookupDomain: '',
       recentActivity: [],
+      topDomains: [],
+      currentTip: '',
+      dnsTips: [
+        "DNS-over-HTTPS (DoH) encrypts your DNS queries to prevent eavesdropping and manipulation.",
+        "A 'TTL' (Time to Live) tells DNS resolvers how long to cache a record before asking again.",
+        "MX records with lower priority numbers are tried first for email delivery.",
+        "DMARC helps prevent email spoofing by telling receivers how to handle failed SPF/DKIM checks.",
+        "CNAME records cannot coexist with other record types for the same hostname.",
+        "The '.' at the end of a domain name (e.g. google.com.) represents the DNS root zone."
+      ],
+      providerStatus: [
+        { name: 'Google DNS', url: 'https://dns.google/resolve', status: 'checking', latency: 0 },
+        { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query', status: 'checking', latency: 0 },
+        { name: 'Quad9', url: 'https://dns.quad9.net/dns-query', status: 'checking', latency: 0 }
+      ],
       chartInitialized: false,
       updatingCharts: false,
       sessionStart: null,
@@ -26,6 +41,8 @@ export function DashboardPage() {
         this.initSessionTracking();
         
         this.refreshStats();
+        this.checkProviderHealth();
+        this.currentTip = this.dnsTips[Math.floor(Math.random() * this.dnsTips.length)];
         
         // Initialize charts with more delay and only once
         setTimeout(() => {
@@ -42,7 +59,10 @@ export function DashboardPage() {
         
         // Refresh every minute for stats, every second for session timer
         setInterval(() => this.updateSessionTime(), 1000);
-        setInterval(() => this.refreshStats(), 60000);
+        setInterval(() => {
+          this.refreshStats();
+          this.checkProviderHealth();
+        }, 60000);
         
         // Update activity on page interaction
         document.addEventListener('click', () => this.updateLastActivity());
@@ -101,6 +121,7 @@ export function DashboardPage() {
           this.stats.successRate = 0;
           this.stats.avgResponseTime = '0ms';
           this.recentActivity = [];
+          this.topDomains = [];
           this.updateSessionTime();
           return;
         }
@@ -129,10 +150,47 @@ export function DashboardPage() {
           timeAgo: this.getTimeAgo(h.timestamp),
           type: this.getQueryType(h.recordTypes)
         }));
+
+        // Calculate Top Domains
+        const domainCounts = {};
+        history.forEach(h => {
+          const domain = h.query.toLowerCase().trim();
+          domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+        });
+        this.topDomains = Object.entries(domainCounts)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([domain, count]) => ({ domain, count }));
         
         // Update charts if initialized
         if (this.chartInitialized) {
             this.updateCharts(history);
+        }
+      },
+
+      async checkProviderHealth() {
+        for (let provider of this.providerStatus) {
+          provider.status = 'checking';
+          const start = performance.now();
+          try {
+            // Use a simple query to check health
+            const response = await fetch(`${provider.url}?name=google.com&type=A`, {
+              headers: { 'Accept': 'application/dns-json' }
+            });
+            const end = performance.now();
+            if (response.ok) {
+              provider.status = 'online';
+              provider.latency = Math.round(end - start);
+              provider.message = 'Operational';
+            } else {
+              provider.status = 'error';
+              provider.message = `HTTP ${response.status}`;
+            }
+          } catch (e) {
+            provider.status = 'offline';
+            // Check if it's likely a CSP or Block error (common with Cloudflare/Quad9 in browsers)
+            provider.message = 'Blocked (CSP/Extension)';
+          }
         }
       },
       
