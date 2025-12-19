@@ -2,6 +2,7 @@
 <html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://dns.google https://cdn.jsdelivr.net https://cloudflare-dns.com https://dns.quad9.net;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DNSTools{% endblock %}</title>
     <meta name="description" content="A Web UI for Google DNS - Fast DNS lookups using Google's DNS-over-HTTPS service">
@@ -203,14 +204,14 @@
     <div onclick="event.stopPropagation()" 
          class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-[10px] font-bold text-white logo-font">About DNSTools</h3>
+            <h3 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h3>
             <button onclick="toggleInfoModal()" 
                     class="text-[#8b949e] hover:text-[#c9d1d9]">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="space-y-3 text-sm text-[#c9d1d9]">
-            <p>DNSTools is a privacy-focused, client-side web interface for DNS lookups. It connects directly from your browser to DNS-over-HTTPS (DoH) providers, ensuring your queries are encrypted and never logged by this application.</p>
+            <p><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is a privacy-focused, client-side web interface for DNS lookups. It connects directly from your browser to DNS-over-HTTPS (DoH) providers, ensuring your queries are encrypted and never logged by this application.</p>
             
             <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3">
                 <h4 class="font-medium text-[#58a6ff] mb-2">DNS Queries via:</h4>
