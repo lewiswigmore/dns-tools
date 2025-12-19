@@ -26,8 +26,7 @@ export function DashboardPage() {
       ],
       providerStatus: [
         { name: 'Google DNS', url: 'https://dns.google/resolve', status: 'checking', latency: 0 },
-        { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query', status: 'checking', latency: 0 },
-        { name: 'Quad9', url: 'https://dns.quad9.net/dns-query', status: 'checking', latency: 0 }
+        { name: 'Cloudflare', url: 'https://cloudflare-dns.com/dns-query', status: 'checking', latency: 0 }
       ],
       chartInitialized: false,
       updatingCharts: false,
@@ -174,7 +173,7 @@ export function DashboardPage() {
           const start = performance.now();
           try {
             // Use a simple query to check health
-            const response = await fetch(`${provider.url}?name=google.com&type=1`, {
+            const response = await fetch(`${provider.url}?name=google.com&type=A`, {
               headers: { 'Accept': 'application/dns-json' }
             });
             const end = performance.now();

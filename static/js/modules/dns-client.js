@@ -2,8 +2,7 @@ export class DNSClient {
     constructor() {
       this.dohServers = [
         'https://dns.google/resolve',
-        'https://cloudflare-dns.com/dns-query',
-        'https://dns.quad9.net/dns-query'
+        'https://cloudflare-dns.com/dns-query'
       ];
     }
     
@@ -96,8 +95,7 @@ export class DNSClient {
       
       const providers = [
         { name: 'Google', url: this.dohServers[0] },
-        { name: 'Cloudflare', url: this.dohServers[1] },
-        { name: 'Quad9', url: this.dohServers[2] }
+        { name: 'Cloudflare', url: this.dohServers[1] }
       ];
 
       for (const domain of domainsArray) {
@@ -144,14 +142,7 @@ export class DNSClient {
     
     async queryDNS(domain, recordType, providerUrl = null) {
       const url = providerUrl || this.dohServers[0];
-      // Use numeric type for Quad9 to ensure compatibility
-      let typeParam = recordType;
-      if (url.includes('quad9')) {
-        const typeMap = { 'A': 1, 'AAAA': 28, 'CNAME': 5, 'MX': 15, 'TXT': 16, 'NS': 2, 'PTR': 12, 'SOA': 6, 'SRV': 33, 'CAA': 257 };
-        if (typeMap[recordType]) typeParam = typeMap[recordType];
-      }
-      
-      const dohUrl = `${url}?name=${encodeURIComponent(domain)}&type=${typeParam}`;
+      const dohUrl = `${url}?name=${encodeURIComponent(domain)}&type=${recordType}`;
       
       try {
         const response = await fetch(dohUrl, {

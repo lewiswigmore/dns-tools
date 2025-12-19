@@ -115,7 +115,7 @@ export function LookupPage() {
                 text += `| Provider | Status | Latency | Records |\n`;
                 text += `|----------|--------|---------|---------|\n`;
                 
-                ['Google', 'Cloudflare', 'Quad9'].forEach(provider => {
+                ['Google', 'Cloudflare'].forEach(provider => {
                   const res = row.comparisons[type][provider];
                   if (res) {
                     const records = res.records.map(r => r.value).join(', ') || 'No records';
