@@ -17,7 +17,15 @@
     <style>
         [x-cloak]{display:none!important}
         body{font-family:'Segoe UI','Roboto',sans-serif;background:#0d1117;color:#c9d1d9;font-size:0.875rem}
-        .panel{background:#161b22;border:1px solid #30363d;border-radius:12px}
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #0d1117; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border: 2px solid #0d1117; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+        .panel{background:#161b22;border:1px solid #30363d;border-radius:12px;transition:border-color 0.2s ease;}
+        .panel:hover{border-color:#444c56;}
         .panel-flat{background:#161b22}
         .pill{border-radius:9999px;padding:0.25rem 0.65rem;font-size:0.65rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;line-height:1}
         .pill-outline{background:transparent;border:1px solid currentColor}
@@ -102,40 +110,57 @@
     }
 </script>
 
-<div class="flex h-screen">
+<div x-data="{ mobileMenuOpen: false }" class="flex h-screen overflow-hidden">
+    <!-- Mobile Overlay -->
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="mobileMenuOpen = false"
+         class="fixed inset-0 z-40 bg-black/60 md:hidden" x-cloak></div>
+
     <!-- Sidebar -->
-    <aside class="w-56 flex flex-col border-r border-[#30363d] bg-[#0d1117]">
+    <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+           class="fixed inset-y-0 left-0 z-50 flex flex-col w-56 transition-transform duration-300 ease-in-out border-r border-[#30363d] bg-[#0d1117] md:relative md:translate-x-0">
         <div class="p-4 border-b border-[#30363d]">
             <div class="flex items-center justify-between mb-1">
-                <h1 class="text-base font-semibold text-white tracking-wide">DNSTools</h1>
-                <button onclick="toggleInfoModal()" 
-                        class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
-                        title="About DNSTools">
-                    <i class="fas fa-info-circle text-xs"></i>
-                </button>
+                <h1 class="text-[10px] font-bold text-white tracking-[0.3em] uppercase">DNSTools</h1>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleInfoModal()" 
+                            class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
+                            title="About DNSTools">
+                        <i class="fas fa-info-circle text-xs"></i>
+                    </button>
+                    <button @click="mobileMenuOpen = false" class="text-[#8b949e] md:hidden">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
             </div>
-            <p class="text-[10px] text-[#8b949e]">A Web UI for Google DNS</p>
+            <p class="text-[9px] text-[#8b949e] tracking-tight">A Web UI for Google DNS</p>
         </div>
-        <nav class="flex-1 p-3 space-y-4 text-xs font-medium">
+        <nav class="flex-1 p-3 space-y-4 text-xs font-medium overflow-y-auto">
             <!-- Overview -->
             <div>
-                <a href="{{ url_for('dashboard_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dashboard' else 'text-[#c9d1d9]' }}"><i class="fas fa-chart-pie w-4 mr-2"></i>Dashboard</a>
+                <a href="{{ url_for('dashboard_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dashboard' else 'text-[#c9d1d9]' }}"><i class="fas fa-chart-pie w-4 mr-2"></i>Dashboard</a>
             </div>
 
             <!-- Tools -->
             <div class="space-y-0.5">
                 <p class="px-3 text-[10px] font-bold text-[#6e7681] uppercase tracking-wider mb-2 mt-2">Tools</p>
-                <a href="{{ url_for('lookup_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='lookup' else 'text-[#c9d1d9]' }}"><i class="fas fa-search w-4 mr-2"></i>DNS Lookup</a>
-                <a href="{{ url_for('mx_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4 mr-2"></i>MX Lookup</a>
-                <a href="{{ url_for('dmarc_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4 mr-2"></i>DMARC Lookup</a>
-                <a href="{{ url_for('headers_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
+                <a href="{{ url_for('lookup_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='lookup' else 'text-[#c9d1d9]' }}"><i class="fas fa-search w-4 mr-2"></i>DNS Lookup</a>
+                <a href="{{ url_for('mx_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4 mr-2"></i>MX Lookup</a>
+                <a href="{{ url_for('dmarc_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4 mr-2"></i>DMARC Lookup</a>
+                <a href="{{ url_for('headers_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
             </div>
 
             <!-- Insights -->
             <div class="space-y-0.5">
                 <p class="px-3 text-[10px] font-bold text-[#6e7681] uppercase tracking-wider mb-2 mt-2">Insights</p>
-                <a href="{{ url_for('history_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='history' else 'text-[#c9d1d9]' }}"><i class="fas fa-history w-4 mr-2"></i>History</a>
-                <a href="{{ url_for('resources_page') }}" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4 mr-2"></i>Resources</a>
+                <a href="{{ url_for('history_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='history' else 'text-[#c9d1d9]' }}"><i class="fas fa-history w-4 mr-2"></i>History</a>
+                <a href="{{ url_for('resources_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='resources' else 'text-[#c9d1d9]' }}"><i class="fas fa-book w-4 mr-2"></i>Resources</a>
                 <div class="flex items-center justify-between px-3 py-2 rounded-md text-[#8b949e] cursor-not-allowed opacity-60">
                     <span class="flex items-center">
                         <i class="fas fa-shield-virus w-4 mr-2"></i>Threat Intel
@@ -154,9 +179,20 @@
             <p class="text-[#6e7681]">&copy; {{ 2025 }}</p>
         </div>
     </aside>
+
     <!-- Main -->
-    <main class="flex-1 overflow-auto p-6 space-y-4 bg-[#0d1117]">
-        {% block content %}{% endblock %}
+    <main class="flex-1 overflow-auto bg-[#0d1117] flex flex-col">
+        <!-- Mobile Header -->
+        <header class="flex items-center justify-between p-4 border-b border-[#30363d] md:hidden">
+            <h1 class="text-[10px] font-bold text-white tracking-[0.3em] uppercase">DNSTools</h1>
+            <button @click="mobileMenuOpen = true" class="text-[#c9d1d9] p-1">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+        </header>
+
+        <div class="p-4 md:p-6 space-y-4">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 </div>
 

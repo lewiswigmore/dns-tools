@@ -20,3 +20,18 @@ window.DashboardPage = DashboardPage;
 window.ResourcesPage = ResourcesPage;
 
 console.log('DNS Tools modules loaded');
+
+// Global Keyboard Shortcuts
+window.addEventListener('keydown', (e) => {
+    // Focus search input on '/' key
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        const mainInput = document.querySelector('textarea, input[type="text"]');
+        if (mainInput) mainInput.focus();
+    }
+    
+    // Clear focus on 'Escape'
+    if (e.key === 'Escape') {
+        if (document.activeElement) document.activeElement.blur();
+    }
+});
