@@ -10,7 +10,7 @@
     <link rel="alternate icon" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={darkMode:'class'};</script>
-    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     {% block head_extra %}{% endblock %}
@@ -104,7 +104,7 @@
             </button>
         </div>
         <div class="space-y-3 text-sm text-[#c9d1d9]">
-            <p>DNSTools is a web interface for Google's DNS-over-HTTPS service, providing fast and reliable DNS lookups.</p>
+            <p>DNSTools is a privacy-focused, client-side web interface for DNS lookups. It connects directly from your browser to DNS-over-HTTPS (DoH) providers, ensuring your queries are encrypted and never logged by this application.</p>
             
             <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3">
                 <h4 class="font-medium text-[#58a6ff] mb-2">DNS Queries via:</h4>
@@ -115,7 +115,14 @@
                 </ul>
             </div>
             
-            <p class="text-xs text-[#8b949e]">All queries are made client-side using DNS-over-HTTPS for privacy and security.</p>
+            <div class="space-y-2 pt-2 border-t border-[#30363d]">
+                <h4 class="font-medium text-[#c9d1d9] flex items-center"><i class="fas fa-user-shield mr-2 text-[#3fb950]"></i>Privacy First Architecture</h4>
+                <ul class="text-xs text-[#8b949e] space-y-1 list-disc pl-4">
+                    <li><strong>100% Client-Side:</strong> All logic runs locally in your browser.</li>
+                    <li><strong>No Backend Tracking:</strong> We do not store or see your queries.</li>
+                    <li><strong>Secure Transport:</strong> Uses HTTPS for all DNS requests.</li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

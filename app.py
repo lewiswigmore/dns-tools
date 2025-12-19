@@ -363,6 +363,23 @@ def history_page():
 def resources_page():
     return render_template('resources.html', active_page='resources')
 
+# Route to handle .html requests for local development compatibility
+@app.route('/<page_name>.html')
+def html_page(page_name):
+    """
+    Handle .html requests to support static site structure in local Flask dev.
+    Example: /lookup.html -> renders lookup.html
+    """
+    # Security check
+    if '..' in page_name or page_name.startswith('/'):
+        return render_template('dashboard.html', active_page='dashboard')
+        
+    try:
+        return render_template(f'{page_name}.html', active_page=page_name)
+    except Exception:
+        # Fallback to dashboard if template not found
+        return render_template('dashboard.html', active_page='dashboard')
+
 # SPF and Intel routes removed - locked access in navigation
 
 @app.route('/api/test', methods=['GET'])

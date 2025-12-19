@@ -149,8 +149,8 @@ def create_client_side_apis(dist_dir):
 if __name__ == '__main__':
     try:
         create_static_site()
-        print("\\n✅ Static site generation completed successfully!")
+        print("\\nStatic site generation completed successfully!")
     except Exception as e:
-        print(f"\\n❌ Error during static site generation: {e}")
+        print(f"\\nError during static site generation: {e}")
         import traceback
         traceback.print_exc()
