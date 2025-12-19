@@ -6,6 +6,8 @@ export function LookupPage() {
       availableRecordTypes:['A','AAAA','CNAME','TXT','NS'],
       selectedRecordTypes:['A'],
       results:[],
+      comparisonResults: [],
+      compareMode: false,
       loading:false,
       autoGrow,
       init(){
@@ -36,24 +38,32 @@ export function LookupPage() {
         if(!this.domains.trim()||this.selectedRecordTypes.length===0) return;
         
         this.loading=true;
+        this.results = [];
+        this.comparisonResults = [];
         
         try {
           const startTime = Date.now();
-          const response = await window.dnsClient.performLookup(this.domains, this.selectedRecordTypes);
+          
+          if (this.compareMode) {
+            const response = await window.dnsClient.performComparison(this.domains, this.selectedRecordTypes);
+            this.comparisonResults = response.results || [];
+          } else {
+            const response = await window.dnsClient.performLookup(this.domains, this.selectedRecordTypes);
+            this.results = response.results || [];
+          }
+          
           const duration = (Date.now() - startTime) / 1000;
           
-          this.results = response.results || [];
-          
-          // Add to history
+          // Add to history (simplified for comparison mode)
           addHistory({
             query: this.domains,
             timestamp: Date.now(),
-            domains: response.stats?.domains_processed || this.results.length,
+            domains: this.compareMode ? this.comparisonResults.length : this.results.length,
             duration: duration,
             success: true,
             recordTypes: this.selectedRecordTypes,
-            results: response.results,
-            stats: response.stats
+            results: this.compareMode ? this.comparisonResults : this.results,
+            mode: this.compareMode ? 'comparison' : 'standard'
           });
           
           // Refresh dashboard if present
@@ -77,7 +87,7 @@ export function LookupPage() {
           this.loading = false;
         }
       },
-      exportResults(){ exportJSON(this.results); },
+      exportResults(){ exportJSON(this.compareMode ? this.comparisonResults : this.results); },
       
       async copyToClipboard(text) {
         try {
@@ -89,28 +99,55 @@ export function LookupPage() {
       },
 
       async copyAllResults() {
-        if (!this.results || this.results.length === 0) return;
+        const data = this.compareMode ? this.comparisonResults : this.results;
+        if (!data || data.length === 0) return;
         
-        // Format results as readable text
-        let text = '';
-        this.results.forEach(row => {
-          text += `Domain: ${row.domain}\n`;
-          text += `Status: ${row.status}\n`;
-          
-          this.selectedRecordTypes.forEach(type => {
-            if (row.records && row.records[type] && row.records[type].length > 0) {
-              text += `${type} Records:\n`;
-              row.records[type].forEach(rec => {
-                text += `  - ${rec.value} (TTL: ${rec.ttl})\n`;
-              });
+        let text = '# DNS Lookup Results\n\n';
+        text += `**Date:** ${new Date().toLocaleString()}\n`;
+        text += `**Mode:** ${this.compareMode ? 'Provider Comparison' : 'Standard Lookup'}\n\n`;
+        
+        if (this.compareMode) {
+          data.forEach(row => {
+            text += `## ${row.domain}\n\n`;
+            this.selectedRecordTypes.forEach(type => {
+              if (row.comparisons[type]) {
+                text += `### ${type} Records\n\n`;
+                text += `| Provider | Status | Latency | Records |\n`;
+                text += `|----------|--------|---------|---------|\n`;
+                
+                ['Google', 'Cloudflare', 'Quad9'].forEach(provider => {
+                  const res = row.comparisons[type][provider];
+                  if (res) {
+                    const records = res.records.map(r => r.value).join(', ') || 'No records';
+                    text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+                  }
+                });
+                text += '\n';
+              }
+            });
+          });
+        } else {
+          data.forEach(row => {
+            text += `## ${row.domain}\n\n`;
+            text += `**Status:** ${row.status === 'success' ? '✅ Success' : '❌ Error'}\n\n`;
+            
+            this.selectedRecordTypes.forEach(type => {
+              if (row.records && row.records[type] && row.records[type].length > 0) {
+                text += `### ${type} Records\n`;
+                text += `| Value | TTL |\n`;
+                text += `|-------|-----|\n`;
+                row.records[type].forEach(rec => {
+                  text += `| \`${rec.value}\` | ${rec.ttl} |\n`;
+                });
+                text += '\n';
+              }
+            });
+            
+            if (row.errors && row.errors.length > 0) {
+              text += `**Errors:**\n${row.errors.map(e => `- ${e}`).join('\n')}\n\n`;
             }
           });
-          
-          if (row.errors && row.errors.length > 0) {
-            text += `Errors: ${row.errors.join(', ')}\n`;
-          }
-          text += '\n-------------------\n\n';
-        });
+        }
         
         await this.copyToClipboard(text);
       }

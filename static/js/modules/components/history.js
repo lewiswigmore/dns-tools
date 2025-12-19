@@ -231,62 +231,93 @@ export function HistoryPage() {
         if (!this.previewData || !this.previewData.results) return;
         
         const type = this.getQueryType(this.previewData.recordTypes);
-        let text = `Query: ${this.getDisplayTitle(this.previewData)}\n`;
-        text += `Type: ${type}\n`;
-        text += `Date: ${new Date(this.previewData.timestamp).toLocaleString()}\n`;
-        text += '-------------------\n\n';
+        const isComparison = this.previewData.mode === 'comparison';
+        
+        let text = `# ${this.getDisplayTitle(this.previewData)}\n\n`;
+        text += `**Type:** ${type}\n`;
+        text += `**Date:** ${new Date(this.previewData.timestamp).toLocaleString()}\n`;
+        text += `**Mode:** ${isComparison ? 'Provider Comparison' : 'Standard Lookup'}\n\n`;
+        text += '---\n\n';
 
-        if (type === 'DNS') {
+        if (isComparison) {
+          this.previewData.results.forEach(row => {
+            text += `## ${row.domain}\n\n`;
+            if (row.comparisons) {
+              Object.keys(row.comparisons).forEach(recType => {
+                text += `### ${recType} Records\n\n`;
+                text += `| Provider | Status | Latency | Records |\n`;
+                text += `|----------|--------|---------|---------|\n`;
+                
+                ['Google', 'Cloudflare', 'Quad9'].forEach(provider => {
+                  const res = row.comparisons[recType][provider];
+                  if (res) {
+                    const records = res.records.map(r => r.value).join(', ') || 'No records';
+                    text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+                  }
+                });
+                text += '\n';
+              });
+            }
+          });
+        } else if (type === 'DNS') {
           if (Array.isArray(this.previewData.results)) {
             this.previewData.results.forEach(res => {
-              text += `Domain: ${res.domain}\n`;
+              text += `## ${res.domain}\n\n`;
               if (res.records) {
                 for (const [recType, records] of Object.entries(res.records)) {
                   if (records && records.length > 0) {
-                    text += `${recType} Records:\n`;
+                    text += `### ${recType} Records\n`;
+                    text += `| Value | TTL |\n`;
+                    text += `|-------|-----|\n`;
                     records.forEach(rec => {
                       const val = typeof rec === 'object' ? (rec.data || rec.value || rec.target || JSON.stringify(rec)) : rec;
-                      text += `  - ${val}\n`;
+                      text += `| \`${val}\` | ${rec.ttl} |\n`;
                     });
+                    text += '\n';
                   }
                 }
               }
-              text += '\n';
             });
           }
         } else if (type === 'MX') {
           if (Array.isArray(this.previewData.results)) {
-            text += 'MX Records:\n';
+            text += '### MX Records\n\n';
+            text += `| Priority | Exchange |\n`;
+            text += `|----------|----------|\n`;
             this.previewData.results.forEach(rec => {
-              const val = typeof rec === 'object' ? (rec.exchange || `${rec.priority} ${rec.exchange}` || JSON.stringify(rec)) : rec;
-              text += `  - ${val}\n`;
+              const priority = typeof rec === 'object' ? rec.priority : '-';
+              const exchange = typeof rec === 'object' ? rec.exchange : rec;
+              text += `| ${priority} | \`${exchange}\` |\n`;
             });
           }
         } else if (type === 'DMARC') {
           const res = this.previewData.results.result;
           if (res) {
-            text += `Raw Record: ${res.raw || 'None'}\n\n`;
-            if (res.policy) text += `Policy: ${res.policy}\n`;
-            if (res.adkim) text += `DKIM Alignment: ${res.adkim}\n`;
-            if (res.aspf) text += `SPF Alignment: ${res.aspf}\n`;
+            text += `### DMARC Record\n\n`;
+            text += `\`${res.raw || 'None'}\`\n\n`;
+            text += `**Policy:** ${res.policy}\n`;
+            if (res.adkim) text += `**DKIM Alignment:** ${res.adkim}\n`;
+            if (res.aspf) text += `**SPF Alignment:** ${res.aspf}\n`;
           }
         } else if (type === 'Headers') {
           const res = this.previewData.results;
           if (res.routing) {
-            text += `From: ${res.routing.from}\n`;
-            text += `To: ${res.routing.to}\n`;
-            text += `Subject: ${res.routing.subject}\n`;
-            text += `Date: ${res.routing.date}\n\n`;
+            text += `**From:** \`${res.routing.from}\`\n`;
+            text += `**To:** \`${res.routing.to}\`\n`;
+            text += `**Subject:** \`${res.routing.subject}\`\n`;
+            text += `**Date:** ${res.routing.date}\n\n`;
           }
           
-          if (res.spf) text += `SPF: ${res.spf.status}\n`;
-          if (res.dkim) text += `DKIM: ${res.dkim.status}\n`;
-          if (res.dmarc) text += `DMARC: ${res.dmarc.status}\n`;
+          text += `### Authentication\n`;
+          if (res.spf) text += `- **SPF:** ${res.spf.status}\n`;
+          if (res.dkim) text += `- **DKIM:** ${res.dkim.status}\n`;
+          if (res.dmarc) text += `- **DMARC:** ${res.dmarc.status}\n`;
           
           if (res.security) {
-            text += `\nTLS: ${res.security.tls ? 'Yes' : 'No'}\n`;
+            text += `\n### Security\n`;
+            text += `- **TLS:** ${res.security.tls ? 'Yes' : 'No'}\n`;
             if (res.security.warnings && res.security.warnings.length > 0) {
-              text += `Warnings: ${res.security.warnings.join(', ')}\n`;
+              text += `\n**Warnings:**\n${res.security.warnings.map(w => `- ${w}`).join('\n')}\n`;
             }
           }
         }

@@ -86,9 +86,72 @@ export class DNSClient {
         }
       };
     }
+
+    async performComparison(domains, recordTypes) {
+      const results = [];
+      const domainsArray = [...new Set(domains.split(/[\n,\s]+/)
+        .filter(d => d.trim())
+        .map(d => this.deobfuscateDomain(d.trim()))
+        .filter(d => this.isValidDomain(d)))];
+      
+      const providers = [
+        { name: 'Google', url: this.dohServers[0] },
+        { name: 'Cloudflare', url: this.dohServers[1] },
+        { name: 'Quad9', url: this.dohServers[2] }
+      ];
+
+      for (const domain of domainsArray) {
+        const domainResult = {
+          domain: domain,
+          comparisons: {}
+        };
+
+        for (const recordType of recordTypes) {
+          domainResult.comparisons[recordType] = {};
+          
+          // Query all providers in parallel
+          const providerPromises = providers.map(async (provider) => {
+            try {
+              const start = performance.now();
+              const records = await this.queryDNS(domain.trim(), recordType, provider.url);
+              const duration = Math.round(performance.now() - start);
+              return {
+                provider: provider.name,
+                records: records,
+                latency: duration,
+                status: 'success'
+              };
+            } catch (error) {
+              return {
+                provider: provider.name,
+                records: [],
+                error: error.message,
+                status: 'error'
+              };
+            }
+          });
+
+          const providerResults = await Promise.all(providerPromises);
+          providerResults.forEach(res => {
+            domainResult.comparisons[recordType][res.provider] = res;
+          });
+        }
+        results.push(domainResult);
+      }
+
+      return { results };
+    }
     
-    async queryDNS(domain, recordType) {
-      const dohUrl = `${this.dohServers[0]}?name=${encodeURIComponent(domain)}&type=${recordType}`;
+    async queryDNS(domain, recordType, providerUrl = null) {
+      const url = providerUrl || this.dohServers[0];
+      // Use numeric type for Quad9 to ensure compatibility
+      let typeParam = recordType;
+      if (url.includes('quad9')) {
+        const typeMap = { 'A': 1, 'AAAA': 28, 'CNAME': 5, 'MX': 15, 'TXT': 16, 'NS': 2, 'PTR': 12, 'SOA': 6, 'SRV': 33, 'CAA': 257 };
+        if (typeMap[recordType]) typeParam = typeMap[recordType];
+      }
+      
+      const dohUrl = `${url}?name=${encodeURIComponent(domain)}&type=${typeParam}`;
       
       try {
         const response = await fetch(dohUrl, {

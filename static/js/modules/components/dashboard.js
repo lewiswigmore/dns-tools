@@ -174,7 +174,7 @@ export function DashboardPage() {
           const start = performance.now();
           try {
             // Use a simple query to check health
-            const response = await fetch(`${provider.url}?name=google.com&type=A`, {
+            const response = await fetch(`${provider.url}?name=google.com&type=1`, {
               headers: { 'Accept': 'application/dns-json' }
             });
             const end = performance.now();
