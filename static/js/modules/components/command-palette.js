@@ -45,6 +45,17 @@ export function CommandPalette() {
 
             this.allActions = [...navActions, ...dnsConcepts, ...intelConcepts];
             
+            // Listen for keyboard shortcuts
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    this.toggle();
+                }
+                if (e.key === 'Escape' && this.open) {
+                    this.close();
+                }
+            });
+
             // Listen for custom open event
             window.addEventListener('open-command-palette', () => {
                 this.open = true;

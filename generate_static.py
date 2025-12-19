@@ -113,7 +113,17 @@ def create_static_site():
             template = env.get_template(template_name)
             
             # Render with any context needed
-            context = {}
+            # Mock request object for templates that use request.args
+            class MockRequest:
+                def __init__(self):
+                    self.args = {}
+                def get(self, key, default=None):
+                    return self.args.get(key, default)
+
+            context = {
+                'request': MockRequest()
+            }
+            
             if template_name == 'resources.html':
                 # Add any specific context for resources page if needed
                 context['resource_categories'] = [

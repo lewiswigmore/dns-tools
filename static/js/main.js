@@ -96,9 +96,4 @@ window.addEventListener('keydown', (e) => {
         const mainInput = document.querySelector('textarea, input[type="text"]');
         if (mainInput) mainInput.focus();
     }
-    
-    // Clear focus on 'Escape'
-    if (e.key === 'Escape') {
-        if (document.activeElement) document.activeElement.blur();
-    }
 });

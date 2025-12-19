@@ -212,9 +212,6 @@
 
 <!-- Command Palette -->
 <div x-data="CommandPalette" 
-     @keydown.window.prevent.ctrl.k="open = true; $nextTick(() => document.getElementById('cmd-palette-input').focus())" 
-     @keydown.window.prevent.cmd.k="open = true; $nextTick(() => document.getElementById('cmd-palette-input').focus())"
-     @keydown.window.escape="close()"
      class="relative z-[100]" 
      role="dialog" 
      aria-modal="true"
