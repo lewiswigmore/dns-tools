@@ -1,5 +1,5 @@
 import { loadHistory } from '../utils.js';
-import { KNOWLEDGE_BASE } from './intel.js';
+import { KNOWLEDGE_BASE } from '../data/index.js';
 
 export function DashboardPage() {
     // Store chart instances outside the Alpine data object to prevent reactivity issues
