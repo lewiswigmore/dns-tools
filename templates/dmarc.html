@@ -15,6 +15,23 @@
         <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
       </div>
 
+      <!-- Compare Providers Toggle -->
+      <div class="flex items-center justify-between mb-4 p-3 bg-[#161b22] rounded-lg border border-[#30363d]">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-[#30363d] rounded-full">
+            <i class="fas fa-balance-scale text-[#58a6ff]"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-[#c9d1d9]">Compare Providers</h3>
+            <p class="text-xs text-[#8b949e]">Query Google and Cloudflare simultaneously</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" x-model="compareMode" class="sr-only peer">
+          <div class="w-11 h-6 bg-[#30363d] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#58a6ff]"></div>
+        </label>
+      </div>
+
       <button @click="performLookup" 
               :disabled="loading || !domain.trim()" 
               disabled
@@ -36,7 +53,7 @@
     </div>
   </div>
 
-  <div x-show="result" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
+  <div x-show="result || comparisonResult" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
     <div class="flex justify-between items-center">
       <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-shield-alt mr-2"></i>DMARC Policy for <span x-text="domain"></span></h3>
       <div class="flex gap-2">
@@ -50,30 +67,92 @@
         <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
       </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-      <div class="rounded-lg p-3 border border-[#30363d] bg-[#0d1117]">
-        <h4 class="font-semibold mb-2 text-[#c9d1d9]">Policy Action</h4>
-        <span class="pill pill-outline" :class="{'pill-green': result && result.policy==='reject','pill-orange': result && result.policy==='quarantine','pill-blue': !result || !result.policy || result.policy==='none'}" x-text="result ? (result.policy||'none') : 'none'"></span>
+
+    <!-- Standard Results -->
+    <div x-show="!compareMode && result">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="rounded-lg p-3 border border-[#30363d] bg-[#0d1117]">
+          <h4 class="font-semibold mb-2 text-[#c9d1d9]">Policy Action</h4>
+          <span class="pill pill-outline" :class="{'pill-green': result && result.policy==='reject','pill-orange': result && result.policy==='quarantine','pill-blue': !result || !result.policy || result.policy==='none'}" x-text="result ? (result.policy||'none') : 'none'"></span>
+        </div>
+        <div class="rounded-lg p-3 border border-[#30363d] bg-[#0d1117]">
+          <h4 class="font-semibold mb-2 text-[#c9d1d9]">Alignment</h4>
+          <div class="space-y-1">
+            <div x-show="result && result.adkim" class="text-[10px] text-[#c9d1d9]">DKIM: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.adkim ? result.adkim : ''"></span></div>
+            <div x-show="result && result.aspf" class="text-[10px] text-[#c9d1d9]">SPF: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.aspf ? result.aspf : ''"></span></div>
+          </div>
+        </div>
       </div>
-      <div class="rounded-lg p-3 border border-[#30363d] bg-[#0d1117]">
-        <h4 class="font-semibold mb-2 text-[#c9d1d9]">Alignment</h4>
-        <div class="space-y-1">
-          <div x-show="result && result.adkim" class="text-[10px] text-[#c9d1d9]">DKIM: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.adkim ? result.adkim : ''"></span></div>
-          <div x-show="result && result.aspf" class="text-[10px] text-[#c9d1d9]">SPF: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.aspf ? result.aspf : ''"></span></div>
+      <div x-show="result && result.raw" class="mt-4">
+        <h4 class="font-semibold mb-2 text-[#c9d1d9] text-xs">Raw DMARC Record</h4>
+        <div class="rounded-lg p-3 font-mono text-[10px] border border-[#30363d] bg-[#0d1117] text-[#8b949e] group relative">
+          <div x-text="result && result.raw ? result.raw : ''" class="pr-8 break-all"></div>
+          <button x-data="{ copied: false }" 
+                  @click="copyToClipboard(result.raw); copied = true; setTimeout(() => copied = false, 1000)" 
+                  class="absolute top-3 right-3 text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200"
+                  :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                  :title="copied ? 'Copied!' : 'Copy value'">
+            <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+          </button>
         </div>
       </div>
     </div>
-    <div x-show="result && result.raw" class="mt-4">
-      <h4 class="font-semibold mb-2 text-[#c9d1d9] text-xs">Raw DMARC Record</h4>
-      <div class="rounded-lg p-3 font-mono text-[10px] border border-[#30363d] bg-[#0d1117] text-[#8b949e] group relative">
-        <div x-text="result && result.raw ? result.raw : ''" class="pr-8 break-all"></div>
-        <button x-data="{ copied: false }" 
-                @click="copyToClipboard(result.raw); copied = true; setTimeout(() => copied = false, 1000)" 
-                class="absolute top-3 right-3 text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200"
-                :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
-                :title="copied ? 'Copied!' : 'Copy value'">
-          <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
-        </button>
+
+    <!-- Comparison Results -->
+    <div x-show="compareMode && comparisonResult" class="space-y-6">
+      <!-- Comparison Explanation -->
+      <div class="panel p-3 rounded-lg border border-[#30363d] bg-[#0d1117]">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-info-circle text-[#58a6ff] mt-1"></i>
+          <div class="text-xs text-[#8b949e] space-y-1">
+            <p class="font-semibold text-[#c9d1d9]">Why do results differ?</p>
+            <ul class="list-disc list-inside space-y-1 ml-1">
+              <li><strong>Propagation:</strong> Recent changes may not have reached all providers yet.</li>
+              <li><strong>Geo-Location:</strong> Providers may return different IPs based on your location (CDN).</li>
+              <li><strong>Caching:</strong> One provider might be serving a cached record while another has updated.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#0d1117] rounded-lg border border-[#30363d] overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#30363d]">
+          <!-- Google -->
+          <div class="p-3 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold text-[#8b949e]">Google</span>
+              <span class="text-[10px]" :class="comparisonResult.Google.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Google.latency + 'ms'"></span>
+            </div>
+            <template x-if="comparisonResult.Google.records.length > 0">
+              <div class="space-y-1">
+                <template x-for="rec in comparisonResult.Google.records">
+                  <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
+                </template>
+              </div>
+            </template>
+            <template x-if="!comparisonResult.Google.records.length">
+              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+            </template>
+          </div>
+
+          <!-- Cloudflare -->
+          <div class="p-3 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold text-[#8b949e]">Cloudflare</span>
+              <span class="text-[10px]" :class="comparisonResult.Cloudflare.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Cloudflare.latency + 'ms'"></span>
+            </div>
+            <template x-if="comparisonResult.Cloudflare.records.length > 0">
+              <div class="space-y-1">
+                <template x-for="rec in comparisonResult.Cloudflare.records">
+                  <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
+                </template>
+              </div>
+            </template>
+            <template x-if="!comparisonResult.Cloudflare.records.length">
+              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
   </div>

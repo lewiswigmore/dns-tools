@@ -15,6 +15,23 @@
         <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
       </div>
 
+      <!-- Compare Providers Toggle -->
+      <div class="flex items-center justify-between mb-4 p-3 bg-[#161b22] rounded-lg border border-[#30363d]">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-[#30363d] rounded-full">
+            <i class="fas fa-balance-scale text-[#58a6ff]"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-[#c9d1d9]">Compare Providers</h3>
+            <p class="text-xs text-[#8b949e]">Query Google and Cloudflare simultaneously</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" x-model="compareMode" class="sr-only peer">
+          <div class="w-11 h-6 bg-[#30363d] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#58a6ff]"></div>
+        </label>
+      </div>
+
       <button @click="performLookup" 
               :disabled="loading || !domain.trim()" 
               disabled
@@ -36,7 +53,7 @@
     </div>
   </div>
 
-  <div x-show="results && results.length>0" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
+  <div x-show="(results && results.length>0) || (comparisonResult)" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
     <div class="flex justify-between items-center">
       <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-envelope mr-2"></i>MX Records for <span x-text="domain"></span></h3>
       <div class="flex gap-2">
@@ -50,7 +67,9 @@
         <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
       </div>
     </div>
-    <div class="overflow-x-auto">
+
+    <!-- Standard Results -->
+    <div x-show="!compareMode" class="overflow-x-auto">
       <table class="w-full text-xs">
         <thead>
           <tr class="border-b border-[#30363d] text-[#8b949e]">
@@ -78,6 +97,70 @@
           </template>
         </tbody>
       </table>
+    </div>
+
+    <!-- Comparison Results -->
+    <div x-show="compareMode && comparisonResult" class="space-y-6">
+      <!-- Comparison Explanation -->
+      <div class="panel p-3 rounded-lg border border-[#30363d] bg-[#0d1117]">
+        <div class="flex items-start gap-3">
+          <i class="fas fa-info-circle text-[#58a6ff] mt-1"></i>
+          <div class="text-xs text-[#8b949e] space-y-1">
+            <p class="font-semibold text-[#c9d1d9]">Why do results differ?</p>
+            <ul class="list-disc list-inside space-y-1 ml-1">
+              <li><strong>Propagation:</strong> Recent changes may not have reached all providers yet.</li>
+              <li><strong>Geo-Location:</strong> Providers may return different IPs based on your location (CDN).</li>
+              <li><strong>Caching:</strong> One provider might be serving a cached record while another has updated.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#0d1117] rounded-lg border border-[#30363d] overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#30363d]">
+          <!-- Google -->
+          <div class="p-3 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold text-[#8b949e]">Google</span>
+              <span class="text-[10px]" :class="comparisonResult.Google.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Google.latency + 'ms'"></span>
+            </div>
+            <template x-if="comparisonResult.Google.records.length > 0">
+              <div class="space-y-1">
+                <template x-for="rec in comparisonResult.Google.records">
+                  <div class="flex items-center justify-between bg-[#161b22] p-1.5 rounded border border-[#30363d]">
+                    <span class="text-[10px] font-mono truncate" :title="rec.exchange" x-text="rec.exchange"></span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#30363d] text-[#c9d1d9]" x-text="'Pri: ' + rec.priority"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+            <template x-if="!comparisonResult.Google.records.length">
+              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+            </template>
+          </div>
+
+          <!-- Cloudflare -->
+          <div class="p-3 space-y-2">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-semibold text-[#8b949e]">Cloudflare</span>
+              <span class="text-[10px]" :class="comparisonResult.Cloudflare.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Cloudflare.latency + 'ms'"></span>
+            </div>
+            <template x-if="comparisonResult.Cloudflare.records.length > 0">
+              <div class="space-y-1">
+                <template x-for="rec in comparisonResult.Cloudflare.records">
+                  <div class="flex items-center justify-between bg-[#161b22] p-1.5 rounded border border-[#30363d]">
+                    <span class="text-[10px] font-mono truncate" :title="rec.exchange" x-text="rec.exchange"></span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#30363d] text-[#c9d1d9]" x-text="'Pri: ' + rec.priority"></span>
+                  </div>
+                </template>
+              </div>
+            </template>
+            <template x-if="!comparisonResult.Cloudflare.records.length">
+              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+            </template>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

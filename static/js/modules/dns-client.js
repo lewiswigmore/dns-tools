@@ -184,6 +184,91 @@ export class DNSClient {
       }
     }
     
+    async performMXComparison(domain) {
+      const providers = [
+        { name: 'Google', url: this.dohServers[0] },
+        { name: 'Cloudflare', url: this.dohServers[1] }
+      ];
+
+      const comparison = {};
+      
+      const providerPromises = providers.map(async (provider) => {
+        try {
+          const start = performance.now();
+          const records = await this.queryDNS(domain.trim(), 'MX', provider.url);
+          const duration = Math.round(performance.now() - start);
+          return {
+            provider: provider.name,
+            records: records,
+            latency: duration,
+            status: 'success'
+          };
+        } catch (error) {
+          return {
+            provider: provider.name,
+            records: [],
+            error: error.message,
+            status: 'error'
+          };
+        }
+      });
+
+      const results = await Promise.all(providerPromises);
+      results.forEach(res => {
+        comparison[res.provider] = res;
+      });
+
+      return { comparison };
+    }
+
+    async performDMARCComparison(domain) {
+      const providers = [
+        { name: 'Google', url: this.dohServers[0] },
+        { name: 'Cloudflare', url: this.dohServers[1] }
+      ];
+
+      const comparison = {};
+      const dmarcDomain = `_dmarc.${domain.trim()}`;
+      
+      const providerPromises = providers.map(async (provider) => {
+        try {
+          const start = performance.now();
+          const records = await this.queryDNS(dmarcDomain, 'TXT', provider.url);
+          const duration = Math.round(performance.now() - start);
+          
+          // Find DMARC record
+          const dmarcRecord = records.find(r => r.value.startsWith('v=DMARC1'));
+          let parsed = null;
+          
+          if (dmarcRecord) {
+             parsed = this.parseDMARCPolicy(dmarcRecord.value);
+          }
+
+          return {
+            provider: provider.name,
+            records: records,
+            dmarc: dmarcRecord ? { raw: dmarcRecord.value, ...parsed } : null,
+            latency: duration,
+            status: 'success'
+          };
+        } catch (error) {
+          return {
+            provider: provider.name,
+            dmarc: null,
+            error: error.message,
+            status: 'error'
+          };
+        }
+      });
+
+      const results = await Promise.all(providerPromises);
+      results.forEach(res => {
+        comparison[res.provider] = res;
+      });
+
+      return { comparison };
+    }
+    
     async performMXLookup(domain) {
       try {
         const records = await this.queryDNS(domain, 'MX');
