@@ -497,9 +497,10 @@
     init() { 
         // Check if we are on the root/dashboard page
         const isRoot = window.location.pathname === '/' || window.location.pathname.endsWith('/index.html');
-        if (isRoot && !localStorage.getItem('dnstools_onboarding_seen')) {
-            setTimeout(() => this.open = true, 1500); 
-        }
+        // Auto-onboarding disabled per user request
+        // if (isRoot && !localStorage.getItem('dnstools_onboarding_seen')) {
+        //     setTimeout(() => this.open = true, 1500); 
+        // }
         window.addEventListener('open-onboarding', () => { this.open = true; this.step = 1; });
     },
     finish() {
