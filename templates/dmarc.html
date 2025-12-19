@@ -4,9 +4,16 @@
 {% block title %}DMARC Lookup - DNSTools{% endblock %}
 {% block content %}
 <div x-data="DMARCPage()" x-init="init()" class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">DMARC Lookup</h2>
+      <p class="text-xs text-[#8b949e]">Validate email authentication policies</p>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.section_header('fa-shield-alt','DMARC Lookup & Configuration') }}
       {{ ui.info_banner('fa-shield-alt','DMARC Policy Information','DMARC builds on SPF & DKIM to define policy for handling authentication failures and reporting.') }}
 
       <div class="mb-4">

@@ -1,4 +1,5 @@
 import { loadHistory } from '../utils.js';
+import { KNOWLEDGE_BASE } from './intel.js';
 
 export function DashboardPage() {
     // Store chart instances outside the Alpine data object to prevent reactivity issues
@@ -13,6 +14,8 @@ export function DashboardPage() {
         avgResponseTime: '0ms'
       },
       quickLookupDomain: '',
+      quickIntelQuery: '',
+      featuredConcept: null,
       recentActivity: [],
       topDomains: [],
       currentTip: '',
@@ -43,6 +46,11 @@ export function DashboardPage() {
         this.checkProviderHealth();
         this.currentTip = this.dnsTips[Math.floor(Math.random() * this.dnsTips.length)];
         
+        // Pick a random concept
+        if (KNOWLEDGE_BASE && KNOWLEDGE_BASE.length > 0) {
+            this.featuredConcept = KNOWLEDGE_BASE[Math.floor(Math.random() * KNOWLEDGE_BASE.length)];
+        }
+
         // Initialize charts with more delay and only once
         setTimeout(() => {
           if (!this.chartInitialized) {
@@ -71,6 +79,11 @@ export function DashboardPage() {
       performQuickLookup() {
         if (!this.quickLookupDomain.trim()) return;
         window.location = 'lookup.html?domains=' + encodeURIComponent(this.quickLookupDomain.trim());
+      },
+
+      performIntelLookup() {
+        if (!this.quickIntelQuery.trim()) return;
+        window.location = 'intel.html?q=' + encodeURIComponent(this.quickIntelQuery.trim());
       },
       
       initSessionTracking() {
@@ -226,6 +239,7 @@ export function DashboardPage() {
         if (recordTypes.includes && recordTypes.includes('MX')) return 'MX';
         if (recordTypes.includes && recordTypes.includes('DMARC')) return 'DMARC';
         if (recordTypes.includes && recordTypes.includes('Headers')) return 'Headers';
+        if (recordTypes.includes && recordTypes.includes('INTEL')) return 'Intel';
         return 'DNS';
       },
       
@@ -362,7 +376,7 @@ export function DashboardPage() {
           
           // Update Type Chart
           if (typeChartInstance) {
-              const types = { 'DNS': 0, 'MX': 0, 'DMARC': 0, 'Headers': 0 };
+              const types = { 'DNS': 0, 'MX': 0, 'DMARC': 0, 'Headers': 0, 'Intel': 0 };
               let total = 0;
               
               if (hasHistory) {
@@ -382,10 +396,10 @@ export function DashboardPage() {
                   typeChartInstance.options.plugins.tooltip = { enabled: false };
               } else {
                   typeChartInstance.data.datasets[0].data = [
-                      types['DNS'], types['MX'], types['DMARC'], types['Headers']
+                      types['DNS'], types['MX'], types['DMARC'], types['Headers'], types['Intel']
                   ];
-                  typeChartInstance.data.datasets[0].backgroundColor = ['#3fb950', '#58a6ff', '#d29922', '#a855f7'];
-                  typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers'];
+                  typeChartInstance.data.datasets[0].backgroundColor = ['#3fb950', '#58a6ff', '#d29922', '#a855f7', '#f85149'];
+                  typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers', 'Intel'];
                   typeChartInstance.options.plugins.tooltip = { enabled: true };
               }
               
@@ -429,6 +443,10 @@ export function DashboardPage() {
           // Extract domain from query for DMARC
           const domain = activity.query.trim();
           window.location = 'dmarc.html?domain=' + encodeURIComponent(domain);
+        } else if (type === 'intel') {
+          // Extract target from query for Intel
+          const target = activity.query.trim();
+          window.location = 'intel.html?q=' + encodeURIComponent(target);
         } else {
           // For DNS lookups, pass domains and record types if available
           window.location = 'lookup.html?domains=' + encodeURIComponent(activity.query);

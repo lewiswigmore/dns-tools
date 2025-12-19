@@ -4,9 +4,16 @@
 {% block title %}Email Headers Analysis - DNSTools{% endblock %}
 {% block content %}
 <div x-data="HeadersPage()" class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">Email Headers</h2>
+      <p class="text-xs text-[#8b949e]">Analyze delivery path and authentication</p>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.section_header('fa-file-alt','Email Headers Analysis') }}
       {{ ui.info_banner('fa-info-circle','Email Header Analysis','Paste raw email headers to analyze delivery path, authentication results, and security indicators.') }}
 
       <div class="mb-4">

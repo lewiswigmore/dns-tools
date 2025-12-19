@@ -1,16 +1,133 @@
 {% extends 'base.html' %}
+{% import 'components.html' as ui %}
 {% set active_page='intel' %}
-{% block title %}Threat Intelligence (Soon) - DNSTools{% endblock %}
+{% block title %}Threat Intelligence - DNSTools{% endblock %}
 {% block content %}
-<div class="panel p-8 rounded-xl border border-[#30363d] space-y-4">
-  <h2 class="text-lg font-semibold text-[#c9d1d9]">Threat Intelligence Workspace</h2>
-  <p class="text-sm text-[#8b949e]">Planned capabilities:</p>
-  <ul class="list-disc pl-6 text-sm text-[#8b949e] space-y-1">
-    <li>Bulk IOC (domains/IPs) enrichment</li>
-    <li>Passive DNS aggregation</li>
-    <li>Reputation & blocklist correlation</li>
-    <li>Export to JSON / STIX</li>
-  </ul>
-  <p class="text-sm text-[#8b949e]">Stay tuned.</p>
+<div x-data="IntelPage()" x-init="init()" class="space-y-8">
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-lg font-semibold text-[#c9d1d9]">Threat Intelligence</h2>
+            <p class="text-xs text-[#8b949e]">Investigation Tools & Knowledge Base</p>
+        </div>
+    </div>
+
+    <!-- Investigation Launcher -->
+    <div class="panel p-4 rounded-xl space-y-4 border border-[#30363d] bg-[#161b22]">
+        {{ ui.section_header('fa-search','Investigation Launcher') }}
+        
+        <div class="flex gap-3">
+            <div class="flex-1 relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-crosshairs text-[#8b949e] text-xs"></i>
+                </div>
+                <input type="text" 
+                       x-model="query" 
+                       @keydown.enter="analyze()"
+                       placeholder="Enter Domain, IP, or File Hash (e.g., example.com, 8.8.8.8, MD5)" 
+                       class="w-full bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-2 pl-9 pr-4 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58]">
+            </div>
+            <button @click="analyze()" 
+                    :disabled="loading || !query.trim()"
+                    class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <i class="fas fa-search" :class="loading ? 'fa-spin' : ''"></i>
+                <span x-text="loading ? 'Analyzing...' : 'Analyze'"></span>
+            </button>
+        </div>
+        <p x-show="error" x-text="error" class="text-[10px] text-[#f85149]"></p>
+
+        <!-- Results Area -->
+        <div x-show="results" class="space-y-4 pt-4 border-t border-[#30363d]" style="display: none;">
+            
+            <!-- Target Info -->
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 rounded-full bg-[#0d1117] border border-[#30363d] flex items-center justify-center">
+                    <i class="fas fa-globe text-lg text-[#58a6ff]" x-show="results?.type === 'Domain'"></i>
+                    <i class="fas fa-network-wired text-lg text-[#a855f7]" x-show="results?.type === 'IP Address'"></i>
+                    <i class="fas fa-file-code text-lg text-[#d29922]" x-show="results?.type === 'File Hash'"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-[#c9d1d9]" x-text="results?.target"></h3>
+                    <span class="text-[10px] text-[#8b949e] uppercase tracking-wider" x-text="results?.type"></span>
+                </div>
+            </div>
+
+            <!-- Smart Deep Links -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <template x-for="link in results?.links" :key="link.name">
+                    <a :href="link.url" target="_blank" rel="noopener noreferrer" 
+                       class="panel p-3 flex items-center gap-3 hover:border-[#58a6ff] group transition-all rounded-xl bg-[#0d1117]">
+                        <div class="h-8 w-8 rounded-lg bg-[#161b22] border border-[#30363d] flex items-center justify-center group-hover:border-[#58a6ff] transition-colors">
+                            <i :class="link.icon + ' ' + link.color" class="text-sm"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-semibold text-[#c9d1d9] group-hover:text-[#58a6ff] transition-colors" x-text="link.name"></h4>
+                            <p class="text-[9px] text-[#8b949e]">View Report <i class="fas fa-external-link-alt ml-1 text-[8px]"></i></p>
+                        </div>
+                    </a>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Base Grid -->
+    <div class="space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#30363d] pb-4">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-book text-[#8b949e]"></i>
+                <h3 class="text-sm font-semibold text-[#c9d1d9]">Knowledge Base</h3>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
+                    <input type="text" 
+                           x-model="conceptSearch" 
+                           placeholder="Search concepts..." 
+                           class="bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58] w-full md:w-48">
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <template x-for="tag in allTags" :key="tag">
+                        <button @click="conceptFilter = tag"
+                                :class="conceptFilter === tag ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#8b949e]'"
+                                class="px-3 py-1.5 rounded-full text-[10px] font-medium border transition-colors whitespace-nowrap"
+                                x-text="tag">
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <template x-for="concept in filteredConcepts" :key="concept.id">
+                <div @click="showConcept(concept)" class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] hover:border-[#58a6ff] cursor-pointer transition-all group h-full flex flex-col">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="h-8 w-8 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center group-hover:border-[#58a6ff] transition-colors shrink-0">
+                            <i :class="concept.icon + ' ' + concept.iconColor"></i>
+                        </div>
+                        <h4 class="text-xs font-bold text-[#c9d1d9] group-hover:text-[#58a6ff]" x-text="concept.title"></h4>
+                    </div>
+                    <p class="text-[10px] text-[#8b949e] leading-relaxed flex-grow" x-text="concept.summary"></p>
+                    <div class="mt-3 flex flex-wrap gap-1">
+                        <template x-for="tag in concept.tags" :key="tag">
+                            <span class="px-1.5 py-0.5 rounded bg-[#0d1117] border border-[#30363d] text-[9px] text-[#8b949e]" x-text="tag"></span>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Empty State -->
+            <div x-show="filteredConcepts.length === 0" class="col-span-full text-center py-8 text-[#8b949e]">
+                <i class="fas fa-search mb-2 text-xl"></i>
+                <p class="text-xs">No concepts found matching your search.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Concept Modal -->
+    {{ ui.concept_modal() }}
+
 </div>
 {% endblock %}

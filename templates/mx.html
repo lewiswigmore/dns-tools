@@ -4,9 +4,16 @@
 {% block title %}MX Lookup - DNSTools{% endblock %}
 {% block content %}
 <div x-data="MXPage()" x-init="init()" class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">MX Lookup</h2>
+      <p class="text-xs text-[#8b949e]">Check mail exchange records and priority</p>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.section_header('fa-envelope','MX Lookup & Configuration') }}
       {{ ui.info_banner('fa-info-circle','MX Record Information','MX records define the mail servers responsible for accepting email on behalf of a domain. Lower priority = higher preference.') }}
 
       <div class="mb-4">

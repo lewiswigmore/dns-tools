@@ -4,9 +4,15 @@
 {% block title %}Search History - DNSTools{% endblock %}
 {% block content %}
 <div x-data="HistoryPage()" class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">Search History</h2>
+      <p class="text-xs text-[#8b949e]">Review previous lookup queries with detailed analytics</p>
+    </div>
+  </div>
+
   <div class="panel p-4 rounded-xl space-y-4">
-    {{ ui.section_header('fa-history','Search History') }}
-    <p class="text-[#8b949e] mb-4 text-xs">Review previous lookup queries with detailed analytics.</p>
     
     <!-- Filter and Stats Bar -->
     <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">

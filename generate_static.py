@@ -51,6 +51,7 @@ def create_static_site():
             'headers_page': 'headers.html',
             'history_page': 'history.html',
             'resources_page': 'resources.html',
+            'intel_page': 'intel.html',
             
             # Route endpoints (URL paths from Flask app) 
             'dashboard': 'dashboard.html',
@@ -60,6 +61,7 @@ def create_static_site():
             'headers': 'headers.html',
             'history': 'history.html',
             'resources': 'resources.html',
+            'intel': 'intel.html',
             
             # Legacy Blueprint-style endpoints (for compatibility)
             'main.index': 'index.html',
@@ -101,7 +103,8 @@ def create_static_site():
         'headers.html': 'headers.html',
         'history.html': 'history.html',
         'dashboard.html': 'dashboard.html',
-        'resources.html': 'resources.html'
+        'resources.html': 'resources.html',
+        'intel.html': 'intel.html'
     }
     
     # Generate each page

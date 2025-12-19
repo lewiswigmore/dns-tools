@@ -20,32 +20,74 @@
     </button>
   </div>
 
-  <!-- Quick Lookup -->
-  <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22]">
-    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-      <i class="fas fa-globe text-[#58a6ff]"></i>
-      Quick Lookup
-      <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Perform a standard A-record DNS lookup instantly"></i>
-    </h3>
-    <div class="flex gap-3">
-      <input type="text" 
-             x-model="quickLookupDomain" 
-             @keyup.enter="performQuickLookup()" 
-             placeholder="Enter domain to lookup (e.g. google.com)..." 
-             class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58] text-sm">
-      <button @click="performQuickLookup()" 
-              :disabled="!quickLookupDomain.trim()"
-              disabled
-              class="bg-[#30363d] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-sm text-sm"
-              :class="quickLookupDomain.trim() ? 'bg-[#238636]' : 'bg-[#30363d]'">
-        <i class="fas fa-search mr-2"></i>Lookup
-      </button>
+  <!-- Quick Lookups & Knowledge -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    
+    <!-- Quick Lookups -->
+    <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] space-y-4">
+        <!-- DNS -->
+        <div>
+            <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
+                <i class="fas fa-globe text-[#58a6ff]"></i> DNS Lookup
+            </h3>
+            <div class="flex gap-2">
+                <input type="text" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()" 
+                       placeholder="Enter domain (e.g. google.com)..." 
+                       class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58]">
+                <button @click="performQuickLookup()" :disabled="!quickLookupDomain.trim()" 
+                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Lookup
+                </button>
+            </div>
+        </div>
+        
+        <!-- Intel -->
+        <div>
+            <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
+                <i class="fas fa-shield-alt text-[#f85149]"></i> Threat Intel
+            </h3>
+            <div class="flex gap-2">
+                <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()" 
+                       placeholder="Enter IP, Domain, or Hash..." 
+                       class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#f85149] focus:ring-1 focus:ring-[#f85149] transition-all placeholder-[#484f58]">
+                <button @click="performIntelLookup()" :disabled="!quickIntelQuery.trim()" 
+                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Analyze
+                </button>
+            </div>
+        </div>
     </div>
+
+    <!-- Featured Concept -->
+    <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] flex flex-col" x-show="featuredConcept">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold text-[#c9d1d9] flex items-center gap-2">
+                <i class="fas fa-lightbulb text-[#d29922]"></i> Featured Concept
+            </h3>
+            <span class="text-[10px] text-[#8b949e] border border-[#30363d] rounded px-1.5 py-0.5" x-text="featuredConcept?.tags[0]"></span>
+        </div>
+        
+        <div class="flex items-start gap-3 flex-1">
+            <div class="h-10 w-10 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center shrink-0">
+                <i :class="featuredConcept?.icon + ' ' + featuredConcept?.iconColor" class="text-lg"></i>
+            </div>
+            <div>
+                <h4 class="text-sm font-bold text-[#c9d1d9] mb-1" x-text="featuredConcept?.title"></h4>
+                <p class="text-xs text-[#8b949e] line-clamp-2" x-text="featuredConcept?.summary"></p>
+            </div>
+        </div>
+        
+        <a :href="'intel.html?concept=' + featuredConcept?.id" 
+           class="mt-3 text-center w-full py-1.5 rounded border border-[#30363d] bg-[#0d1117] text-[#58a6ff] text-xs hover:bg-[#30363d] transition-colors font-medium">
+            Learn More <i class="fas fa-arrow-right ml-1 text-[10px]"></i>
+        </a>
+    </div>
+
   </div>
 
   <!-- Session Statistics -->
   <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.1s">
+    <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -60,7 +102,7 @@
       </div>
     </div>
     
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.2s">
+    <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -75,7 +117,7 @@
       </div>
     </div>
     
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.3s">
+    <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -90,7 +132,7 @@
       </div>
     </div>
     
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.4s">
+    <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -109,7 +151,7 @@
   <!-- Charts Section -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <!-- Hourly Activity Chart -->
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.5s">
+    <div class="panel p-4 rounded-xl">
       <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
         <i class="fas fa-chart-bar text-[#58a6ff]"></i>
         Activity Last 24 Hours
@@ -121,7 +163,7 @@
     </div>
     
     <!-- Lookup Types Distribution -->
-    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.6s">
+    <div class="panel p-4 rounded-xl">
       <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
         <i class="fas fa-chart-pie text-[#58a6ff]"></i>
         Lookup Types

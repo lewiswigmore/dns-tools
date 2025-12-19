@@ -4,9 +4,16 @@
 {% block title %}DNS Lookup - DNSTools{% endblock %}
 {% block content %}
 <div x-data="LookupPage()" x-init="init()" class="space-y-4">
+  
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">DNS Lookup</h2>
+      <p class="text-xs text-[#8b949e]">Query DNS records for multiple domains</p>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.section_header('fa-edit','Domain Input & Configuration') }}
       {{ ui.info_banner('fa-shield-alt','Security & Obfuscation Support','This tool handles obfuscated domains (google[.]com, hxxp://example[.]com) used in security research.') }}
 
       <div class="mb-4">

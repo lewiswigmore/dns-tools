@@ -363,6 +363,10 @@ def history_page():
 def resources_page():
     return render_template('resources.html', active_page='resources')
 
+@app.route('/intel')
+def intel_page():
+    return render_template('intel.html', active_page='intel')
+
 # Route to handle .html requests for local development compatibility
 @app.route('/<page_name>.html')
 def html_page(page_name):

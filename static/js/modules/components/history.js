@@ -76,6 +76,8 @@ export function HistoryPage() {
           case 'MX': return baseClass + 'pill-orange';
           case 'DMARC': return baseClass + 'pill-purple';
           case 'Headers': return baseClass + 'pill-yellow';
+          case 'Intel': return baseClass + 'pill-red';
+          case 'Concept': return baseClass + 'pill-blue';
           default: return baseClass + 'pill-blue';
         }
       },
@@ -152,6 +154,14 @@ export function HistoryPage() {
           // Extract domain from query for DMARC
           const domain = item.query.trim();
           window.location = 'dmarc.html?domain=' + encodeURIComponent(domain);
+        } else if (type === 'Intel') {
+          // Extract target from query for Intel
+          const target = item.query.trim();
+          window.location = 'intel.html?q=' + encodeURIComponent(target);
+        } else if (type === 'Concept') {
+          // Extract concept ID from results
+          const conceptId = item.results && item.results.id ? item.results.id : item.query;
+          window.location = 'intel.html?concept=' + encodeURIComponent(conceptId);
         } else {
           // For DNS lookups, pass domains and record types
           const recordTypes = item.recordTypes ? item.recordTypes.join(',') : 'A';
@@ -172,6 +182,8 @@ export function HistoryPage() {
         if (recordTypes.includes('MX')) return 'MX';
         if (recordTypes.includes('DMARC')) return 'DMARC';
         if (recordTypes.includes('Headers')) return 'Headers';
+        if (recordTypes.includes('INTEL')) return 'Intel';
+        if (recordTypes.includes('CONCEPT')) return 'Concept';
         return 'DNS';
       },
       
@@ -320,6 +332,20 @@ export function HistoryPage() {
               text += `\n**Warnings:**\n${res.security.warnings.map(w => `- ${w}`).join('\n')}\n`;
             }
           }
+        } else if (type === 'Intel') {
+          const res = this.previewData.results;
+          text += `**Target:** ${res.target}\n`;
+          text += `**Type:** ${res.type}\n\n`;
+          text += `### Analysis Links\n`;
+          if (res.links) {
+            res.links.forEach(link => {
+              text += `- [${link.name}](${link.url})\n`;
+            });
+          }
+        } else if (type === 'Concept') {
+          const res = this.previewData.results;
+          text += `**Concept:** ${this.previewData.query}\n\n`;
+          text += `**Summary:** ${res.summary}\n`;
         }
 
         await this.copyToClipboard(text);
