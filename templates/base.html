@@ -10,6 +10,7 @@
     <link rel="alternate icon" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={darkMode:'class'};</script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <script type="module" src="{{ url_for('static', filename='js/main.js') }}" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -17,6 +18,7 @@
     <style>
         [x-cloak]{display:none!important}
         body{font-family:'Segoe UI','Roboto',sans-serif;background:#0d1117;color:#c9d1d9;font-size:0.875rem}
+        .logo-font{font-family:'Space Grotesk',sans-serif;letter-spacing:0.3em;text-transform:uppercase}
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -93,7 +95,7 @@
 <!-- Global Loader -->
 <div id="global-loader">
     <div class="loader-content">
-        <div class="text-[#8b949e] text-[10px] font-bold tracking-[0.3em]">DNSTOOLS</div>
+        <div class="text-[#8b949e] text-[10px] font-bold logo-font">DNSTOOLS</div>
         <div class="loader-bar-bg">
             <div id="loader-progress" class="loader-bar-fill"></div>
         </div>
@@ -124,10 +126,10 @@
 
     <!-- Sidebar -->
     <aside :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
-           class="fixed inset-y-0 left-0 z-50 flex flex-col w-56 transition-transform duration-300 ease-in-out border-r border-[#30363d] bg-[#0d1117] md:relative md:translate-x-0">
+           class="fixed inset-y-0 left-0 left-0 z-50 flex flex-col w-56 transition-transform duration-300 ease-in-out border-r border-[#30363d] bg-[#0d1117] md:relative md:translate-x-0">
         <div class="p-4 border-b border-[#30363d]">
             <div class="flex items-center justify-between mb-1">
-                <h1 class="text-[10px] font-bold text-white tracking-[0.3em] uppercase">DNSTools</h1>
+                <h1 class="text-[10px] font-bold text-white logo-font">DNSTools</h1>
                 <div class="flex items-center gap-3">
                     <button onclick="toggleInfoModal()" 
                             class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
@@ -184,7 +186,7 @@
     <main class="flex-1 overflow-auto bg-[#0d1117] flex flex-col">
         <!-- Mobile Header -->
         <header class="flex items-center justify-between p-4 border-b border-[#30363d] md:hidden">
-            <h1 class="text-[10px] font-bold text-white tracking-[0.3em] uppercase">DNSTools</h1>
+            <h1 class="text-[10px] font-bold text-white logo-font">DNSTools</h1>
             <button @click="mobileMenuOpen = true" class="text-[#c9d1d9] p-1">
                 <i class="fas fa-bars text-lg"></i>
             </button>
@@ -201,7 +203,7 @@
     <div onclick="event.stopPropagation()" 
          class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="text-[10px] font-bold text-white tracking-[0.3em] uppercase">About DNSTools</h3>
+            <h3 class="text-[10px] font-bold text-white logo-font">About DNSTools</h3>
             <button onclick="toggleInfoModal()" 
                     class="text-[#8b949e] hover:text-[#c9d1d9]">
                 <i class="fas fa-times"></i>
