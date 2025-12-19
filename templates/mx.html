@@ -77,7 +77,7 @@
 
     <!-- Standard Results -->
     <div x-show="!compareMode" class="overflow-x-auto">
-      <table class="w-full text-xs">
+      <table class="w-full text-xs responsive-table">
         <thead>
           <tr class="border-b border-[#30363d] text-[#8b949e]">
             <th class="text-left py-2 px-3">Priority</th>
@@ -87,9 +87,9 @@
         <tbody>
           <template x-for="r in results" :key="r.exchange">
             <tr class="border-b border-[#30363d] hover:bg-[#161b22] group">
-              <td class="py-2 px-3"><span class="pill pill-outline pill-green" x-text="r.priority"></span></td>
-              <td class="py-2 px-3 font-mono text-[11px]">
-                <div class="flex items-center justify-between">
+              <td class="py-2 px-3" data-label="Priority"><span class="pill pill-outline pill-green" x-text="r.priority"></span></td>
+              <td class="py-2 px-3 font-mono text-[11px]" data-label="Mail Server">
+                <div class="flex items-center justify-between w-full">
                   <span x-text="r.exchange"></span>
                   <button x-data="{ copied: false }" 
                           @click="copyToClipboard(r.exchange); copied = true; setTimeout(() => copied = false, 1000)" 

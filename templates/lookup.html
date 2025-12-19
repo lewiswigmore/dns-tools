@@ -98,7 +98,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     
     <!-- Standard Results -->
     <div x-show="!compareMode" class="overflow-x-auto rounded-md border border-[#30363d]">
-      <table class="min-w-full text-xs">
+      <table class="min-w-full text-xs responsive-table">
         <thead class="bg-[#161b22]">
           <tr>
             <th class="px-3 py-2 text-left">Domain</th>
@@ -110,18 +110,18 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
         <tbody class="divide-y divide-[#30363d]">
           <template x-for="(row, index) in results" :key="row.domain + '_' + index">
             <tr class="hover:bg-[#161b22] animate-fade-in-up" :style="'animation-delay: ' + (index * 0.05) + 's'">
-              <td class="px-3 py-2" x-text="row.domain"></td>
-              <td class="px-3 py-2">
+              <td class="px-3 py-2" data-label="Domain" x-text="row.domain"></td>
+              <td class="px-3 py-2" data-label="Status">
                 <span x-show="row.status==='success'" class="pill pill-outline pill-green">Success</span>
                 <span x-show="row.status==='error'" class="pill pill-outline pill-red">Error</span>
               </td>
               <template x-for="rt in selectedRecordTypes" :key="'col_' + rt + '_' + index">
-                <td class="px-3 py-2">
+                <td class="px-3 py-2" :data-label="rt + ' Records'">
                   <template x-if="row.records[rt] && row.records[rt].length">
-                    <div class="space-y-1">
+                    <div class="space-y-1 w-full">
                       <template x-for="(rec, recIndex) in row.records[rt]" :key="rt + '_' + index + '_' + recIndex">
                         <div class="flex items-center justify-between bg-[#0d1117] rounded px-2 py-1 border border-[#30363d] group">
-                          <span class="font-mono text-[10px] truncate max-w-[200px]" :title="rec.value" x-text="rec.value"></span>
+                          <span class="font-mono text-[10px] truncate max-w-[150px] sm:max-w-[200px]" :title="rec.value" x-text="rec.value"></span>
                           <div class="flex items-center gap-2">
                             <span class="text-[10px] text-[#8b949e]" x-text="'TTL '+rec.ttl"></span>
                             <button x-data="{ copied: false }" 
@@ -139,7 +139,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                   <span x-show="!row.records[rt] || !row.records[rt].length" class="text-[10px] text-[#8b949e]">—</span>
                 </td>
               </template>
-              <td class="px-3 py-2">
+              <td class="px-3 py-2" data-label="Issues">
                 <template x-if="row.errors && row.errors.length">
                   <div class="space-y-1">
                     <template x-for="err in row.errors" :key="err"><div class="text-[11px] text-[#f85149]" x-text="err"></div></template>

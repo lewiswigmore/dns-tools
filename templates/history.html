@@ -34,36 +34,38 @@
       </div>
       
       <!-- Type Filter Pills -->
-      <div class="flex flex-wrap gap-2">
-        <button @click="toggleTypeFilter('all')" 
-                :class="typeFilter === 'all' ? 'pill pill-blue' : 'pill pill-outline pill-blue'"
-                class="text-[10px]">
-          All (<span x-text="history.length"></span>)
-        </button>
-        <button @click="toggleTypeFilter('DNS')" 
-                :class="typeFilter === 'DNS' ? 'pill pill-green' : 'pill pill-outline pill-green'"
-                class="text-[10px]">
-          DNS (<span x-text="getTypeCount('DNS')"></span>)
-        </button>
-        <button @click="toggleTypeFilter('MX')" 
-                :class="typeFilter === 'MX' ? 'pill pill-orange' : 'pill pill-outline pill-orange'"
-                class="text-[10px]">
-          MX (<span x-text="getTypeCount('MX')"></span>)
-        </button>
-        <button @click="toggleTypeFilter('DMARC')" 
-                :class="typeFilter === 'DMARC' ? 'pill pill-purple' : 'pill pill-outline pill-purple'"
-                class="text-[10px]">
-          DMARC (<span x-text="getTypeCount('DMARC')"></span>)
-        </button>
-        <button @click="toggleTypeFilter('Headers')" 
-                :class="typeFilter === 'Headers' ? 'pill pill-yellow' : 'pill pill-outline pill-yellow'"
-                class="text-[10px]">
-          Headers (<span x-text="getTypeCount('Headers')"></span>)
-        </button>
+      <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar w-full lg:w-auto">
+        <div class="flex min-w-max gap-1">
+          <button @click="toggleTypeFilter('all')" 
+                  :class="typeFilter === 'all' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            All (<span x-text="history.length"></span>)
+          </button>
+          <button @click="toggleTypeFilter('DNS')" 
+                  :class="typeFilter === 'DNS' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            DNS (<span x-text="getTypeCount('DNS')"></span>)
+          </button>
+          <button @click="toggleTypeFilter('MX')" 
+                  :class="typeFilter === 'MX' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            MX (<span x-text="getTypeCount('MX')"></span>)
+          </button>
+          <button @click="toggleTypeFilter('DMARC')" 
+                  :class="typeFilter === 'DMARC' ? 'bg-[#a855f7] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            DMARC (<span x-text="getTypeCount('DMARC')"></span>)
+          </button>
+          <button @click="toggleTypeFilter('Headers')" 
+                  :class="typeFilter === 'Headers' ? 'bg-[#e3b341] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            Headers (<span x-text="getTypeCount('Headers')"></span>)
+          </button>
+        </div>
       </div>
       
       <!-- Clear All Button -->
-      <button @click="clearAll" class="pill pill-outline pill-red text-[10px]">
+      <button @click="clearAll" class="w-full lg:w-auto px-3 py-1.5 rounded-lg border border-[#f85149] text-[#f85149] hover:bg-[#f851491a] transition-colors text-[10px] font-medium">
         <i class="fas fa-trash mr-2"></i>Clear All
       </button>
     </div>
@@ -158,56 +160,56 @@
   <!-- Preview Modal -->
   <div x-show="previewModal" 
        x-cloak
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50"
        @click="closePreview">
     <div @click.stop 
-         class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
+         class="bg-[#161b22] border-0 sm:border border-[#30363d] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col">
       
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-[#30363d]">
+      <div class="flex items-center justify-between p-4 border-b border-[#30363d] shrink-0">
         <div class="flex items-center gap-3">
-          <h3 class="text-lg font-semibold text-[#c9d1d9]">Query Results</h3>
+          <h3 class="text-base sm:text-lg font-semibold text-[#c9d1d9]">Query Results</h3>
           <span x-show="previewData" 
                 :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'" 
                 x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'" 
                 class="text-[10px] font-medium"></span>
         </div>
         <button @click="closePreview" 
-                class="text-[#8b949e] hover:text-[#c9d1d9] text-lg">
+                class="text-[#8b949e] hover:text-[#c9d1d9] text-lg p-1">
           <i class="fas fa-times"></i>
         </button>
       </div>
       
       <!-- Modal Content -->
-      <div class="p-4 overflow-y-auto max-h-[60vh] concept-modal-content">
+      <div class="p-4 overflow-y-auto flex-1 concept-modal-content">
         <div class="space-y-4">
           <!-- Query Info -->
-          <div class="flex flex-wrap gap-4 text-xs text-[#8b949e] mb-4">
-            <span><i class="fas fa-search mr-2"></i><span x-text="previewData ? getDisplayTitle(previewData) : ''"></span></span>
-            <span><i class="fas fa-calendar mr-2"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
-            <span><i class="fas fa-clock mr-2"></i><span x-text="formatDuration(previewData?.duration)"></span></span>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 text-[10px] sm:text-xs text-[#8b949e] mb-4">
+            <span class="flex items-center"><i class="fas fa-search mr-2 w-3"></i><span x-text="previewData ? getDisplayTitle(previewData) : ''"></span></span>
+            <span class="flex items-center"><i class="fas fa-calendar mr-2 w-3"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
+            <span class="flex items-center"><i class="fas fa-clock mr-2 w-3"></i><span x-text="formatDuration(previewData?.duration)"></span></span>
           </div>
           
           <!-- DNS Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'DNS' && previewData?.results && Array.isArray(previewData.results)" class="space-y-4">
             <template x-for="(result, resultIndex) in (previewData?.results || [])" :key="'dns-result-' + resultIndex">
-              <div class="panel p-4 rounded-lg border border-[#30363d]">
-                <h4 class="font-semibold text-[#c9d1d9] mb-3" x-text="result.domain"></h4>
-                <div class="space-y-2">
+              <div class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
+                <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm" x-text="result.domain"></h4>
+                <div class="space-y-3">
                   <template x-for="(records, recordType) in result.records" :key="'dns-' + resultIndex + '-' + recordType">
                     <div x-show="records && records.length > 0">
-                      <h5 class="text-sm font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
+                      <h5 class="text-xs font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
                       <div class="space-y-1">
                         <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
                           <div class="flex items-center justify-between bg-[#0d1117] p-2 rounded border border-[#30363d] group">
-                            <div class="text-sm font-mono text-[#c9d1d9] truncate max-w-[400px]" 
+                            <div class="text-[11px] font-mono text-[#c9d1d9] truncate max-w-[200px] sm:max-w-[400px]" 
                                  x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
                             <button x-data="{ copied: false }" 
                                     @click="copyToClipboard(typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
                                     class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
-                                    :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                                    :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
                                     :title="copied ? 'Copied!' : 'Copy value'">
-                              <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                              <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                             </button>
                           </div>
                         </template>
@@ -221,17 +223,17 @@
           
           <!-- MX Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'MX' && previewData?.results && Array.isArray(previewData.results)" class="space-y-2">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3">MX Records</h4>
+            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">MX Records</h4>
             <template x-for="(record, mxIndex) in (previewData?.results || [])" :key="'mx-record-' + mxIndex">
               <div class="flex items-center justify-between bg-[#0d1117] p-3 rounded border border-[#30363d] group">
-                <div class="text-sm font-mono text-[#c9d1d9]" 
+                <div class="text-[11px] font-mono text-[#c9d1d9]" 
                      x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
                 <button x-data="{ copied: false }" 
                         @click="copyToClipboard(typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
                         class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
-                        :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                        :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
                         :title="copied ? 'Copied!' : 'Copy value'">
-                  <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                  <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                 </button>
               </div>
             </template>
@@ -239,21 +241,21 @@
           
           <!-- DMARC Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'DMARC'">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3">DMARC Policy</h4>
+            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">DMARC Policy</h4>
             
             <div class="space-y-3">
               <!-- Raw DMARC Record -->
               <div>
-                <h5 class="text-sm font-medium text-[#58a6ff] mb-2">Raw DMARC Record</h5>
-                <div class="text-sm font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9]">
+                <h5 class="text-xs font-medium text-[#58a6ff] mb-2">Raw DMARC Record</h5>
+                <div class="text-[11px] font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] break-all">
                   <span x-text="previewData?.results?.result?.raw || 'No DMARC record found'"></span>
                 </div>
               </div>
               
               <!-- Parsed Policy Details -->
               <div x-show="previewData?.results?.result?.policy">
-                <h5 class="text-sm font-medium text-[#58a6ff] mb-2">Policy Details</h5>
-                <div class="text-sm bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] space-y-1">
+                <h5 class="text-xs font-medium text-[#58a6ff] mb-2">Policy Details</h5>
+                <div class="text-[11px] bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] space-y-1">
                   <div class="flex justify-between">
                     <span class="text-[#8b949e]">Policy:</span>
                     <span class="font-mono" x-text="previewData?.results?.result?.policy"></span>
@@ -273,12 +275,12 @@
           
           <!-- Headers Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'Headers'" class="space-y-4">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3">Email Header Analysis</h4>
+            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">Email Header Analysis</h4>
             
             <!-- Authentication Status -->
-            <div x-show="previewData?.results?.spf || previewData?.results?.dkim || previewData?.results?.dmarc" class="panel p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3">Authentication Status</h5>
-              <div class="space-y-2 text-sm">
+            <div x-show="previewData?.results?.spf || previewData?.results?.dkim || previewData?.results?.dmarc" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Authentication Status</h5>
+              <div class="space-y-2 text-[11px]">
                 <div class="flex justify-between">
                   <span class="text-[#8b949e]">SPF:</span>
                   <span class="pill pill-outline" 
@@ -301,9 +303,9 @@
             </div>
             
             <!-- Security Indicators -->
-            <div x-show="previewData?.results?.security" class="panel p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3">Security Indicators</h5>
-              <div class="space-y-2 text-sm">
+            <div x-show="previewData?.results?.security" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Security Indicators</h5>
+              <div class="space-y-2 text-[11px]">
                 <div class="flex items-center gap-2">
                   <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-green-500' : 'fa-unlock text-red-500'"></i>
                   <span x-text="previewData?.results?.security?.tls ? 'TLS Encrypted' : 'No TLS Encryption'"></span>
@@ -311,7 +313,7 @@
                 <div x-show="previewData?.results?.security?.warnings?.length > 0">
                   <h6 class="font-medium text-red-400 mb-1">Security Warnings:</h6>
                   <template x-for="(warning, warningIndex) in (previewData?.results?.security?.warnings || [])" :key="'warning-' + warningIndex">
-                    <div class="bg-red-900/20 border border-red-700 rounded p-2 text-red-300 text-xs">
+                    <div class="bg-red-900/20 border border-red-700 rounded p-2 text-red-300 text-[10px]">
                       <i class="fas fa-exclamation-triangle mr-1"></i>
                       <span x-text="warning"></span>
                     </div>
@@ -321,37 +323,37 @@
             </div>
             
             <!-- Delivery Path -->
-            <div x-show="previewData?.results?.delivery_path?.length > 0" class="panel p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3">Delivery Path</h5>
+            <div x-show="previewData?.results?.delivery_path?.length > 0" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Delivery Path</h5>
               <div class="space-y-1">
                 <template x-for="(hop, hopIndex) in (previewData?.results?.delivery_path || [])" :key="'hop-' + hopIndex">
                   <div class="bg-[#0d1117] rounded p-2 border border-[#30363d]">
-                    <div class="font-mono text-sm text-[#c9d1d9]" x-text="hop.server"></div>
-                    <div class="text-xs text-[#8b949e]" x-text="hop.timestamp"></div>
+                    <div class="font-mono text-[11px] text-[#c9d1d9] break-all" x-text="hop.server"></div>
+                    <div class="text-[10px] text-[#8b949e]" x-text="hop.timestamp"></div>
                   </div>
                 </template>
               </div>
             </div>
             
             <!-- Routing Information -->
-            <div x-show="previewData?.results?.routing" class="panel p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3">Email Headers</h5>
-              <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
+            <div x-show="previewData?.results?.routing" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
+              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Email Headers</h5>
+              <div class="space-y-2 text-[11px]">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span class="text-[#8b949e]">From:</span>
-                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.from"></span>
+                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.from"></span>
                 </div>
-                <div class="flex justify-between">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span class="text-[#8b949e]">To:</span>
-                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.to"></span>
+                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.to"></span>
                 </div>
-                <div class="flex justify-between">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span class="text-[#8b949e]">Subject:</span>
-                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.subject"></span>
+                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.subject"></span>
                 </div>
-                <div class="flex justify-between">
+                <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
                   <span class="text-[#8b949e]">Date:</span>
-                  <span class="text-[#c9d1d9] font-mono text-xs" x-text="previewData?.results?.routing?.date"></span>
+                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.date"></span>
                 </div>
               </div>
             </div>
@@ -360,24 +362,24 @@
       </div>
       
       <!-- Modal Footer -->
-      <div class="flex items-center justify-between p-6 border-t border-[#30363d]">
-        <div class="flex gap-2">
+      <div class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-[#30363d] gap-4 shrink-0">
+        <div class="flex gap-2 w-full sm:w-auto">
           <button x-data="{ copied: false }" 
                   @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
-                  class="pill pill-outline pill-blue transition-all duration-200"
+                  class="flex-1 sm:flex-none pill pill-outline pill-blue transition-all duration-200 text-[10px] sm:text-xs"
                   :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
             <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
-            <span x-text="copied ? 'Copied!' : 'Copy as Markdown'"></span>
+            <span x-text="copied ? 'Copied!' : 'Copy Markdown'"></span>
           </button>
-          <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+          <button @click="exportResults" class="flex-1 sm:flex-none pill pill-outline pill-green text-[10px] sm:text-xs"><i class="fas fa-download"></i><span>Export</span></button>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-2 w-full sm:w-auto">
           <button @click="rerun(previewData)" 
-                  class="pill pill-outline pill-blue">
-            <i class="fas fa-redo mr-2"></i>Rerun Query
+                  class="flex-1 sm:flex-none pill pill-outline pill-blue text-[10px] sm:text-xs">
+            <i class="fas fa-redo mr-2"></i>Rerun
           </button>
           <button @click="closePreview" 
-                  class="pill pill-outline pill-gray">
+                  class="flex-1 sm:flex-none pill pill-outline pill-gray text-[10px] sm:text-xs">
             Close
           </button>
         </div>

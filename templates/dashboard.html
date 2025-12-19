@@ -30,12 +30,12 @@
             <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
                 <i class="fas fa-globe text-[#58a6ff]"></i> DNS Lookup
             </h3>
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <input type="text" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()" 
                        placeholder="Enter domain (e.g. google.com)..." 
                        class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58]">
                 <button @click="performQuickLookup()" :disabled="!quickLookupDomain.trim()" 
-                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
                     Lookup
                 </button>
             </div>
@@ -46,12 +46,12 @@
             <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
                 <i class="fas fa-shield-alt text-[#f85149]"></i> Threat Intel
             </h3>
-            <div class="flex gap-2">
+            <div class="flex flex-col sm:flex-row gap-2">
                 <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()" 
                        placeholder="Enter IP, Domain, or Hash..." 
                        class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#f85149] focus:ring-1 focus:ring-[#f85149] transition-all placeholder-[#484f58]">
                 <button @click="performIntelLookup()" :disabled="!quickIntelQuery.trim()" 
-                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
                     Analyze
                 </button>
             </div>
