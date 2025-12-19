@@ -67,7 +67,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[100px] px-4 py-3 b
         </thead>
         <tbody class="divide-y divide-[#30363d]">
           <template x-for="(row, index) in results" :key="row.domain + '_' + index">
-            <tr class="hover:bg-[#161b22]">
+            <tr class="hover:bg-[#161b22] animate-fade-in-up" :style="'animation-delay: ' + (index * 0.05) + 's'">
               <td class="px-4 py-3" x-text="row.domain"></td>
               <td class="px-4 py-3">
                 <span x-show="row.status==='success'" class="pill pill-outline pill-green">Success</span>

@@ -44,9 +44,44 @@
         .quota-mid{background:#d29922}
         .quota-low{background:#f85149}
         .divider{border-top:1px solid #30363d}
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+        
+        /* Global Loader */
+        #global-loader {
+            position: fixed; inset: 0; background: #0d1117; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
+        }
+        .loader-spinner {
+            width: 40px; height: 40px; border: 3px solid #30363d;
+            border-top-color: #58a6ff; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-hidden { opacity: 0; visibility: hidden; }
     </style>
 </head>
 <body>
+<!-- Global Loader -->
+<div id="global-loader">
+    <div class="flex flex-col items-center gap-4">
+        <div class="loader-spinner"></div>
+        <div class="text-[#8b949e] text-sm font-medium tracking-wide">LOADING</div>
+    </div>
+</div>
+<script>
+    // Immediately hide loader if we've already visited in this session
+    if (sessionStorage.getItem('dt_session_active')) {
+        document.getElementById('global-loader').style.display = 'none';
+    }
+</script>
+
 <div class="flex h-screen">
     <!-- Sidebar -->
     <aside class="w-64 flex flex-col border-r border-[#30363d] bg-[#0d1117]">
@@ -87,7 +122,7 @@
         </div>
     </aside>
     <!-- Main -->
-    <main class="flex-1 overflow-auto p-6 space-y-6 bg-[#0d1117]">
+    <main class="flex-1 overflow-auto p-6 space-y-6 bg-[#0d1117] animate-fade-in-up">
         {% block content %}{% endblock %}
     </main>
 </div>
@@ -137,6 +172,22 @@
     document.getElementById('infoModal').addEventListener('click', function(e) {
         if (e.target === this) {
             toggleInfoModal();
+        }
+    });
+
+    // Handle Global Loader
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('global-loader');
+        if (loader && loader.style.display !== 'none') {
+            // First visit: Show animation then hide
+            setTimeout(() => {
+                loader.classList.add('loader-hidden');
+                setTimeout(() => loader.remove(), 500);
+                sessionStorage.setItem('dt_session_active', 'true');
+            }, 800); // Give it a moment to be seen on first load
+        } else if (loader) {
+            // Subsequent visits: Cleanup immediately
+            loader.remove();
         }
     });
 </script>
