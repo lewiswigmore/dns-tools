@@ -16,14 +16,14 @@
       </div>
 
       <!-- Compare Providers Toggle -->
-      <div class="flex items-center justify-between mb-4 p-3 bg-[#161b22] rounded-lg border border-[#30363d]">
+      <div x-show="$store.settings.config.providers.length > 1" class="flex items-center justify-between mb-4 p-3 bg-[#161b22] rounded-lg border border-[#30363d]">
         <div class="flex items-center gap-3">
           <div class="p-2 bg-[#30363d] rounded-full">
             <i class="fas fa-balance-scale text-[#58a6ff]"></i>
           </div>
           <div>
             <h3 class="text-sm font-semibold text-[#c9d1d9]">Compare Providers</h3>
-            <p class="text-xs text-[#8b949e]">Query Google and Cloudflare simultaneously</p>
+            <p class="text-xs text-[#8b949e]">Query selected providers simultaneously</p>
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
@@ -117,41 +117,27 @@
 
       <div class="bg-[#0d1117] rounded-lg border border-[#30363d] overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#30363d]">
-          <!-- Google -->
-          <div class="p-3 space-y-2">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] font-semibold text-[#8b949e]">Google</span>
-              <span class="text-[10px]" :class="comparisonResult.Google.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Google.latency + 'ms'"></span>
-            </div>
-            <template x-if="comparisonResult.Google.records.length > 0">
-              <div class="space-y-1">
-                <template x-for="rec in comparisonResult.Google.records">
-                  <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
-                </template>
+          <template x-for="provider in Object.keys(comparisonResult).sort()" :key="provider">
+            <div class="p-3 space-y-2">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2">
+                  <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[#c9d1d9]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[#8b949e]')"></i>
+                  <span class="text-[10px] font-semibold text-[#8b949e]" x-text="provider"></span>
+                </div>
+                <span class="text-[10px]" :class="comparisonResult[provider].status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult[provider].latency + 'ms'"></span>
               </div>
-            </template>
-            <template x-if="!comparisonResult.Google.records.length">
-              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
-            </template>
-          </div>
-
-          <!-- Cloudflare -->
-          <div class="p-3 space-y-2">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] font-semibold text-[#8b949e]">Cloudflare</span>
-              <span class="text-[10px]" :class="comparisonResult.Cloudflare.status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult.Cloudflare.latency + 'ms'"></span>
+              <template x-if="comparisonResult[provider].records.length > 0">
+                <div class="space-y-1">
+                  <template x-for="rec in comparisonResult[provider].records">
+                    <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="!comparisonResult[provider].records.length">
+                <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+              </template>
             </div>
-            <template x-if="comparisonResult.Cloudflare.records.length > 0">
-              <div class="space-y-1">
-                <template x-for="rec in comparisonResult.Cloudflare.records">
-                  <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
-                </template>
-              </div>
-            </template>
-            <template x-if="!comparisonResult.Cloudflare.records.length">
-              <div class="text-[10px] text-[#8b949e] italic">No records found</div>
-            </template>
-          </div>
+          </template>
         </div>
       </div>
     </div>

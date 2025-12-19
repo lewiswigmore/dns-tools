@@ -1,4 +1,5 @@
 import { DNSClient } from './modules/dns-client.js';
+import { loadSettings, saveSettings } from './modules/utils.js';
 import { LookupPage } from './modules/components/lookup.js';
 import { MXPage } from './modules/components/mx.js';
 import { DMARCPage } from './modules/components/dmarc.js';
@@ -22,6 +23,47 @@ window.ResourcesPage = ResourcesPage;
 // Register with Alpine if it's already loaded, otherwise wait for alpine:init
 const registerComponents = () => {
     if (window.Alpine) {
+        // Register Settings Store
+        window.Alpine.store('settings', {
+            open: false,
+            config: loadSettings(),
+            toggle() { this.open = !this.open; },
+            close() { this.open = false; },
+            updateProvider(provider, enabled) {
+                const current = new Set(this.config.providers);
+                if (enabled) current.add(provider);
+                else current.delete(provider);
+                
+                // Ensure at least one provider is selected
+                if (current.size === 0) {
+                    alert('At least one provider must be enabled.');
+                    return;
+                }
+                
+                this.config.providers = Array.from(current);
+                
+                // If primary provider is disabled, switch to the first available one
+                if (!current.has(this.config.primaryProvider)) {
+                    this.config.primaryProvider = this.config.providers[0];
+                }
+                
+                this.save();
+            },
+            setPrimary(provider) {
+                if (this.config.providers.includes(provider)) {
+                    this.config.primaryProvider = provider;
+                    this.save();
+                }
+            },
+            save() {
+                saveSettings(this.config);
+                // Notify DNS Client of changes
+                if (window.dnsClient) window.dnsClient.updateSettings(this.config);
+                // Refresh dashboard if active
+                if (window.dashboardInstance) window.dashboardInstance.refreshStats();
+            }
+        });
+
         window.Alpine.data('LookupPage', LookupPage);
         window.Alpine.data('MXPage', MXPage);
         window.Alpine.data('DMARCPage', DMARCPage);

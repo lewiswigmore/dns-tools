@@ -179,7 +179,10 @@
         <template x-for="provider in providerStatus" :key="provider.name">
           <div class="p-3 rounded-lg border border-[#30363d] bg-[#0d1117] flex flex-col gap-2 relative group">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-medium text-[#c9d1d9]" x-text="provider.name"></span>
+              <div class="flex items-center gap-2">
+                <i class="text-xs" :class="provider.name.includes('Google') ? 'fab fa-google text-[#c9d1d9]' : (provider.name.includes('Cloudflare') ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[#8b949e]')"></i>
+                <span class="text-xs font-medium text-[#c9d1d9]" x-text="provider.name"></span>
+              </div>
               <span class="w-2 h-2 rounded-full bg-[#8b949e]" 
                     :class="{
                       'bg-[#3fb950] shadow-[0_0_8px_#3fb950]': provider.status === 'online',
@@ -201,6 +204,14 @@
             </div>
           </div>
         </template>
+        
+        <!-- Configure Card -->
+        <button @click="$store.settings.toggle()" class="p-3 rounded-lg border border-dashed border-[#30363d] bg-[#0d1117]/50 hover:bg-[#161b22] hover:border-[#58a6ff] transition-all group flex flex-col items-center justify-center gap-2 h-full min-h-[80px]">
+            <div class="w-8 h-8 rounded-full bg-[#30363d] group-hover:bg-[#58a6ff] flex items-center justify-center transition-colors">
+                <i class="fas fa-cog text-[#8b949e] group-hover:text-white transition-colors"></i>
+            </div>
+            <span class="text-xs font-medium text-[#8b949e] group-hover:text-[#c9d1d9]">Configure Providers</span>
+        </button>
       </div>
     </div>
   </div>
@@ -225,7 +236,7 @@
       <button onclick="toggleInfoModal()"
               class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#c9d1d9] hover:bg-[#30363d] transition-colors text-xs font-medium">
         <i class="fas fa-info-circle"></i>
-        About DNSTools
+        About <span class="logo-font">DNSTools</span>
       </button>
     </div>
   </div>

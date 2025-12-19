@@ -115,7 +115,10 @@ export function LookupPage() {
                 text += `| Provider | Status | Latency | Records |\n`;
                 text += `|----------|--------|---------|---------|\n`;
                 
-                ['Google', 'Cloudflare'].forEach(provider => {
+                // Get providers from the result itself to ensure we match what was returned
+                const providers = Object.keys(row.comparisons[type]).sort();
+                
+                providers.forEach(provider => {
                   const res = row.comparisons[type][provider];
                   if (res) {
                     const records = res.records.map(r => r.value).join(', ') || 'No records';

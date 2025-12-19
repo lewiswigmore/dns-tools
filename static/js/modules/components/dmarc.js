@@ -113,7 +113,9 @@ export function DMARCPage() {
           text += `| Provider | Status | Latency | Record |\n`;
           text += `|----------|--------|---------|--------|\n`;
           
-          ['Google', 'Cloudflare'].forEach(provider => {
+          const providers = Object.keys(this.comparisonResult).sort();
+          
+          providers.forEach(provider => {
             const res = this.comparisonResult[provider];
             if (res) {
               const record = res.records.length > 0 ? res.records[0].value : 'No record';

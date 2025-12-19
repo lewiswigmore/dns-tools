@@ -1,9 +1,17 @@
+import { loadSettings } from './utils.js';
+
+const PROVIDER_URLS = {
+  'Google': 'https://dns.google/resolve',
+  'Cloudflare': 'https://cloudflare-dns.com/dns-query'
+};
+
 export class DNSClient {
     constructor() {
-      this.dohServers = [
-        'https://dns.google/resolve',
-        'https://cloudflare-dns.com/dns-query'
-      ];
+      this.settings = loadSettings();
+    }
+
+    updateSettings(newSettings) {
+        this.settings = newSettings;
     }
     
     deobfuscateDomain(domain) {
@@ -93,10 +101,10 @@ export class DNSClient {
         .map(d => this.deobfuscateDomain(d.trim()))
         .filter(d => this.isValidDomain(d)))];
       
-      const providers = [
-        { name: 'Google', url: this.dohServers[0] },
-        { name: 'Cloudflare', url: this.dohServers[1] }
-      ];
+      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
+        name: name,
+        url: PROVIDER_URLS[name]
+      })).filter(p => p.url);
 
       for (const domain of domainsArray) {
         const domainResult = {
@@ -108,7 +116,7 @@ export class DNSClient {
           domainResult.comparisons[recordType] = {};
           
           // Query all providers in parallel
-          const providerPromises = providers.map(async (provider) => {
+          const providerPromises = activeProviders.map(async (provider) => {
             try {
               const start = performance.now();
               const records = await this.queryDNS(domain.trim(), recordType, provider.url);
@@ -141,7 +149,11 @@ export class DNSClient {
     }
     
     async queryDNS(domain, recordType, providerUrl = null) {
-      const url = providerUrl || this.dohServers[0];
+      let url = providerUrl;
+      if (!url) {
+          const primary = this.settings.primaryProvider || 'Google';
+          url = PROVIDER_URLS[primary] || PROVIDER_URLS['Google'];
+      }
       const dohUrl = `${url}?name=${encodeURIComponent(domain)}&type=${recordType}`;
       
       try {
@@ -185,14 +197,14 @@ export class DNSClient {
     }
     
     async performMXComparison(domain) {
-      const providers = [
-        { name: 'Google', url: this.dohServers[0] },
-        { name: 'Cloudflare', url: this.dohServers[1] }
-      ];
+      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
+        name: name,
+        url: PROVIDER_URLS[name]
+      })).filter(p => p.url);
 
       const comparison = {};
       
-      const providerPromises = providers.map(async (provider) => {
+      const providerPromises = activeProviders.map(async (provider) => {
         try {
           const start = performance.now();
           const records = await this.queryDNS(domain.trim(), 'MX', provider.url);
@@ -222,15 +234,15 @@ export class DNSClient {
     }
 
     async performDMARCComparison(domain) {
-      const providers = [
-        { name: 'Google', url: this.dohServers[0] },
-        { name: 'Cloudflare', url: this.dohServers[1] }
-      ];
+      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
+        name: name,
+        url: PROVIDER_URLS[name]
+      })).filter(p => p.url);
 
       const comparison = {};
       const dmarcDomain = `_dmarc.${domain.trim()}`;
       
-      const providerPromises = providers.map(async (provider) => {
+      const providerPromises = activeProviders.map(async (provider) => {
         try {
           const start = performance.now();
           const records = await this.queryDNS(dmarcDomain, 'TXT', provider.url);

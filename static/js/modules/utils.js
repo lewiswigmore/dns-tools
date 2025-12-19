@@ -1,4 +1,5 @@
 const HISTORY_KEY = 'dns_history';
+const SETTINGS_KEY = 'dnstools_settings';
 
 export const safeStorage = {
   getItem: (key) => {
@@ -30,6 +31,20 @@ export const safeStorage = {
 };
 
 export function safeJSONParse(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
+
+export function loadSettings() {
+  const defaults = {
+    providers: ['Google', 'Cloudflare'],
+    primaryProvider: 'Google'
+  };
+  const stored = safeStorage.getItem(SETTINGS_KEY);
+  if (!stored) return defaults;
+  return { ...defaults, ...safeJSONParse(stored, {}) };
+}
+
+export function saveSettings(settings) {
+  safeStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+}
 
 export function loadHistory(){ 
   try {

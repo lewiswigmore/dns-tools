@@ -113,7 +113,9 @@ export function MXPage() {
           text += `| Provider | Status | Latency | Records |\n`;
           text += `|----------|--------|---------|---------|\n`;
           
-          ['Google', 'Cloudflare'].forEach(provider => {
+          const providers = Object.keys(this.comparisonResult).sort();
+          
+          providers.forEach(provider => {
             const res = this.comparisonResult[provider];
             if (res) {
               const records = res.records.map(r => `${r.priority} ${r.exchange}`).join(', ') || 'No records';
