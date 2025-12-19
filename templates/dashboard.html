@@ -5,10 +5,10 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 {% endblock %}
 {% block content %}
-<div x-data="DashboardPage()" x-init="init()" class="space-y-6">
+<div x-data="DashboardPage()" x-init="init()" class="space-y-4">
   <!-- Quick Lookup -->
-  <div class="panel p-6 rounded-xl border border-[#30363d] bg-[#161b22]">
-    <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4 flex items-center">
+  <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22]">
+    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center">
       <i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Quick Lookup
     </h3>
     <div class="flex gap-3">
@@ -16,9 +16,9 @@
              x-model="quickLookupDomain" 
              @keyup.enter="performQuickLookup()" 
              placeholder="Enter domain to lookup (e.g., google.com)..." 
-             class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58]">
+             class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58] text-sm">
       <button @click="performQuickLookup()" 
-              class="bg-[#238636] hover:bg-[#2ea043] text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center shadow-sm">
+              class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center shadow-sm text-sm">
         <i class="fas fa-search mr-2"></i>Lookup
       </button>
     </div>
@@ -29,11 +29,11 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.1s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-sm">Total Lookups Today</p>
-          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.totalLookups"></p>
+          <p class="text-[#8b949e] text-xs">Total Lookups Today</p>
+          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.totalLookups"></p>
         </div>
-        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-search text-[#c9d1d9] text-sm"></i>
+        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-search text-[#c9d1d9] text-xs"></i>
         </div>
       </div>
     </div>
@@ -41,11 +41,11 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.2s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-sm">Success Rate</p>
-          <p class="text-2xl font-bold" :class="stats.successRate >= 90 ? 'text-[#3fb950]' : stats.successRate >= 70 ? 'text-[#d29922]' : 'text-[#f85149]'" x-text="stats.successRate + '%'"></p>
+          <p class="text-[#8b949e] text-xs">Success Rate</p>
+          <p class="text-xl font-bold" :class="stats.successRate >= 90 ? 'text-[#3fb950]' : stats.successRate >= 70 ? 'text-[#d29922]' : 'text-[#f85149]'" x-text="stats.successRate + '%'"></p>
         </div>
-        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-chart-line text-[#c9d1d9] text-sm"></i>
+        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-chart-line text-[#c9d1d9] text-xs"></i>
         </div>
       </div>
     </div>
@@ -53,14 +53,14 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.3s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-sm flex items-center gap-1">
+          <p class="text-[#8b949e] text-xs flex items-center gap-1">
             Session Time
-            <i class="fas fa-info-circle text-xs cursor-help" title="Time elapsed since you opened the dashboard in this browser session"></i>
+            <i class="fas fa-info-circle text-[10px] cursor-help" title="Time elapsed since you opened the dashboard in this browser session"></i>
           </p>
-          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.sessionTime"></p>
+          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.sessionTime"></p>
         </div>
-        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-clock text-[#c9d1d9] text-sm"></i>
+        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-clock text-[#c9d1d9] text-xs"></i>
         </div>
       </div>
     </div>
@@ -68,75 +68,75 @@
     <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.4s">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-sm">Avg Response Time</p>
-          <p class="text-2xl font-bold text-[#c9d1d9]" x-text="stats.avgResponseTime"></p>
+          <p class="text-[#8b949e] text-xs">Avg Response Time</p>
+          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.avgResponseTime"></p>
         </div>
-        <div class="w-10 h-10 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-tachometer-alt text-[#c9d1d9] text-sm"></i>
+        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
+          <i class="fas fa-tachometer-alt text-[#c9d1d9] text-xs"></i>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Charts Section -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <!-- Hourly Activity Chart -->
-    <div class="panel p-6 rounded-xl animate-fade-in-up" style="animation-delay: 0.5s">
-      <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4">
+    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.5s">
+      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3">
         <i class="fas fa-chart-bar mr-2 text-[#58a6ff]"></i>Activity Last 24 Hours
       </h3>
-      <div class="h-64 w-full relative">
+      <div class="h-48 w-full relative">
         <canvas id="hourlyChart" class="w-full h-full"></canvas>
       </div>
     </div>
     
     <!-- Lookup Types Distribution -->
-    <div class="panel p-6 rounded-xl animate-fade-in-up" style="animation-delay: 0.6s">
-      <h3 class="text-lg font-semibold text-[#c9d1d9] mb-4">
+    <div class="panel p-4 rounded-xl animate-fade-in-up" style="animation-delay: 0.6s">
+      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3">
         <i class="fas fa-chart-pie mr-2 text-[#58a6ff]"></i>Lookup Types
       </h3>
-      <div class="h-64 relative">
+      <div class="h-48 relative">
         <canvas id="typeChart"></canvas>
       </div>
     </div>
   </div>
 
   <!-- Recent Activity -->
-  <div class="panel p-6 rounded-xl">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-[#c9d1d9]">
+  <div class="panel p-4 rounded-xl">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-base font-semibold text-[#c9d1d9]">
         <i class="fas fa-history mr-2 text-[#58a6ff]"></i>Recent Activity
       </h3>
-      <a href="{{ url_for('history_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm font-medium">
+      <a href="{{ url_for('history_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs font-medium">
         <i class="fas fa-external-link-alt mr-1"></i>View Full History
       </a>
     </div>
     <div class="space-y-2">
       <template x-for="activity in recentActivity" :key="activity.timestamp">
-        <div class="flex items-center justify-between p-3 rounded-lg border border-[#30363d] bg-[#0d1117]">
+        <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
           <div class="flex items-center space-x-3">
             <div class="flex-1">
-              <p class="text-[#c9d1d9] font-medium" x-text="activity.query"></p>
-              <p class="text-[#8b949e] text-xs" x-text="activity.timeAgo"></p>
+              <p class="text-[#c9d1d9] font-medium text-sm" x-text="activity.query"></p>
+              <p class="text-[#8b949e] text-[10px]" x-text="activity.timeAgo"></p>
             </div>
           </div>
           <div class="flex items-center space-x-2">
-            <span class="pill pill-outline text-xs"
+            <span class="pill pill-outline text-[10px]"
                  :class="{
                    'pill-green': activity.type === 'DNS',
                    'pill-blue': activity.type === 'MX', 
                    'pill-orange': activity.type === 'DMARC',
                    'pill-purple': activity.type === 'Headers'
                  }" x-text="activity.type"></span>
-            <button @click="rerunQuery(activity)" class="text-[#58a6ff] hover:text-[#79c0ff] text-sm">
+            <button @click="rerunQuery(activity)" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs">
               <i class="fas fa-redo"></i>
             </button>
           </div>
         </div>
       </template>
-      <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-8">
-        <i class="fas fa-chart-line text-3xl mb-2"></i>
-        <p>No activity yet. Start by running some DNS lookups!</p>
+      <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-6">
+        <i class="fas fa-chart-line text-2xl mb-2"></i>
+        <p class="text-xs">No activity yet. Start by running some DNS lookups!</p>
       </div>
     </div>
   </div>

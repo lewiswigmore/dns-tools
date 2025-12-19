@@ -3,13 +3,13 @@
 {% set active_page='history' %}
 {% block title %}Search History - DNSTools{% endblock %}
 {% block content %}
-<div x-data="HistoryPage()" class="space-y-6">
-  <div class="panel p-6 rounded-xl space-y-4">
+<div x-data="HistoryPage()" class="space-y-4">
+  <div class="panel p-4 rounded-xl space-y-4">
     {{ ui.section_header('fa-history','Search History') }}
-    <p class="text-[#8b949e] mb-6">Review previous lookup queries with detailed analytics.</p>
+    <p class="text-[#8b949e] mb-4 text-xs">Review previous lookup queries with detailed analytics.</p>
     
     <!-- Filter and Stats Bar -->
-    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">
+    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">
       <!-- Search Filter -->
       <div class="flex-1 max-w-md">
         <div class="relative">
@@ -17,12 +17,12 @@
                  x-model="searchFilter" 
                  @input="applyFilters"
                  placeholder="Filter by domain, type, or status..."
-                 class="w-full px-4 py-2 pl-10 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#c9d1d9] placeholder-[#8b949e] focus:border-[#58a6ff] focus:outline-none focus:ring-1 focus:ring-[#58a6ff]">
-          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e]"></i>
+                 class="w-full px-3 py-1.5 pl-9 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#c9d1d9] placeholder-[#8b949e] focus:border-[#58a6ff] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] text-xs">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
           <button x-show="searchFilter.length > 0" 
                   @click="searchFilter = ''; applyFilters()" 
                   class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] hover:text-[#c9d1d9]">
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times text-xs"></i>
           </button>
         </div>
       </div>
@@ -31,100 +31,100 @@
       <div class="flex flex-wrap gap-2">
         <button @click="toggleTypeFilter('all')" 
                 :class="typeFilter === 'all' ? 'pill pill-blue' : 'pill pill-outline pill-blue'"
-                class="text-xs">
+                class="text-[10px]">
           All (<span x-text="history.length"></span>)
         </button>
         <button @click="toggleTypeFilter('DNS')" 
                 :class="typeFilter === 'DNS' ? 'pill pill-green' : 'pill pill-outline pill-green'"
-                class="text-xs">
+                class="text-[10px]">
           DNS (<span x-text="getTypeCount('DNS')"></span>)
         </button>
         <button @click="toggleTypeFilter('MX')" 
                 :class="typeFilter === 'MX' ? 'pill pill-orange' : 'pill pill-outline pill-orange'"
-                class="text-xs">
+                class="text-[10px]">
           MX (<span x-text="getTypeCount('MX')"></span>)
         </button>
         <button @click="toggleTypeFilter('DMARC')" 
                 :class="typeFilter === 'DMARC' ? 'pill pill-purple' : 'pill pill-outline pill-purple'"
-                class="text-xs">
+                class="text-[10px]">
           DMARC (<span x-text="getTypeCount('DMARC')"></span>)
         </button>
         <button @click="toggleTypeFilter('Headers')" 
                 :class="typeFilter === 'Headers' ? 'pill pill-yellow' : 'pill pill-outline pill-yellow'"
-                class="text-xs">
+                class="text-[10px]">
           Headers (<span x-text="getTypeCount('Headers')"></span>)
         </button>
       </div>
       
       <!-- Clear All Button -->
-      <button @click="clearAll" class="pill pill-outline pill-red text-xs">
+      <button @click="clearAll" class="pill pill-outline pill-red text-[10px]">
         <i class="fas fa-trash mr-2"></i>Clear All
       </button>
     </div>
     
     <!-- Results Summary -->
-    <div x-show="history.length > 0" class="text-sm text-[#8b949e]">
+    <div x-show="history.length > 0" class="text-xs text-[#8b949e]">
       Showing <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
       <span x-show="searchFilter.length > 0">matching "<span x-text="searchFilter" class="text-[#c9d1d9]"></span>"</span>
     </div>
     
     <!-- Empty State -->
-    <div x-cloak x-show="history.length===0" class="text-center py-12">
-      <i class="fas fa-history text-5xl text-[#30363d] mb-4"></i>
-      <p class="text-sm text-[#8b949e] mb-4">No history yet. Perform a lookup to populate this list.</p>
-      <a href="{{ url_for('lookup_page') }}" class="pill pill-outline pill-blue"><i class="fas fa-search mr-2"></i>Start Lookup</a>
+    <div x-cloak x-show="history.length===0" class="text-center py-8">
+      <i class="fas fa-history text-4xl text-[#30363d] mb-3"></i>
+      <p class="text-xs text-[#8b949e] mb-3">No history yet. Perform a lookup to populate this list.</p>
+      <a href="{{ url_for('lookup_page') }}" class="pill pill-outline pill-blue text-xs"><i class="fas fa-search mr-2"></i>Start Lookup</a>
     </div>
     
     <!-- No Filtered Results -->
-    <div x-cloak x-show="history.length > 0 && filteredHistory.length === 0" class="text-center py-8">
-      <i class="fas fa-filter text-4xl text-[#30363d] mb-4"></i>
-      <p class="text-sm text-[#8b949e] mb-4">No entries match your current filter.</p>
-      <button @click="clearFilters" class="pill pill-outline pill-blue">
+    <div x-cloak x-show="history.length > 0 && filteredHistory.length === 0" class="text-center py-6">
+      <i class="fas fa-filter text-3xl text-[#30363d] mb-3"></i>
+      <p class="text-xs text-[#8b949e] mb-3">No entries match your current filter.</p>
+      <button @click="clearFilters" class="pill pill-outline pill-blue text-xs">
         <i class="fas fa-times mr-2"></i>Clear Filters
       </button>
     </div>
     
     <!-- History Items -->
-    <div x-cloak x-show="filteredHistory.length > 0" class="space-y-4">
+    <div x-cloak x-show="filteredHistory.length > 0" class="space-y-3">
       <template x-for="(item,i) in filteredHistory" :key="i">
         <div @click="showPreview(item)" 
-             class="panel p-4 rounded-lg border border-[#30363d] hover:border-[#58a6ff] transition-colors cursor-pointer">
-          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+             class="panel p-3 rounded-lg border border-[#30363d] hover:border-[#58a6ff] transition-colors cursor-pointer">
+          <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
             <!-- Main Info -->
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h4 class="font-semibold text-[#c9d1d9] text-lg" x-text="getDisplayTitle(item)"></h4>
-                <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-xs font-medium"></span>
+                <h4 class="font-semibold text-[#c9d1d9] text-base" x-text="getDisplayTitle(item)"></h4>
+                <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-[10px] font-medium"></span>
               </div>
               
               <!-- Enhanced Metadata -->
-              <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-xs text-[#8b949e]">
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-[10px] text-[#8b949e]">
                 <div class="flex items-center">
-                  <i class="fas fa-globe w-4 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-globe w-3 mr-2 text-[#58a6ff]"></i>
                   <span><span x-text="item.domains"></span> domain<span x-show="item.domains !== 1">s</span></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-clock w-4 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-clock w-3 mr-2 text-[#58a6ff]"></i>
                   <span x-text="formatDuration(item.duration)"></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-calendar w-4 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-calendar w-3 mr-2 text-[#58a6ff]"></i>
                   <span x-text="formatDate(item.timestamp)"></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-stopwatch w-4 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-stopwatch w-3 mr-2 text-[#58a6ff]"></i>
                   <span x-text="getTimeAgo(item.timestamp)"></span>
                 </div>
               </div>
               
               <!-- Record Types Detail -->
-              <div x-show="item.recordTypes && item.recordTypes.length > 0" class="mt-3">
-                <div class="flex items-center gap-2 text-xs">
-                  <i class="fas fa-list w-4 text-[#8b949e]"></i>
+              <div x-show="item.recordTypes && item.recordTypes.length > 0" class="mt-2">
+                <div class="flex items-center gap-2 text-[10px]">
+                  <i class="fas fa-list w-3 text-[#8b949e]"></i>
                   <span class="text-[#8b949e]">Record Types:</span>
                   <div class="flex flex-wrap gap-1">
                     <template x-for="(type, typeIndex) in item.recordTypes" :key="'type-' + i + '-' + typeIndex">
-                      <span class="px-2 py-1 bg-[#0d1117] border border-[#30363d] rounded text-[#c9d1d9]" x-text="type"></span>
+                      <span class="px-1.5 py-0.5 bg-[#0d1117] border border-[#30363d] rounded text-[#c9d1d9]" x-text="type"></span>
                     </template>
                   </div>
                 </div>
@@ -136,7 +136,7 @@
               <div class="flex flex-col items-end gap-2">
                 <div class="flex items-center gap-2">
                   <button @click.stop="rerun(item)" 
-                          class="pill pill-outline pill-blue text-xs flex items-center"
+                          class="pill pill-outline pill-blue text-[10px] flex items-center"
                           title="Rerun this query">
                     <i class="fas fa-redo mr-1"></i>Rerun
                   </button>
@@ -158,25 +158,25 @@
          class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
       
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-6 border-b border-[#30363d]">
+      <div class="flex items-center justify-between p-4 border-b border-[#30363d]">
         <div class="flex items-center gap-3">
-          <h3 class="text-xl font-semibold text-[#c9d1d9]">Query Results</h3>
+          <h3 class="text-lg font-semibold text-[#c9d1d9]">Query Results</h3>
           <span x-show="previewData" 
                 :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'" 
                 x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'" 
-                class="text-xs font-medium"></span>
+                class="text-[10px] font-medium"></span>
         </div>
         <button @click="closePreview" 
-                class="text-[#8b949e] hover:text-[#c9d1d9] text-xl">
+                class="text-[#8b949e] hover:text-[#c9d1d9] text-lg">
           <i class="fas fa-times"></i>
         </button>
       </div>
       
       <!-- Modal Content -->
-      <div class="p-6 overflow-y-auto max-h-[60vh] concept-modal-content">
+      <div class="p-4 overflow-y-auto max-h-[60vh] concept-modal-content">
         <div class="space-y-4">
           <!-- Query Info -->
-          <div class="flex flex-wrap gap-4 text-sm text-[#8b949e] mb-6">
+          <div class="flex flex-wrap gap-4 text-xs text-[#8b949e] mb-4">
             <span><i class="fas fa-search mr-2"></i><span x-text="previewData ? getDisplayTitle(previewData) : ''"></span></span>
             <span><i class="fas fa-calendar mr-2"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
             <span><i class="fas fa-clock mr-2"></i><span x-text="formatDuration(previewData?.duration)"></span></span>

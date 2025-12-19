@@ -3,26 +3,26 @@
 {% set active_page='mx' %}
 {% block title %}MX Lookup - DNSTools{% endblock %}
 {% block content %}
-<div x-data="MXPage()" x-init="init()" class="space-y-6">
-  <div class="panel p-6 rounded-xl space-y-4">
+<div x-data="MXPage()" x-init="init()" class="space-y-4">
+  <div class="panel p-4 rounded-xl space-y-4">
     {{ ui.section_header('fa-envelope','MX Lookup & Configuration') }}
     {{ ui.info_banner('fa-info-circle','MX Record Information','MX records define the mail servers responsible for accepting email on behalf of a domain. Lower priority = higher preference.') }}
 
-    <div class="mb-6">
-      <label class="block text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for MX lookup:</label>
-      <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9]" placeholder="example.com" />
-      <p class="mt-2 text-xs text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
+    <div class="mb-4">
+      <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for MX lookup:</label>
+      <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9] text-sm" placeholder="example.com" />
+      <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
     </div>
 
-    <button @click="performLookup" :disabled="loading || !domain.trim()" class="w-full py-3 px-6 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition">
+    <button @click="performLookup" :disabled="loading || !domain.trim()" class="w-full py-2 px-4 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition text-sm">
       <span x-show="!loading"><i class="fas fa-search mr-2"></i>Lookup MX Records</span>
       <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Looking up...</span>
     </button>
   </div>
 
-  <div x-show="results && results.length>0" x-transition style="display: none;" class="panel rounded-xl p-6 space-y-4">
+  <div x-show="results && results.length>0" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
     <div class="flex justify-between items-center">
-      <h3 class="text-lg font-semibold text-[#c9d1d9]"><i class="fas fa-envelope mr-2"></i>MX Records for <span x-text="domain"></span></h3>
+      <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-envelope mr-2"></i>MX Records for <span x-text="domain"></span></h3>
       <div class="flex gap-2">
         <button x-data="{ copied: false }" 
                 @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
@@ -35,18 +35,18 @@
       </div>
     </div>
     <div class="overflow-x-auto">
-      <table class="w-full text-sm">
+      <table class="w-full text-xs">
         <thead>
           <tr class="border-b border-[#30363d] text-[#8b949e]">
-            <th class="text-left py-3 px-4">Priority</th>
-            <th class="text-left py-3 px-4">Mail Server</th>
+            <th class="text-left py-2 px-3">Priority</th>
+            <th class="text-left py-2 px-3">Mail Server</th>
           </tr>
         </thead>
         <tbody>
           <template x-for="r in results" :key="r.exchange">
             <tr class="border-b border-[#30363d] hover:bg-[#161b22] group">
-              <td class="py-3 px-4"><span class="pill pill-outline pill-green" x-text="r.priority"></span></td>
-              <td class="py-3 px-4 font-mono text-[11px]">
+              <td class="py-2 px-3"><span class="pill pill-outline pill-green" x-text="r.priority"></span></td>
+              <td class="py-2 px-3 font-mono text-[11px]">
                 <div class="flex items-center justify-between">
                   <span x-text="r.exchange"></span>
                   <button x-data="{ copied: false }" 
@@ -54,7 +54,7 @@
                           class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
                           :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
                           :title="copied ? 'Copied!' : 'Copy value'">
-                    <i class="fas text-xs" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                    <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                   </button>
                 </div>
               </td>
@@ -66,11 +66,11 @@
   </div>
 
   <div x-show="searchPerformed && !loading && !error && (!results || results.length === 0) && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
-    <p class="text-sm text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No MX records found for <span x-text="domain"></span>. This domain may not accept email or may not exist.</p>
+    <p class="text-xs text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No MX records found for <span x-text="domain"></span>. This domain may not accept email or may not exist.</p>
   </div>
 
   <div x-show="error && error.length>0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
-    <p class="text-sm text-[#f85149]" x-text="error"></p>
+    <p class="text-xs text-[#f85149]" x-text="error"></p>
   </div>
 </div>
 {% endblock %}
