@@ -10,7 +10,8 @@
 
     <div class="mb-6">
       <label class="block text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for DMARC lookup:</label>
-      <input x-model="domain" type="text" class="w-full px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9]" placeholder="example.com" />
+      <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-4 py-3 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9]" placeholder="example.com" />
+      <p class="mt-2 text-xs text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
     </div>
 
     <button @click="performLookup" :disabled="loading || !domain.trim()" class="w-full py-3 px-6 rounded-md font-semibold bg-[#238636] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition">
