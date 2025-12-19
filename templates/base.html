@@ -58,21 +58,37 @@
             display: flex; align-items: center; justify-content: center;
             transition: opacity 0.5s ease-out, visibility 0.5s;
         }
-        .loader-spinner {
-            width: 40px; height: 40px; border: 3px solid #30363d;
-            border-top-color: #58a6ff; border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .loader-content {
+            width: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-bar-bg {
+            width: 100%;
+            height: 2px;
+            background: #30363d;
+            border-radius: 1px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .loader-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: #58a6ff;
+            transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+        }
         .loader-hidden { opacity: 0; visibility: hidden; }
     </style>
 </head>
 <body>
 <!-- Global Loader -->
 <div id="global-loader">
-    <div class="flex flex-col items-center gap-4">
-        <div class="loader-spinner"></div>
-        <div class="text-[#8b949e] text-sm font-medium tracking-wide">LOADING</div>
+    <div class="loader-content">
+        <div class="text-[#8b949e] text-[10px] font-bold tracking-[0.3em]">DNSTOOLS</div>
+        <div class="loader-bar-bg">
+            <div id="loader-progress" class="loader-bar-fill"></div>
+        </div>
     </div>
 </div>
 <script>
@@ -195,13 +211,20 @@
     // Handle Global Loader
     window.addEventListener('load', () => {
         const loader = document.getElementById('global-loader');
+        const progress = document.getElementById('loader-progress');
+        
         if (loader && loader.style.display !== 'none') {
+            // Start progress bar animation
+            setTimeout(() => {
+                if (progress) progress.style.width = '100%';
+            }, 50);
+
             // First visit: Show animation then hide
             setTimeout(() => {
                 loader.classList.add('loader-hidden');
                 setTimeout(() => loader.remove(), 500);
                 sessionStorage.setItem('dt_session_active', 'true');
-            }, 800); // Give it a moment to be seen on first load
+            }, 1600); // Increased from 800ms for a "tiny bit longer" feel
         } else if (loader) {
             // Subsequent visits: Cleanup immediately
             loader.remove();
