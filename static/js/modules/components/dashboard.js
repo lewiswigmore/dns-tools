@@ -10,7 +10,7 @@ export function DashboardPage() {
       stats: {
         totalLookups: 0,
         successRate: 0,
-        sessionTime: '0m',
+        sessionTime: '0s',
         avgResponseTime: '0ms'
       },
       quickLookupDomain: '',
@@ -19,6 +19,7 @@ export function DashboardPage() {
       recentActivity: [],
       topDomains: [],
       currentTip: '',
+      showSessionModal: false,
       dnsTips: [
         "DNS-over-HTTPS (DoH) encrypts your DNS queries to prevent eavesdropping and manipulation.",
         "A 'TTL' (Time to Live) tells DNS resolvers how long to cache a record before asking again.",
@@ -88,7 +89,6 @@ export function DashboardPage() {
       
       initSessionTracking() {
         const SESSION_KEY = 'dnstools_session_start';
-        const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
         
         // Check if there's an existing session
         const existingSession = localStorage.getItem(SESSION_KEY);
@@ -96,16 +96,7 @@ export function DashboardPage() {
         
         if (existingSession) {
           const sessionStart = parseInt(existingSession);
-          const timeSinceLastActivity = now - this.getLastActivity();
-          
-          // If last activity was more than 30 minutes ago, start new session
-          if (timeSinceLastActivity > INACTIVITY_TIMEOUT) {
-            this.sessionStart = now;
-            localStorage.setItem(SESSION_KEY, now.toString());
-          } else {
-            // Continue existing session
-            this.sessionStart = sessionStart;
-          }
+          this.sessionStart = sessionStart;
         } else {
           // Start new session
           this.sessionStart = now;
@@ -166,6 +157,9 @@ export function DashboardPage() {
         // Calculate Top Domains
         const domainCounts = {};
         history.forEach(h => {
+          // Skip non-domain queries (like concepts)
+          if (h.recordTypes && h.recordTypes.includes('CONCEPT')) return;
+          
           const domain = h.query.toLowerCase().trim();
           domainCounts[domain] = (domainCounts[domain] || 0) + 1;
         });
@@ -209,6 +203,12 @@ export function DashboardPage() {
       updateSessionTime(){
         const elapsed = Date.now() - this.sessionStart;
         const totalSeconds = Math.floor(elapsed / 1000);
+        
+        if (totalSeconds >= 86400) {
+          this.stats.sessionTime = '24h+';
+          return;
+        }
+
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds % 3600) / 60);
         const seconds = totalSeconds % 60;
