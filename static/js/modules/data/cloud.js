@@ -1,28 +1,5 @@
 export const CLOUD_CONCEPTS = [
     {
-        id: 'cloud-shared-responsibility',
-        title: 'Shared Responsibility Model',
-        icon: 'fas fa-cloud',
-        iconColor: 'text-[#58a6ff]',
-        tags: ['Cloud Security', 'Basics'],
-        complexity: 'Beginner',
-        summary: 'Who secures what? Understanding the division of security tasks between provider and customer.',
-        content: `
-            <h4>The Cloud Security Line in the Sand</h4>
-            <p>Security and Compliance is a shared responsibility between Cloud Providers (Microsoft Azure, AWS, GCP) and the customer.</p>
-            <div class="grid grid-cols-1 gap-4 my-4">
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#58a6ff] font-semibold mb-1">Provider Responsibility (Security "of" the Cloud)</h5>
-                    <p class="text-sm text-[#8b949e]">Hardware, Global Infrastructure, Compute, Storage, Database, Networking software.</p>
-                </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Customer Responsibility (Security "in" the Cloud)</h5>
-                    <p class="text-sm text-[#8b949e]">Customer Data, IAM (Entra ID), Operating System patches (for VMs), Firewall configuration, Encryption.</p>
-                </div>
-            </div>
-        `
-    },
-    {
         id: 'entra-id-iam',
         title: 'Microsoft Entra ID (IAM)',
         icon: 'fas fa-id-card',
@@ -48,59 +25,6 @@ export const CLOUD_CONCEPTS = [
                         <i class="fas fa-check-circle text-[#3fb950]"></i>
                         <span class="text-[#8b949e]"><strong>Good:</strong> Assigning "Storage Blob Data Reader" role.</span>
                     </div>
-                </div>
-            </div>
-        `
-    },
-    {
-        id: 'cspm-defender',
-        title: 'Microsoft Defender for Cloud',
-        icon: 'fas fa-shield-alt',
-        iconColor: 'text-[#0078d4]',
-        tags: ['Cloud Security', 'Azure'],
-        complexity: 'Intermediate',
-        summary: 'Cloud Security Posture Management (CSPM) and Workload Protection (CWP) in Azure.',
-        content: `
-            <h4>What is Defender for Cloud?</h4>
-            <p>Microsoft Defender for Cloud is a unified cloud-native application protection platform (CNAPP) that helps strengthen your security posture and protects workloads.</p>
-
-            <h4>Key Capabilities</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
-                <li><strong>Secure Score:</strong> A single metric to assess your security posture.</li>
-                <li><strong>Recommendations:</strong> Actionable steps to fix misconfigurations (e.g., "Enable MFA", "Encrypt SQL DB").</li>
-                <li><strong>Threat Detection:</strong> Alerts on suspicious activities like brute force attacks or malware on VMs.</li>
-            </ul>
-        `
-    },
-    {
-        id: 'azure-sentinel',
-        title: 'Microsoft Sentinel (SIEM)',
-        icon: 'fas fa-binoculars',
-        iconColor: 'text-[#0078d4]',
-        tags: ['Cloud Security', 'Azure'],
-        complexity: 'Advanced',
-        summary: 'Cloud-native SIEM and SOAR solution for intelligent security analytics and threat intelligence.',
-        content: `
-            <h4>What is Microsoft Sentinel?</h4>
-            <p>Microsoft Sentinel is a scalable, cloud-native, security information and event management (SIEM) and security orchestration, automation, and response (SOAR) solution.</p>
-
-            <h4>Core Functions</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Collect</h5>
-                    <p class="text-xs text-[#8b949e]">Data at cloud scale across all users, devices, applications, and infrastructure.</p>
-                </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Detect</h5>
-                    <p class="text-xs text-[#8b949e]">Previously undetected threats and minimize false positives using Microsoft's analytics.</p>
-                </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Investigate</h5>
-                    <p class="text-xs text-[#8b949e]">Threats with artificial intelligence and hunt for suspicious activities at scale.</p>
-                </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Respond</h5>
-                    <p class="text-xs text-[#8b949e]">To incidents rapidly with built-in orchestration and automation of common tasks.</p>
                 </div>
             </div>
         `
@@ -214,6 +138,108 @@ export const CLOUD_CONCEPTS = [
                 <li><strong>Automatic Registration:</strong> VMs in the VNet can automatically register their A records.</li>
                 <li><strong>Split-Horizon:</strong> You can have a public zone <code>contoso.com</code> and a private zone <code>contoso.com</code>. Internal users see internal IPs; external users see public IPs.</li>
             </ul>
+        `
+    },
+    {
+        id: 'azure-public-ip',
+        title: 'Azure Public IP Addresses',
+        icon: 'fas fa-globe-americas',
+        iconColor: 'text-[#58a6ff]',
+        tags: ['Azure', 'Networking'],
+        complexity: 'Beginner',
+        summary: 'Understanding Public IP SKUs (Basic vs Standard) and allocation methods.',
+        content: `
+            <h4>Public IP Addresses in Azure</h4>
+            <p>Public IP addresses allow Internet resources to communicate inbound to Azure resources. They also enable Azure resources to communicate outbound to the Internet.</p>
+
+            <h4>SKUs: Basic vs. Standard</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
+                    <h5 class="text-[#58a6ff] font-semibold mb-1">Standard SKU</h5>
+                    <ul class="list-disc list-inside text-xs text-[#8b949e]">
+                        <li><strong>Static only:</strong> IP address doesn't change.</li>
+                        <li><strong>Secure by default:</strong> Closed to inbound traffic unless allowed by NSG.</li>
+                        <li><strong>Zone Redundant:</strong> Can span availability zones.</li>
+                    </ul>
+                </div>
+                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
+                    <h5 class="text-[#d29922] font-semibold mb-1">Basic SKU</h5>
+                    <ul class="list-disc list-inside text-xs text-[#8b949e]">
+                        <li><strong>Dynamic or Static:</strong> Dynamic IPs change on stop/start.</li>
+                        <li><strong>Open by default:</strong> NSG is optional (but recommended).</li>
+                        <li><strong>No Zone Redundancy.</strong></li>
+                    </ul>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 'azure-dns-zones',
+        title: 'Azure DNS Zones',
+        icon: 'fas fa-sitemap',
+        iconColor: 'text-[#a855f7]',
+        tags: ['Azure', 'DNS'],
+        complexity: 'Intermediate',
+        summary: 'Hosting your domains on Azure\'s global name server network.',
+        content: `
+            <h4>Hosting Domains in Azure</h4>
+            <p>Azure DNS allows you to host your DNS domain in Azure and manage your DNS records using the same credentials, APIs, tools, and billing as your other Azure services.</p>
+
+            <h4>Key Benefits</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li><strong>Global Network:</strong> Uses Microsoft's global network of Anycast name servers for ultra-fast query responses.</li>
+                <li><strong>Reliability:</strong> 100% availability SLA.</li>
+                <li><strong>Security:</strong> Supports Role-Based Access Control (RBAC) to restrict who can modify records.</li>
+                <li><strong>Alias Records:</strong> Can point to Azure resources (like Public IPs or Traffic Manager) directly, updating automatically if the resource IP changes.</li>
+            </ul>
+        `
+    },
+    {
+        id: 'private-endpoints',
+        title: 'Private Endpoints (Private Link)',
+        icon: 'fas fa-network-wired',
+        iconColor: 'text-[#3fb950]',
+        tags: ['Azure', 'Networking', 'Security'],
+        complexity: 'Advanced',
+        summary: 'Accessing PaaS services (SQL, Storage) privately from your VNet.',
+        content: `
+            <h4>What is a Private Endpoint?</h4>
+            <p>A Private Endpoint is a network interface that uses a private IP address from your virtual network. This network interface connects you privately and securely to a service powered by Azure Private Link.</p>
+
+            <h4>How it Works</h4>
+            <p>Instead of accessing Azure SQL Database via its public endpoint (<code>sql.database.windows.net</code>), you access it via a private IP (e.g., <code>10.0.1.5</code>) inside your VNet.</p>
+
+            <h4>DNS Integration</h4>
+            <p>To make this work seamlessly, you need to override DNS resolution. Azure creates a CNAME to a private link zone:</p>
+            <pre class="bg-[#0d1117] p-3 rounded border border-[#30363d] text-xs font-mono text-[#c9d1d9] mt-2">
+myserver.database.windows.net 
+  -> myserver.privatelink.database.windows.net 
+    -> 10.0.1.5</pre>
+        `
+    },
+    {
+        id: 'service-tags',
+        title: 'Service Tags',
+        icon: 'fas fa-tags',
+        iconColor: 'text-[#79c0ff]',
+        tags: ['Azure', 'Networking'],
+        complexity: 'Intermediate',
+        summary: 'Simplifying Network Security Group (NSG) rules for Azure services.',
+        content: `
+            <h4>What are Service Tags?</h4>
+            <p>A service tag represents a group of IP address prefixes from a given Azure service. Microsoft manages the address prefixes encompassed by the service tag and automatically updates the service tag as addresses change.</p>
+
+            <h4>Use Cases</h4>
+            <p>Instead of manually maintaining a list of IPs for Azure SQL or Azure Storage in your firewall rules, you can simply allow traffic to the tag:</p>
+            
+            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
+                <ul class="space-y-2 text-sm text-[#c9d1d9]">
+                    <li><strong>Internet:</strong> All public IP addresses outside the VNet.</li>
+                    <li><strong>AzureCloud:</strong> All public IP addresses for Azure cloud services.</li>
+                    <li><strong>Sql:</strong> Azure SQL Database, MySQL, PostgreSQL, etc.</li>
+                    <li><strong>Storage:</strong> Azure Storage.</li>
+                </ul>
+            </div>
         `
     }
 ];

@@ -277,43 +277,5 @@ rule SilentBanker_Trojan {
                 </div>
             </div>
         `
-    },
-    {
-        id: 'zero-trust',
-        title: 'Zero Trust Architecture',
-        icon: 'fas fa-user-lock',
-        iconColor: 'text-[#58a6ff]',
-        tags: ['Security', 'Basics'],
-        complexity: 'Beginner',
-        summary: 'Never Trust, Always Verify: The modern security model for a perimeter-less world.',
-        content: `
-            <h4>The Zero Trust Model</h4>
-            <p>Zero Trust is a strategic initiative that helps prevent successful data breaches by eliminating the concept of trust from an organization's network architecture.</p>
-            
-            <h4>Core Principles</h4>
-            <ul class="space-y-3 my-4">
-                <li class="flex items-start gap-3">
-                    <i class="fas fa-check-circle text-[#3fb950] mt-1"></i>
-                    <div>
-                        <strong class="text-[#c9d1d9]">Verify Explicitly</strong>
-                        <p class="text-xs text-[#8b949e]">Always authenticate and authorize based on all available data points (user identity, location, device health, service or workload, data classification, and anomalies).</p>
-                    </div>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="fas fa-check-circle text-[#3fb950] mt-1"></i>
-                    <div>
-                        <strong class="text-[#c9d1d9]">Use Least Privileged Access</strong>
-                        <p class="text-xs text-[#8b949e]">Limit user access with Just-In-Time and Just-Enough-Access (JIT/JEA), risk-based adaptive polices, and data protection.</p>
-                    </div>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="fas fa-check-circle text-[#3fb950] mt-1"></i>
-                    <div>
-                        <strong class="text-[#c9d1d9]">Assume Breach</strong>
-                        <p class="text-xs text-[#8b949e]">Minimize blast radius and segment access. Verify end-to-end encryption and use analytics to get visibility, drive detection, and improve defenses.</p>
-                    </div>
-                </li>
-            </ul>
-        `
     }
 ];

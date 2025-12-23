@@ -234,5 +234,89 @@ example.com. IN MX 20 backup.mail.example.com.</pre>
                 </ul>
             </div>
         `
+    },
+    {
+        id: 'soa-record',
+        title: 'SOA Record',
+        icon: 'fas fa-crown',
+        iconColor: 'text-[#d29922]',
+        tags: ['DNS', 'Basics'],
+        complexity: 'Advanced',
+        summary: 'Start of Authority: The most important record in a zone file.',
+        content: `
+            <h4>Start of Authority (SOA)</h4>
+            <p>The SOA record is the first record in any zone file. It defines authoritative information about the zone, including the primary name server, the email of the domain administrator, and various timers.</p>
+            
+            <h4>Key Fields</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li><strong>MNAME:</strong> Primary master name server for this zone.</li>
+                <li><strong>RNAME:</strong> Email address of the administrator (where the @ is replaced by a dot).</li>
+                <li><strong>SERIAL:</strong> Revision number of the zone file. Incremented when changes are made.</li>
+                <li><strong>REFRESH:</strong> How often secondary servers should check for updates.</li>
+                <li><strong>RETRY:</strong> How often to retry if the refresh fails.</li>
+                <li><strong>EXPIRE:</strong> How long to keep data if the master is unreachable.</li>
+            </ul>
+        `
+    },
+    {
+        id: 'any-query',
+        title: 'ANY Query',
+        icon: 'fas fa-question-circle',
+        iconColor: 'text-[#f85149]',
+        tags: ['DNS', 'Security'],
+        complexity: 'Intermediate',
+        summary: 'The "wildcard" query often abused for DDoS amplification attacks.',
+        content: `
+            <h4>The ANY Query</h4>
+            <p>A DNS query with type ANY (or *) requests <em>all</em> available records for a domain name. It was originally designed for debugging.</p>
+            
+            <h4>Security Risk: Amplification</h4>
+            <p>Because a small query (60 bytes) can generate a massive response (3000+ bytes) containing A, AAAA, MX, TXT, DNSKEY, and RRSIG records, attackers spoof the victim's IP address and send ANY queries to open resolvers. The resolvers then flood the victim with the large responses.</p>
+            
+            <p class="text-sm text-[#8b949e] mt-2">Note: Many modern DNS providers (like Cloudflare) no longer answer ANY queries fully, returning only a minimal response (HINFO or just one record) to mitigate this risk.</p>
+        `
+    },
+    {
+        id: 'ttl-concept',
+        title: 'Time To Live (TTL)',
+        icon: 'fas fa-hourglass-half',
+        iconColor: 'text-[#79c0ff]',
+        tags: ['DNS', 'Basics'],
+        complexity: 'Beginner',
+        summary: 'How long DNS records are cached by resolvers and browsers.',
+        content: `
+            <h4>What is TTL?</h4>
+            <p>Time To Live (TTL) is a value in a DNS record that tells the resolver how long (in seconds) to cache the record before asking the authoritative server again.</p>
+            
+            <h4>Trade-offs</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
+                    <h5 class="text-[#58a6ff] font-semibold mb-1">Short TTL (e.g., 300s)</h5>
+                    <p class="text-xs text-[#8b949e]">Good for dynamic environments or during migrations. Changes propagate quickly, but increases load on authoritative servers.</p>
+                </div>
+                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
+                    <h5 class="text-[#3fb950] font-semibold mb-1">Long TTL (e.g., 86400s)</h5>
+                    <p class="text-xs text-[#8b949e]">Reduces latency for users (cached locally) and load on servers. Bad if you need to change an IP quickly during an outage.</p>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 'root-hints',
+        title: 'Root Hints',
+        icon: 'fas fa-tree',
+        iconColor: 'text-[#3fb950]',
+        tags: ['DNS', 'Advanced'],
+        complexity: 'Advanced',
+        summary: 'How recursive resolvers know where to start looking for answers.',
+        content: `
+            <h4>Bootstrapping DNS</h4>
+            <p>When a DNS resolver starts up, it knows nothing. It needs a starting point to resolve "www.example.com". That starting point is the <strong>Root Hints</strong> file.</p>
+            
+            <h4>The Root Servers</h4>
+            <p>The file contains the names and IP addresses of the 13 logical root name servers (A.ROOT-SERVERS.NET through M.ROOT-SERVERS.NET). These servers are the top of the DNS hierarchy.</p>
+            
+            <p class="text-sm text-[#8b949e] mt-2">The resolver queries one of these root servers to find the TLD servers (like .com or .net), and walks down the tree from there.</p>
+        `
     }
 ];
