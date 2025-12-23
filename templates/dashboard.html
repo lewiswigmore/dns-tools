@@ -117,7 +117,7 @@
       </div>
     </div>
     
-    <div class="panel p-4 rounded-xl">
+    <div class="panel p-4 rounded-xl cursor-pointer hover:border-[#58a6ff] transition-colors group" @click="showSessionModal = true">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -126,8 +126,8 @@
           </p>
           <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.sessionTime"></p>
         </div>
-        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-clock text-[#c9d1d9] text-xs"></i>
+        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center group-hover:border-[#58a6ff] transition-colors">
+          <i class="fas fa-clock text-[#c9d1d9] text-xs group-hover:text-[#58a6ff] transition-colors"></i>
         </div>
       </div>
     </div>
@@ -321,6 +321,66 @@
       <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-6">
         <i class="fas fa-chart-line text-2xl mb-2"></i>
         <p class="text-xs">No activity yet. Start by running some DNS lookups!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Session Info Modal -->
+  <div x-show="showSessionModal" 
+       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010409]/80 backdrop-blur-sm"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 scale-95"
+       x-transition:enter-end="opacity-100 scale-100"
+       x-transition:leave="transition ease-in duration-100"
+       x-transition:leave-start="opacity-100 scale-100"
+       x-transition:leave-end="opacity-0 scale-95"
+       @keydown.escape.window="showSessionModal = false"
+       style="display: none;">
+    <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl max-w-md w-full overflow-hidden" @click.away="showSessionModal = false">
+      <div class="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#0d1117]">
+        <h3 class="text-sm font-bold text-[#c9d1d9] flex items-center gap-2">
+          <i class="fas fa-clock text-[#58a6ff]"></i> Session Information
+        </h3>
+        <button @click="showSessionModal = false" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-[#8b949e] uppercase tracking-wider">What is a Session?</h4>
+          <p class="text-sm text-[#c9d1d9] leading-relaxed">
+            A session represents your current active period using <span class="logo-font">DNSTools</span>. It starts when you first open the dashboard and persists as long as you remain active.
+          </p>
+        </div>
+        
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-[#8b949e] uppercase tracking-wider">What is it used for?</h4>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
+              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+              <span>Tracks your query volume and success rates for the current day.</span>
+            </li>
+            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
+              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+              <span>Calculates average response times from DNS providers.</span>
+            </li>
+            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
+              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+              <span>Persists indefinitely until you clear your browser data.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="p-3 rounded-lg bg-[#58a6ff1a] border border-[#58a6ff33]">
+          <p class="text-[10px] text-[#58a6ff] font-medium">
+            <i class="fas fa-shield-alt mr-1"></i> Your session data is stored locally in your browser and is never sent to our servers.
+          </p>
+        </div>
+      </div>
+      <div class="p-4 bg-[#0d1117] border-t border-[#30363d] flex justify-end">
+        <button @click="showSessionModal = false" class="px-4 py-2 bg-[#30363d] hover:bg-[#3fb950] text-white rounded-lg text-xs font-medium transition-colors">
+          Got it
+        </button>
       </div>
     </div>
   </div>
