@@ -173,19 +173,6 @@ export function IntelPage() {
             this.currentConcept = conceptObj.title;
             this.conceptModal = true;
             this.loadConcept(conceptObj);
-
-            // Add to History
-            addHistory({
-                query: conceptObj.title,
-                recordTypes: ['CONCEPT'],
-                timestamp: Date.now(),
-                success: true,
-                duration: 0,
-                results: {
-                    id: conceptObj.id,
-                    summary: conceptObj.summary
-                }
-            });
         },
         
         closeConcept() {
