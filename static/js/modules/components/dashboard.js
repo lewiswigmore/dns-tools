@@ -17,7 +17,7 @@ export function DashboardPage() {
       quickIntelQuery: '',
       featuredConcept: null,
       recentActivity: [],
-      topDomains: [],
+      topSearches: [],
       currentTip: '',
       showSessionModal: false,
       dnsTips: [
@@ -154,19 +154,19 @@ export function DashboardPage() {
           type: this.getQueryType(h.recordTypes)
         }));
 
-        // Calculate Top Domains
-        const domainCounts = {};
+        // Calculate Top Searches
+        const searchCounts = {};
         history.forEach(h => {
-          // Skip non-domain queries (like concepts)
+          // Skip non-search queries (like concepts)
           if (h.recordTypes && h.recordTypes.includes('CONCEPT')) return;
           
-          const domain = h.query.toLowerCase().trim();
-          domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+          const query = h.query.toLowerCase().trim();
+          searchCounts[query] = (searchCounts[query] || 0) + 1;
         });
-        this.topDomains = Object.entries(domainCounts)
+        this.topSearches = Object.entries(searchCounts)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5)
-          .map(([domain, count]) => ({ domain, count }));
+          .map(([query, count]) => ({ query, count }));
         
         // Update charts if initialized
         if (this.chartInitialized) {

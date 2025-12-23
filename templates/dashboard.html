@@ -177,24 +177,24 @@
 
   <!-- Insights & Health -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <!-- Top Domains -->
+    <!-- Top Searches -->
     <div class="panel p-4 rounded-xl lg:col-span-1">
       <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
         <i class="fas fa-list-ol text-[#58a6ff]"></i>
-        Top Domains
-        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most frequently queried domains across all sessions"></i>
+        Top Searches
+        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most frequently queried items across all sessions"></i>
       </h3>
       <div class="space-y-2">
-        <template x-for="(item, index) in topDomains" :key="item.domain">
+        <template x-for="(item, index) in topSearches" :key="item.query">
           <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
             <div class="flex items-center gap-2 overflow-hidden">
               <span class="text-[10px] font-bold text-[#8b949e] w-4" x-text="(index + 1) + '.'"></span>
-              <span class="text-[#c9d1d9] text-xs truncate" x-text="item.domain"></span>
+              <span class="text-[#c9d1d9] text-xs truncate" x-text="item.query"></span>
             </div>
             <span class="text-[10px] font-mono text-[#58a6ff] bg-[#58a6ff1a] px-1.5 py-0.5 rounded" x-text="item.count + 'x'"></span>
           </div>
         </template>
-        <div x-show="topDomains.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
+        <div x-show="topSearches.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
           No data yet
         </div>
       </div>
