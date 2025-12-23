@@ -88,14 +88,35 @@
                            placeholder="Search library..." 
                            class="bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58] w-full md:w-48">
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <template x-for="tag in allTags" :key="tag">
+                <div class="flex flex-wrap items-center gap-2">
+                    <template x-for="tag in allTags.slice(0, 3)" :key="tag">
                         <button @click="conceptFilter = tag"
                                 :class="conceptFilter === tag ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#8b949e]'"
                                 class="px-3 py-1.5 rounded-full text-[10px] font-medium border transition-colors whitespace-nowrap"
                                 x-text="tag">
                         </button>
                     </template>
+
+                    <div x-show="allTags.length > 3" class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open" 
+                                :class="!allTags.slice(0, 3).includes(conceptFilter) ? 'bg-[#58a6ff1a] text-[#58a6ff] border-[#58a6ff33]' : 'bg-[#161b22] text-[#8b949e] border-[#30363d]'"
+                                class="px-3 py-1.5 rounded-full text-[10px] font-medium border hover:border-[#8b949e] transition-colors whitespace-nowrap flex items-center gap-1">
+                            <span x-text="!allTags.slice(0, 3).includes(conceptFilter) ? conceptFilter : 'More'"></span>
+                            <i class="fas fa-chevron-down text-[8px]"></i>
+                        </button>
+                        <div x-show="open" 
+                             class="absolute right-0 mt-2 w-40 bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl z-30 py-1 overflow-hidden"
+                             x-transition
+                             style="display: none;">
+                            <template x-for="tag in allTags.slice(3)" :key="tag">
+                                <button @click="conceptFilter = tag; open = false"
+                                        class="w-full text-left px-4 py-2 text-[10px] hover:bg-[#30363d] transition-colors"
+                                        :class="conceptFilter === tag ? 'text-[#58a6ff] font-bold' : 'text-[#8b949e]'"
+                                        x-text="tag">
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
