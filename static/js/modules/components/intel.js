@@ -19,6 +19,7 @@ export function IntelPage() {
         conceptContent: '',
         loadingConcept: false,
         conceptError: '',
+        popstateHandler: null,
 
         init() {
             // Check for query param
@@ -34,27 +35,32 @@ export function IntelPage() {
             if (conceptId) {
                 const concept = this.concepts.find(c => c.id === conceptId);
                 if (concept) {
-                    this.showConcept(concept);
+                    this.showConcept(concept, true);
                 }
             }
 
             // Handle browser back/forward navigation
-            window.addEventListener('popstate', () => {
+            this.popstateHandler = () => {
                 const params = new URLSearchParams(window.location.search);
                 const conceptParam = params.get('concept');
                 
                 if (conceptParam) {
                     const concept = this.concepts.find(c => c.id === conceptParam);
                     if (concept) {
-                        this.showConcept(concept);
+                        this.showConcept(concept, true);
                     }
                 } else if (this.conceptModal) {
-                    this.conceptModal = false;
-                    this.conceptContent = '';
-                    this.conceptError = '';
-                    this.currentConcept = '';
+                    this.closeConcept(true);
                 }
-            });
+            };
+            window.addEventListener('popstate', this.popstateHandler);
+        },
+
+        destroy() {
+            // Cleanup event listener
+            if (this.popstateHandler) {
+                window.removeEventListener('popstate', this.popstateHandler);
+            }
         },
         
         get filteredConcepts() {
@@ -180,7 +186,7 @@ export function IntelPage() {
 
         // --- Knowledge Base Logic ---
 
-        showConcept(concept) {
+        showConcept(concept, skipHistoryUpdate = false) {
             // Handle string input (legacy or direct call) or object
             const conceptObj = typeof concept === 'string' 
                 ? this.concepts.find(c => c.title === concept || c.id === concept) 
@@ -192,22 +198,26 @@ export function IntelPage() {
             this.conceptModal = true;
             this.loadConcept(conceptObj);
             
-            // Update URL with concept query parameter
-            const url = new URL(window.location);
-            url.searchParams.set('concept', conceptObj.id);
-            window.history.pushState({}, '', url);
+            // Update URL with concept query parameter (unless called from popstate handler)
+            if (!skipHistoryUpdate) {
+                const url = new URL(window.location);
+                url.searchParams.set('concept', conceptObj.id);
+                window.history.pushState({}, '', url);
+            }
         },
         
-        closeConcept() {
+        closeConcept(skipHistoryUpdate = false) {
             this.conceptModal = false;
             this.conceptContent = '';
             this.conceptError = '';
             this.currentConcept = '';
             
-            // Remove concept query parameter from URL
-            const url = new URL(window.location);
-            url.searchParams.delete('concept');
-            window.history.pushState({}, '', url);
+            // Remove concept query parameter from URL (unless called from popstate handler)
+            if (!skipHistoryUpdate) {
+                const url = new URL(window.location);
+                url.searchParams.delete('concept');
+                window.history.pushState({}, '', url);
+            }
         },
         
         async loadConcept(conceptObj) {

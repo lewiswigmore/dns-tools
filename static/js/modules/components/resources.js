@@ -12,6 +12,7 @@ export function ResourcesPage() {
       complexityFilter: 'All',
       categoryFilter: 'All',
       searchQuery: '',
+      popstateHandler: null,
       
       get filteredKnowledgeBase() {
         let items = this.knowledgeBase;
@@ -70,21 +71,29 @@ export function ResourcesPage() {
         if (concept) {
             // Wait a tick for Alpine to initialize
             this.$nextTick(() => {
-                this.showConcept(decodeURIComponent(concept));
+                this.showConcept(decodeURIComponent(concept), true);
             });
         }
 
         // Handle browser back/forward navigation
-        window.addEventListener('popstate', () => {
+        this.popstateHandler = () => {
             const params = new URLSearchParams(window.location.search);
             const conceptParam = params.get('concept');
             
             if (conceptParam) {
-                this.showConcept(decodeURIComponent(conceptParam));
+                this.showConcept(decodeURIComponent(conceptParam), true);
             } else if (this.conceptModal) {
-                this.closeConcept();
+                this.closeConcept(true);
             }
-        });
+        };
+        window.addEventListener('popstate', this.popstateHandler);
+      },
+
+      destroy() {
+        // Cleanup event listener
+        if (this.popstateHandler) {
+            window.removeEventListener('popstate', this.popstateHandler);
+        }
       },
       
       initRandomPulseAnimations() {
@@ -117,27 +126,31 @@ export function ResourcesPage() {
         });
       },
       
-      showConcept(conceptName) {
+      showConcept(conceptName, skipHistoryUpdate = false) {
         this.currentConcept = conceptName;
         this.conceptModal = true;
         this.loadConcept(conceptName);
         
-        // Update URL with concept query parameter
-        const url = new URL(window.location);
-        url.searchParams.set('concept', conceptName);
-        window.history.pushState({}, '', url);
+        // Update URL with concept query parameter (unless called from popstate handler)
+        if (!skipHistoryUpdate) {
+            const url = new URL(window.location);
+            url.searchParams.set('concept', encodeURIComponent(conceptName));
+            window.history.pushState({}, '', url);
+        }
       },
       
-      closeConcept() {
+      closeConcept(skipHistoryUpdate = false) {
         this.conceptModal = false;
         this.conceptContent = '';
         this.conceptError = '';
         this.currentConcept = '';
         
-        // Remove concept query parameter from URL
-        const url = new URL(window.location);
-        url.searchParams.delete('concept');
-        window.history.pushState({}, '', url);
+        // Remove concept query parameter from URL (unless called from popstate handler)
+        if (!skipHistoryUpdate) {
+            const url = new URL(window.location);
+            url.searchParams.delete('concept');
+            window.history.pushState({}, '', url);
+        }
       },
       
       async loadConcept(conceptName) {
