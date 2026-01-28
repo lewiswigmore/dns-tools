@@ -73,6 +73,18 @@ export function ResourcesPage() {
                 this.showConcept(decodeURIComponent(concept));
             });
         }
+
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const conceptParam = params.get('concept');
+            
+            if (conceptParam) {
+                this.showConcept(decodeURIComponent(conceptParam));
+            } else if (this.conceptModal) {
+                this.closeConcept();
+            }
+        });
       },
       
       initRandomPulseAnimations() {
@@ -109,6 +121,11 @@ export function ResourcesPage() {
         this.currentConcept = conceptName;
         this.conceptModal = true;
         this.loadConcept(conceptName);
+        
+        // Update URL with concept query parameter
+        const url = new URL(window.location);
+        url.searchParams.set('concept', conceptName);
+        window.history.pushState({}, '', url);
       },
       
       closeConcept() {
@@ -116,6 +133,11 @@ export function ResourcesPage() {
         this.conceptContent = '';
         this.conceptError = '';
         this.currentConcept = '';
+        
+        // Remove concept query parameter from URL
+        const url = new URL(window.location);
+        url.searchParams.delete('concept');
+        window.history.pushState({}, '', url);
       },
       
       async loadConcept(conceptName) {
