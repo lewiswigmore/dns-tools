@@ -33,12 +33,11 @@ Skills are **local developer tools** that extend AI assistant capabilities with 
 ### Skill location
 
 ```
-.agents/skills/          ← canonical skill files (universal, all agents)
-.claude/skills/          ← symlinks to .agents/skills/ for Claude Code
+.agents/skills/          ← canonical skill files (source of truth, all agents)
 skills-lock.json         ← version lock file (auto-generated)
 ```
 
-Both directories and `skills-lock.json` are listed in `.gitignore`. When contributing to this project, reinstall skills locally using the commands below.
+Both are listed in `.gitignore`. When contributing to this project, reinstall skills locally using the commands below.
 
 ### Installed skills
 

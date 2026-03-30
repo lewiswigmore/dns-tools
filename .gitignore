@@ -94,5 +94,4 @@ tmp/
 # Run: npx skills add <owner/repo@skill> to reinstall
 # See .github/copilot-instructions.md for the full skill list
 .agents/
-.claude/
 skills-lock.json
