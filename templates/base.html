@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https:;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}DNSTools{% endblock %}</title>
-    <meta name="description" content="A Web UI for Google DNS - Fast DNS lookups using Google's DNS-over-HTTPS service">
+    <meta name="description" content="DNSTools — A privacy-focused web toolkit for DNS lookups, WHOIS/RDAP queries, email security analysis, and threat intelligence. 100% client-side.">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}" media="(prefers-color-scheme: dark)">
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/dns-tools-logo-light.svg') }}" media="(prefers-color-scheme: light)">
     <link rel="alternate icon" href="{{ url_for('static', filename='images/dns-tools-logo-dark.svg') }}">
@@ -159,7 +159,7 @@
                     </button>
                 </div>
             </div>
-            <p class="text-[9px] text-[#8b949e] tracking-tight">A Web UI for Google DNS</p>
+            <p class="text-[9px] text-[#8b949e] tracking-tight">DNS, WHOIS & Email Security Toolkit</p>
         </div>
         <nav class="flex-1 p-3 space-y-4 text-xs font-medium overflow-y-auto">
             <!-- Overview -->
@@ -443,14 +443,15 @@
             </button>
         </div>
         <div class="space-y-3 text-sm text-[#c9d1d9]">
-            <p><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is a privacy-focused, client-side web interface for DNS lookups. It connects directly from your browser to DNS-over-HTTPS (DoH) providers, ensuring your queries are encrypted and never logged by this application.</p>
+            <p><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is a privacy-focused, client-side web toolkit for DNS lookups, WHOIS/RDAP domain registration queries, and email security analysis. All queries run directly from your browser — nothing is logged by this application.</p>
             
             <div class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3">
-                <h4 class="font-medium text-[#58a6ff] mb-2">DNS Queries via:</h4>
+                <h4 class="font-medium text-[#58a6ff] mb-2">Providers:</h4>
                 <ul class="text-xs text-[#8b949e] space-y-1">
-                    <li>• <span class="font-mono">dns.google/resolve</span> (Primary)</li>
-                    <li>• <span class="font-mono">cloudflare-dns.com/dns-query</span> (Fallback)</li>
-                    <li>• <span class="font-mono">dns.quad9.net/dns-query</span> (Fallback)</li>
+                    <li>• <span class="font-mono">dns.google/resolve</span> — DNS (Primary)</li>
+                    <li>• <span class="font-mono">cloudflare-dns.com/dns-query</span> — DNS (Fallback)</li>
+                    <li>• <span class="font-mono">dns.quad9.net/dns-query</span> — DNS (Fallback)</li>
+                    <li>• <span class="font-mono">data.iana.org/rdap</span> — WHOIS/RDAP Bootstrap</li>
                 </ul>
             </div>
             
@@ -546,14 +547,14 @@ x-cloak>
                     <i class="fas fa-globe text-2xl text-[#58a6ff]"></i>
                 </div>
                 <h2 class="text-xl font-bold text-white mb-2">Welcome to <span class="logo-font">DNSTools</span></h2>
-                <p class="text-[#8b949e] text-sm">Your privacy-focused, client-side DNS analysis workspace.</p>
+                <p class="text-[#8b949e] text-sm">Your privacy-focused, client-side DNS, WHOIS & email security toolkit.</p>
             </div>
             <div class="space-y-3 mb-6">
                 <div class="flex items-start gap-3 p-3 rounded-lg bg-[#0d1117] border border-[#30363d]">
                     <i class="fas fa-shield-alt text-[#3fb950] mt-1"></i>
                     <div>
                         <h4 class="text-sm font-semibold text-[#c9d1d9]">100% Client-Side</h4>
-                        <p class="text-xs text-[#8b949e]">Queries run directly from your browser to Google/Cloudflare via DoH. No backend tracking.</p>
+                        <p class="text-xs text-[#8b949e]">All queries run directly from your browser — DNS via DoH, WHOIS via RDAP. No backend tracking.</p>
                     </div>
                 </div>
             </div>
@@ -585,12 +586,16 @@ x-cloak>
                     <i class="fas fa-tools text-2xl text-[#a855f7]"></i>
                 </div>
                 <h2 class="text-xl font-bold text-white mb-2">Comprehensive Toolkit</h2>
-                <p class="text-[#8b949e] text-sm">Everything you need for DNS & Email security.</p>
+                <p class="text-[#8b949e] text-sm">DNS, WHOIS, email security & threat intelligence — all in one place.</p>
             </div>
-            <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="grid grid-cols-3 gap-3 mb-6">
                 <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-center hover:border-[#58a6ff] transition-colors">
                     <i class="fas fa-search text-[#58a6ff] mb-2 text-lg"></i>
                     <p class="text-xs text-[#c9d1d9] font-medium">DNS Lookup</p>
+                </div>
+                <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-center hover:border-[#bc8cff] transition-colors">
+                    <i class="fas fa-id-card text-[#bc8cff] mb-2 text-lg"></i>
+                    <p class="text-xs text-[#c9d1d9] font-medium">WHOIS</p>
                 </div>
                 <div class="p-3 rounded bg-[#0d1117] border border-[#30363d] text-center hover:border-[#3fb950] transition-colors">
                     <i class="fas fa-envelope text-[#3fb950] mb-2 text-lg"></i>
