@@ -50,6 +50,7 @@ Both directories and `skills-lock.json` are listed in `.gitignore`. When contrib
 | `gh-pages-deploy` | GitHub Pages static deployment via `gh` CLI | `npx skills add aviz85/claude-skills-library@gh-pages-deploy` |
 | `csrf-protection` | CSRF token validation for Flask POST/PUT/DELETE endpoints | `npx skills add harperaa/secure-claude-skills@csrf-protection` |
 | `gh-cli` | GitHub CLI (`gh`) — PRs, issues, releases, Pages, Actions | `npx skills add github/awesome-copilot@gh-cli` |
+| `local-dev` | Local development setup — Flask dev server, static build, env config | *(local-only — create `.agents/skills/local-dev/SKILL.md` manually)* |
 
 ### Reinstall all skills at once
 
@@ -69,7 +70,8 @@ app.py                        Flask application and API routes
 generate_static.py            Static site generator (Flask → dist/)
 templates/                    Jinja2 HTML templates
 static/js/modules/            Vanilla JS ES module frontend
-  components/                 Page-level UI components
+  components/                 Page-level UI components (lookup, whois, dmarc, etc.)
+  rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
 tests/                        Pytest security and regression checks
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
