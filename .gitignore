@@ -89,3 +89,10 @@ results/
 # Temporary files
 temp/
 tmp/
+
+# Agent skills (installed locally per-developer, not committed)
+# Run: npx skills add <owner/repo@skill> to reinstall
+# See .github/copilot-instructions.md for the full skill list
+.agents/
+.claude/
+skills-lock.json
