@@ -82,6 +82,7 @@ tests/                        Pytest security and regression checks
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
+- WHOIS/RDAP lookups in `rdap-client.js` use IANA bootstrap (`data.iana.org/rdap/dns.json`) to find authoritative RDAP servers and query them directly from the browser
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
 
@@ -94,4 +95,5 @@ tests/                        Pytest security and regression checks
 - **2026-03-30** — `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
 - **2026-03-30** — `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent Skills section above).
 - **2026-03-30** — Flask API write operations now enforce CSRF: client code must fetch token from `/api/csrf-token` (or read template-provided token) and send it in `X-CSRF-Token`; otherwise API responds `403 Invalid or missing CSRF token`.
+- **2026-03-30** — CSP `connect-src` uses `https:` (all HTTPS origins) because RDAP servers span hundreds of different domains; this is necessary for the WHOIS/RDAP lookup feature to reach arbitrary registry servers.
 

@@ -8,6 +8,7 @@ import { HistoryPage } from './modules/components/history.js';
 import { DashboardPage } from './modules/components/dashboard.js';
 import { ResourcesPage } from './modules/components/resources.js';
 import { IntelPage } from './modules/components/intel.js';
+import { WhoisPage } from './modules/components/whois.js';
 import { CommandPalette } from './modules/components/command-palette.js';
 
 // Initialize DNS Client
@@ -22,6 +23,7 @@ window.HistoryPage = HistoryPage;
 window.DashboardPage = DashboardPage;
 window.ResourcesPage = ResourcesPage;
 window.IntelPage = IntelPage;
+window.WhoisPage = WhoisPage;
 window.CommandPalette = CommandPalette;
 
 // Register with Alpine if it's already loaded, otherwise wait for alpine:init
@@ -76,6 +78,7 @@ const registerComponents = () => {
         window.Alpine.data('DashboardPage', DashboardPage);
         window.Alpine.data('ResourcesPage', ResourcesPage);
         window.Alpine.data('IntelPage', IntelPage);
+        window.Alpine.data('WhoisPage', WhoisPage);
         window.Alpine.data('CommandPalette', CommandPalette);
     }
 };

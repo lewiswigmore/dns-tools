@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% import 'components.html' as ui %}
+{% set active_page='whois' %}
+{% block title %}WHOIS Lookup - DNSTools{% endblock %}
+{% block content %}
+<div x-data="WhoisPage()" x-init="init()" class="space-y-4">
+
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-semibold text-[#c9d1d9]">WHOIS Lookup</h2>
+      <p class="text-xs text-[#8b949e]">Query domain registration data via RDAP — ICANN's modern WHOIS replacement</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+    <!-- Input Panel -->
+    <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
+      {{ ui.info_banner('fa-info-circle','About RDAP','Registration Data Access Protocol (RDAP) is the IETF-standard replacement for WHOIS. It returns structured JSON directly from the authoritative registry — no third-party proxy required.') }}
+
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain to look up:</label>
+        <input x-model="domain" @keyup.enter="performLookup" type="text"
+               class="w-full px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9] text-sm"
+               placeholder="example.com" />
+        <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run. Queries the authoritative registry RDAP server directly from your browser.</p>
+      </div>
+
+      <button @click="performLookup"
+              :disabled="loading || !domain.trim()"
+              disabled
+              class="w-full py-2 px-4 rounded-md font-semibold bg-[#30363d] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition text-sm"
+              :class="!(loading || !domain.trim()) ? 'bg-[#238636]' : 'bg-[#30363d]'">
+        <span x-show="!loading"><i class="fas fa-search mr-2"></i>WHOIS Lookup</span>
+        <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Querying registry...</span>
+      </button>
+    </div>
+
+    <!-- Help Sidebar -->
+    <div class="lg:col-span-1">
+      {{ ui.help_card('WHOIS / RDAP Basics', 'fa-id-card', [
+        'RDAP replaces legacy WHOIS with structured JSON.',
+        'All gTLDs (.com, .org, .net, etc.) support RDAP.',
+        'Many ccTLDs also support RDAP (.uk, .fr, .br, .au).',
+        'Registrant data is mostly redacted under GDPR.',
+        'DNSSEC signing status is included in the response.'
+      ]) }}
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div x-show="result" x-transition style="display: none;" class="space-y-4">
+    <!-- Header -->
+    <div class="panel rounded-xl p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-id-card mr-2"></i>Registration Data for <span class="text-[#58a6ff]" x-text="result?.ldhName"></span></h3>
+        <div class="flex gap-2">
+          <button x-data="{ copied: false }"
+                  @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)"
+                  class="pill pill-outline pill-blue transition-all duration-200"
+                  :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+            <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+            <span x-text="copied ? 'Copied!' : 'Copy All'"></span>
+          </button>
+          <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+        </div>
+      </div>
+
+      <!-- Registration Overview -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        <!-- Registrar -->
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registrar</p>
+          <p class="text-sm font-semibold text-[#c9d1d9] truncate" x-text="result?.registrar?.name || 'N/A'" :title="result?.registrar?.name"></p>
+        </div>
+        <!-- Registered -->
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registered</p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.events?.registration?.date)"></p>
+        </div>
+        <!-- Expires -->
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Expires</p>
+          <p class="text-sm font-semibold" 
+             :class="result?.events?.expiration?.date && new Date(result.events.expiration.date) < new Date(Date.now() + 30*86400000) ? 'text-[#f85149]' : 'text-[#c9d1d9]'"
+             x-text="formatDate(result?.events?.expiration?.date)"></p>
+        </div>
+        <!-- Last Updated -->
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Last Updated</p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.events?.['last changed']?.date)"></p>
+        </div>
+      </div>
+
+      <!-- Status Codes -->
+      <div x-show="result?.status?.length > 0" class="mb-4">
+        <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2">Domain Status</p>
+        <div class="flex flex-wrap gap-1.5">
+          <template x-for="s in result?.status || []" :key="s">
+            <span class="pill pill-outline text-[10px]" :class="statusClass(s)" x-text="s"></span>
+          </template>
+        </div>
+      </div>
+
+      <!-- RDAP Server Info -->
+      <div class="text-[10px] text-[#6e7681]">
+        <i class="fas fa-server mr-1"></i> Queried: <span x-text="serverUrl"></span>
+      </div>
+    </div>
+
+    <!-- Nameservers -->
+    <div x-show="result?.nameservers?.length > 0" class="panel rounded-xl p-4">
+      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-server mr-2 text-[#58a6ff]"></i>Nameservers</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs responsive-table">
+          <thead>
+            <tr class="border-b border-[#30363d] text-[#8b949e]">
+              <th class="text-left py-2 px-3">Hostname</th>
+              <th class="text-left py-2 px-3">IPv4</th>
+              <th class="text-left py-2 px-3">IPv6</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="ns in result?.nameservers || []" :key="ns.ldhName">
+              <tr class="border-b border-[#30363d] hover:bg-[#161b22] group">
+                <td class="py-2 px-3 font-mono text-[11px]" data-label="Hostname">
+                  <div class="flex items-center justify-between">
+                    <span x-text="ns.ldhName"></span>
+                    <button x-data="{ copied: false }"
+                            @click="copyToClipboard(ns.ldhName); copied = true; setTimeout(() => copied = false, 1000)"
+                            class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
+                            :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'">
+                      <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
+                    </button>
+                  </div>
+                </td>
+                <td class="py-2 px-3 font-mono text-[11px] text-[#8b949e]" data-label="IPv4" x-text="ns.ipv4.join(', ') || '—'"></td>
+                <td class="py-2 px-3 font-mono text-[11px] text-[#8b949e]" data-label="IPv6" x-text="ns.ipv6.join(', ') || '—'"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DNSSEC -->
+    <div x-show="result?.secureDNS" class="panel rounded-xl p-4">
+      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-lock mr-2 text-[#58a6ff]"></i>DNSSEC</h4>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="pill pill-outline" :class="result?.secureDNS?.delegationSigned ? 'pill-green' : 'pill-orange'"
+              x-text="result?.secureDNS?.delegationSigned ? 'Delegation Signed' : 'Unsigned'"></span>
+        <span x-show="result?.secureDNS?.zoneSigned !== null" class="pill pill-outline"
+              :class="result?.secureDNS?.zoneSigned ? 'pill-green' : 'pill-orange'"
+              x-text="result?.secureDNS?.zoneSigned ? 'Zone Signed' : 'Zone Unsigned'"></span>
+      </div>
+      <!-- DS Records -->
+      <template x-if="result?.secureDNS?.dsData?.length > 0">
+        <div class="mt-3">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2">DS Records</p>
+          <div class="space-y-1">
+            <template x-for="ds in result.secureDNS.dsData" :key="ds.keyTag + '-' + ds.digestType">
+              <div class="bg-[#0d1117] rounded-lg p-2 border border-[#30363d] text-[11px] font-mono text-[#8b949e]">
+                Key Tag: <span class="text-[#c9d1d9]" x-text="ds.keyTag"></span> &middot;
+                Algorithm: <span class="text-[#c9d1d9]" x-text="ds.algorithm"></span> &middot;
+                Digest Type: <span class="text-[#c9d1d9]" x-text="ds.digestType"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Raw RDAP JSON Toggle -->
+    <div class="panel rounded-xl p-4">
+      <button @click="showRaw = !showRaw" class="flex items-center gap-2 text-xs font-semibold text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+        <i class="fas" :class="showRaw ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
+        <span x-text="showRaw ? 'Hide Raw RDAP Response' : 'Show Raw RDAP Response'"></span>
+      </button>
+      <div x-show="showRaw" x-transition style="display: none;" class="mt-3">
+        <pre class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 text-[11px] font-mono text-[#8b949e] overflow-auto max-h-96" x-text="JSON.stringify(result?.raw, null, 2)"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- No result / domain not found -->
+  <div x-show="searchPerformed && !loading && !error && !result && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
+    <p class="text-xs text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No registration data found for <span x-text="domain"></span>.</p>
+  </div>
+
+  <!-- Error -->
+  <div x-show="error && error.length > 0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
+    <p class="text-xs text-[#f85149]"><i class="fas fa-exclamation-triangle mr-2"></i><span x-text="error"></span></p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}{% endblock %}
