@@ -4,6 +4,7 @@ import logging
 import asyncio
 import aiohttp
 import os
+import secrets
 from urllib.parse import quote
 from flask import Flask, render_template, request, jsonify, session
 from concurrent.futures import ThreadPoolExecutor
@@ -21,6 +22,42 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dns-intelligence-platform-secret-
 if app.secret_key == 'dns-intelligence-platform-secret-key-change-in-production':
     logger.warning('Using default development SECRET_KEY; set environment variable SECRET_KEY for production security and stable sessions.')
 
+# Session cookie hardening defaults
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('FLASK_ENV') == 'production'
+
+
+def get_csrf_token():
+    """Get or create a session-bound CSRF token."""
+    token = session.get('csrf_token')
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session['csrf_token'] = token
+        session.modified = True
+    return token
+
+
+@app.context_processor
+def inject_csrf_token():
+    """Expose CSRF token to templates for frontend fetch clients."""
+    return {'csrf_token': get_csrf_token()}
+
+
+@app.before_request
+def enforce_csrf_for_api():
+    """Require CSRF token for mutating API requests."""
+    if request.path.startswith('/api/') and request.method in {'POST', 'PUT', 'PATCH', 'DELETE'}:
+        expected_token = get_csrf_token()
+        provided_token = request.headers.get('X-CSRF-Token')
+
+        if not provided_token:
+            json_data = request.get_json(silent=True) or {}
+            provided_token = json_data.get('csrf_token') if isinstance(json_data, dict) else None
+
+        if not provided_token or not secrets.compare_digest(provided_token, expected_token):
+            return jsonify({'error': 'Invalid or missing CSRF token'}), 403
+
 # Security headers
 @app.after_request
 def after_request(response):
@@ -36,8 +73,6 @@ def after_request(response):
 # Production configuration
 if os.environ.get('FLASK_ENV') == 'production':
     app.config['SESSION_COOKIE_SECURE'] = True
-    app.config['SESSION_COOKIE_HTTPONLY'] = True
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Simple rate limiting without quotas (prevent spam)
 def simple_rate_limit():
@@ -399,6 +434,12 @@ def test_endpoint():
     except Exception as e:
         return jsonify({'status': 'error', 'error': str(e)}), 500
 
+
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf_token_endpoint():
+    """Return current session CSRF token for API clients."""
+    return jsonify({'csrf_token': get_csrf_token()})
+
 @app.route('/api/lookup', methods=['POST'])
 def lookup_domains():
     """API endpoint for DNS lookup with simple rate limiting"""
@@ -723,4 +764,5 @@ def api_headers_analysis():
 
 if __name__ == '__main__':
     # Development server
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    debug_enabled = os.environ.get('FLASK_DEBUG', '').lower() in {'1', 'true', 'yes'}
+    app.run(debug=debug_enabled, host='0.0.0.0', port=5000)

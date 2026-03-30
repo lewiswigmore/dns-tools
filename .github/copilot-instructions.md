@@ -33,11 +33,12 @@ Skills are **local developer tools** that extend AI assistant capabilities with 
 ### Skill location
 
 ```
-.agents/skills/          ← canonical skill files (source of truth, all agents)
+.agents/skills/          ← canonical skill files (universal, all agents)
+.claude/skills/          ← symlinks to .agents/skills/ for Claude Code
 skills-lock.json         ← version lock file (auto-generated)
 ```
 
-Both are listed in `.gitignore`. When contributing to this project, reinstall skills locally using the commands below.
+Both directories and `skills-lock.json` are listed in `.gitignore`. When contributing to this project, reinstall skills locally using the commands below.
 
 ### Installed skills
 
@@ -70,6 +71,7 @@ templates/                    Jinja2 HTML templates
 static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components
   data/                       Static knowledge base data
+tests/                        Pytest security and regression checks
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
@@ -79,6 +81,7 @@ static/js/modules/            Vanilla JS ES module frontend
 - JS modules use native ES module imports (no bundler)
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - Security headers are set in `app.py` `after_request` hook
+- Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
 
 ## Known Gotchas
 
@@ -87,5 +90,6 @@ static/js/modules/            Vanilla JS ES module frontend
 
 - **2026-03-30** — `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
 - **2026-03-30** — `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
-- **2026-03-30** — `.agents/`, `.claude/`, and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent Skills section above).
+- **2026-03-30** — `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent Skills section above).
+- **2026-03-30** — Flask API write operations now enforce CSRF: client code must fetch token from `/api/csrf-token` (or read template-provided token) and send it in `X-CSRF-Token`; otherwise API responds `403 Invalid or missing CSRF token`.
 
