@@ -11,7 +11,7 @@ export function HistoryPage() {
       
       init() {
         window.historyPageInstance = this;
-        this.history = loadHistory() || []; // Ensure we always have an array
+        this.history = (loadHistory() || []).filter(h => !h.recordTypes || !h.recordTypes.includes('CONCEPT'));
         this.applyFilters();
       },
       
