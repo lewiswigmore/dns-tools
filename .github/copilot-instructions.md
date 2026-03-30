@@ -31,6 +31,7 @@ Both directories and `skills-lock.json` are listed in `.gitignore`. When contrib
 | `flask` | Flask routing, blueprints, Jinja2, request handling | `npx skills add bobmatnyc/claude-mpm-skills@flask` |
 | `gh-pages-deploy` | GitHub Pages static deployment via `gh` CLI | `npx skills add aviz85/claude-skills-library@gh-pages-deploy` |
 | `csrf-protection` | CSRF token validation for Flask POST/PUT/DELETE endpoints | `npx skills add harperaa/secure-claude-skills@csrf-protection` |
+| `gh-cli` | GitHub CLI (`gh`) — PRs, issues, releases, Pages, Actions | `npx skills add github/awesome-copilot@gh-cli` |
 
 ### Reinstall all skills at once
 
@@ -40,6 +41,7 @@ npx skills add hairyf/skills@tailwindcss
 npx skills add bobmatnyc/claude-mpm-skills@flask
 npx skills add aviz85/claude-skills-library@gh-pages-deploy
 npx skills add harperaa/secure-claude-skills@csrf-protection
+npx skills add github/awesome-copilot@gh-cli
 ```
 
 ## Project Structure
