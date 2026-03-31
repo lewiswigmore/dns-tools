@@ -1,5 +1,5 @@
 import { addHistory, exportJSON } from '../utils.js';
-import { queryDomain, preloadBootstrap } from '../rdap-client.js';
+import { queryTarget, preloadBootstrap } from '../rdap-client.js';
 import { DNSClient } from '../dns-client.js';
 
 export function WhoisPage() {
@@ -18,7 +18,7 @@ export function WhoisPage() {
       preloadBootstrap();
 
       const params = new URLSearchParams(window.location.search);
-      const domainParam = params.get('domain');
+      const domainParam = params.get('domain') || params.get('target') || params.get('ip');
       if (domainParam) {
         this.domain = domainParam;
         setTimeout(() => this.performLookup(), 100);
@@ -37,12 +37,14 @@ export function WhoisPage() {
 
       const startTime = Date.now();
       try {
-        const { result, server } = await queryDomain(this.domain.trim().toLowerCase());
+        const { result, server, queryType } = await queryTarget(this.domain.trim().toLowerCase());
         this.result = result;
         this.serverUrl = server;
 
-        // RDAP frequently omits nameserver glue addresses; enrich with DoH A/AAAA lookups.
-        this.enrichNameserverIPs();
+        // RDAP frequently omits nameserver glue addresses; enrich only for domain lookups.
+        if (queryType === 'domain') {
+          this.enrichNameserverIPs();
+        }
 
         const duration = (Date.now() - startTime) / 1000;
         addHistory({
@@ -51,7 +53,7 @@ export function WhoisPage() {
           domains: 1,
           duration,
           success: true,
-          recordTypes: ['WHOIS'],
+          recordTypes: [queryType === 'ip' ? 'WHOIS-IP' : 'WHOIS'],
           results: [{ domain: this.domain, registrar: result.registrar?.name }],
         });
       } catch (err) {
@@ -134,6 +136,14 @@ export function WhoisPage() {
       return value.includes(':');
     },
 
+    isIpResult() {
+      return this.result?.kind === 'ip';
+    },
+
+    isDomainResult() {
+      return this.result?.kind !== 'ip';
+    },
+
     /** Format an ISO date string for display. */
     formatDate(iso) {
       if (!iso) return '—';
@@ -168,8 +178,18 @@ export function WhoisPage() {
     async copyAllResults() {
       if (!this.result) return;
       const r = this.result;
-      let text = `# WHOIS / RDAP for ${r.ldhName}\n\n`;
+      const label = r.kind === 'ip' ? (r.startAddress || this.domain) : r.ldhName;
+      let text = `# WHOIS / RDAP for ${label}\n\n`;
       text += `**Date:** ${new Date().toLocaleString()}\n\n`;
+      if (r.kind === 'ip') {
+        if (r.networkName) text += `**Network:** ${r.networkName}\n`;
+        if (r.networkType) text += `**Type:** ${r.networkType}\n`;
+        if (r.ipVersion) text += `**IP Version:** ${r.ipVersion}\n`;
+        if (r.startAddress) text += `**Start Address:** ${r.startAddress}\n`;
+        if (r.endAddress) text += `**End Address:** ${r.endAddress}\n`;
+        if (r.cidrBlocks?.length) text += `**CIDR:** ${r.cidrBlocks.join(', ')}\n`;
+        if (r.country) text += `**Country:** ${r.country}\n`;
+      }
       if (r.handle) text += `**Domain ID:** ${r.handle}\n`;
       if (r.registrar) text += `**Registrar:** ${r.registrar.name}\n`;
       if (r.registrar?.handle) text += `**Registrar ID:** ${r.registrar.handle}\n`;
