@@ -23,6 +23,14 @@ microsoft.com
 google.com
 contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-xs leading-relaxed text-[#c9d1d9]"></textarea>
         <p class="mt-2 text-[10px] text-[#8b949e]">Supports standard & obfuscated formats (e.g. google[.]com, hxxp://example[.]org), and accepts commas, spaces, or newlines. Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Ctrl</kbd> + <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
+          <template x-for="preset in presets" :key="preset.label">
+            <button @click="applyPresetDomains(preset.value)" type="button" class="pill pill-outline pill-blue text-[10px]">
+              <span x-text="preset.label"></span>
+            </button>
+          </template>
+        </div>
       </div>
 
       <div class="mb-4">

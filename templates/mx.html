@@ -20,6 +20,14 @@
         <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain for MX lookup:</label>
         <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9] text-sm" placeholder="example.com" />
         <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
+        <div class="mt-2 flex flex-wrap items-center gap-2">
+          <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
+          <template x-for="preset in presets" :key="preset.value">
+            <button @click="applyPreset(preset.value)" type="button" class="pill pill-outline pill-blue text-[10px]">
+              <span x-text="preset.label"></span>
+            </button>
+          </template>
+        </div>
       </div>
 
       <!-- Compare Providers Toggle -->

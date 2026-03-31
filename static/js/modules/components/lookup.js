@@ -3,6 +3,11 @@ import { presetDomains, presetRecordTypes, addHistory, exportJSON, autoGrow } fr
 export function LookupPage() {
     return {
       domains: presetDomains(),
+      presets: [
+        { label: 'google.com', value: 'google.com' },
+        { label: 'cloudflare.com', value: 'cloudflare.com' },
+        { label: 'openai.com + github.com', value: 'openai.com\ngithub.com' },
+      ],
       availableRecordTypes:['A','AAAA','CNAME','TXT','NS'],
       selectedRecordTypes:['A'],
       results:[],
@@ -41,6 +46,10 @@ export function LookupPage() {
       },
       clearAllRecordTypes(){
         this.selectedRecordTypes = [];
+      },
+      applyPresetDomains(value){
+        this.domains = value;
+        if (this.autoGrow && this.$refs?.domainsBox) this.autoGrow(this.$refs.domainsBox);
       },
       async performLookup(){
         if(this.loading) return; 

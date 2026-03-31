@@ -2,6 +2,16 @@ import { addHistory, exportJSON, autoGrow } from '../utils.js';
 
 export function HeadersPage() {
     return {
+      presets: [
+        {
+          label: 'Clean pass sample',
+          value: `Received: from mail.example.com (mail.example.com [192.0.2.1])\nAuthentication-Results: mx.recipient.com; spf=pass smtp.mailfrom=example.com; dkim=pass header.d=example.com; dmarc=pass\nFrom: Security Team <security@example.com>\nTo: user@recipient.com\nSubject: Account notice\nDate: Mon, 1 Jan 2024 12:00:00 +0000`
+        },
+        {
+          label: 'Suspicious sample',
+          value: `Received: from unknown-host (unknown [203.0.113.88])\nAuthentication-Results: mx.recipient.com; spf=fail smtp.mailfrom=bad-domain.tld; dkim=fail header.d=bad-domain.tld; dmarc=fail\nFrom: Support <support@trusted-brand.com>\nReply-To: attacker@evil.tld\nTo: user@recipient.com\nSubject: URGENT: verify your account\nDate: Tue, 2 Jan 2024 09:30:00 +0000`
+        }
+      ],
       headers:'', results:null, loading:false, error:'',
       autoGrow,
       init(){
@@ -132,6 +142,11 @@ export function HeadersPage() {
         } finally {
           this.loading = false;
         }
+      },
+
+      applyPreset(value) {
+        this.headers = value;
+        if (this.autoGrow && this.$refs?.headersBox) this.autoGrow(this.$refs.headersBox);
       },
       
       parseAuthenticationResults(headers) {

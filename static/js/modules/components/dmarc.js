@@ -2,6 +2,11 @@ import { addHistory, exportJSON } from '../utils.js';
 
 export function DMARCPage() {
     return {
+      presets: [
+        { label: 'google.com', value: 'google.com' },
+        { label: 'microsoft.com', value: 'microsoft.com' },
+        { label: 'openai.com', value: 'openai.com' },
+      ],
       domain:'', result:null, comparisonResult: null, compareMode: false, loading:false, error:'', searchPerformed:false,
       init(){
         // Check for domain parameter in URL
@@ -87,6 +92,10 @@ export function DMARCPage() {
         } finally {
           this.loading = false;
         }
+      },
+
+      applyPreset(value) {
+        this.domain = value;
       },
 
       async copyToClipboard(text) {

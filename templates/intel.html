@@ -35,6 +35,14 @@
                 <span x-text="loading ? 'Analyzing...' : 'Analyze'"></span>
             </button>
         </div>
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+            <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
+            <template x-for="preset in presets" :key="preset.label">
+                <button @click="applyPreset(preset.value)" type="button" class="pill pill-outline pill-blue text-[10px]">
+                    <span x-text="preset.label"></span>
+                </button>
+            </template>
+        </div>
         <p x-show="error" x-text="error" class="text-[10px] text-[#f85149]"></p>
 
         <!-- Results Area -->

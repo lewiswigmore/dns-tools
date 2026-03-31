@@ -2,6 +2,11 @@ import { addHistory, exportJSON } from '../utils.js';
 
 export function MXPage() {
     return {
+      presets: [
+        { label: 'google.com', value: 'google.com' },
+        { label: 'microsoft.com', value: 'microsoft.com' },
+        { label: 'openai.com', value: 'openai.com' },
+      ],
       domain:'', results:[], comparisonResult: null, compareMode: false, loading:false, error:'', searchPerformed:false,
       init(){
         // Check for domain parameter in URL
@@ -87,6 +92,10 @@ export function MXPage() {
         } finally {
           this.loading = false;
         }
+      },
+
+      applyPreset(value) {
+        this.domain = value;
       },
 
       async copyToClipboard(text) {

@@ -4,6 +4,11 @@ import { KNOWLEDGE_BASE } from '../data/index.js';
 export function IntelPage() {
     return {
         query: '',
+        presets: [
+            { label: 'Domain', value: 'google.com' },
+            { label: 'IPv4', value: '8.8.8.8' },
+            { label: 'SHA256 hash', value: '44d88612fea8a8f36de82e1278abb02f4e6f0af93bb43f1d3a7a6d0f5d3f5f4f' }
+        ],
         results: null,
         loading: false,
         error: null,
@@ -106,6 +111,10 @@ export function IntelPage() {
             });
 
             this.loading = false;
+        },
+
+        applyPreset(value) {
+            this.query = value;
         },
 
         generateLinks(target, isIP, isDomain, isHash) {
