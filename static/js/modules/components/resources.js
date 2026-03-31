@@ -12,6 +12,8 @@ export function ResourcesPage() {
       complexityFilter: 'All',
       categoryFilter: 'All',
       searchQuery: '',
+      currentPage: 1,
+      pageSize: 20,
       
       get filteredKnowledgeBase() {
         let items = this.knowledgeBase;
@@ -50,8 +52,51 @@ export function ResourcesPage() {
         return items;
       },
 
+      get totalPages() {
+        return Math.max(1, Math.ceil(this.filteredKnowledgeBase.length / this.pageSize));
+      },
+
+      get paginatedKnowledgeBase() {
+        // Clamp to a valid page whenever filters or search shrink the result set.
+        if (this.currentPage > this.totalPages) {
+          this.currentPage = this.totalPages;
+        }
+        if (this.currentPage < 1) {
+          this.currentPage = 1;
+        }
+
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
+        return this.filteredKnowledgeBase.slice(start, end);
+      },
+
+      get pageStartItem() {
+        if (this.filteredKnowledgeBase.length === 0) return 0;
+        return (this.currentPage - 1) * this.pageSize + 1;
+      },
+
+      get pageEndItem() {
+        return Math.min(this.currentPage * this.pageSize, this.filteredKnowledgeBase.length);
+      },
+
       get pageTitle() {
           return this.categoryFilter === 'Security' ? 'Knowledge Base' : 'Content Library';
+      },
+
+      resetPage() {
+        this.currentPage = 1;
+      },
+
+      goToPage(page) {
+        this.currentPage = Math.max(1, Math.min(page, this.totalPages));
+      },
+
+      previousPage() {
+        this.goToPage(this.currentPage - 1);
+      },
+
+      nextPage() {
+        this.goToPage(this.currentPage + 1);
       },
 
       init() {
@@ -64,6 +109,7 @@ export function ResourcesPage() {
         const category = urlParams.get('category');
         if (category) {
             this.categoryFilter = category;
+          this.resetPage();
         }
 
         const concept = urlParams.get('concept');

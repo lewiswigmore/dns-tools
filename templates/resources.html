@@ -16,7 +16,8 @@
         <div class="relative">
             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
             <input type="text" 
-                   x-model="searchQuery" 
+                   x-model="searchQuery"
+                   @input="resetPage()"
                    placeholder="Search library..." 
                    class="bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58] w-full md:w-48">
         </div>
@@ -24,16 +25,16 @@
         <!-- Complexity Filter -->
         <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar">
             <div class="flex min-w-max">
-                <button @click="complexityFilter = 'All'" 
+                <button @click="complexityFilter = 'All'; resetPage()" 
                         :class="complexityFilter === 'All' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">All</button>
-                <button @click="complexityFilter = 'Beginner'" 
+                <button @click="complexityFilter = 'Beginner'; resetPage()" 
                         :class="complexityFilter === 'Beginner' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Beginner</button>
-                <button @click="complexityFilter = 'Intermediate'" 
+                <button @click="complexityFilter = 'Intermediate'; resetPage()" 
                         :class="complexityFilter === 'Intermediate' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Intermediate</button>
-                <button @click="complexityFilter = 'Advanced'" 
+                <button @click="complexityFilter = 'Advanced'; resetPage()" 
                         :class="complexityFilter === 'Advanced' ? 'bg-[#f85149] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Advanced</button>
             </div>
@@ -44,7 +45,7 @@
   <!-- Concepts Grid -->
   <div class="panel p-4 rounded-xl space-y-3" x-show="filteredKnowledgeBase.length > 0">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-      <template x-for="item in filteredKnowledgeBase" :key="item.id">
+      <template x-for="item in paginatedKnowledgeBase" :key="item.id">
         <div @click="showConcept(item.title)" 
              class="panel p-3 rounded-lg concept-container cursor-pointer hover:border-[#58a6ff] transition-colors border border-[#30363d]"
              :class="conceptAnimations[item.title] ? 'concept-pulse' : ''">
@@ -70,6 +71,36 @@
         </div>
       </template>
     </div>
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pt-3 border-t border-[#30363d]">
+      <p class="text-[11px] text-[#8b949e]">
+        Showing <span class="text-[#c9d1d9]" x-text="pageStartItem"></span>
+        -
+        <span class="text-[#c9d1d9]" x-text="pageEndItem"></span>
+        of
+        <span class="text-[#c9d1d9]" x-text="filteredKnowledgeBase.length"></span>
+      </p>
+
+      <div class="flex items-center gap-2">
+        <button @click="previousPage()"
+                :disabled="currentPage === 1"
+                class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="text-[11px] text-[#8b949e]">
+          Page <span class="text-[#c9d1d9]" x-text="currentPage"></span> / <span class="text-[#c9d1d9]" x-text="totalPages"></span>
+        </span>
+        <button @click="nextPage()"
+                :disabled="currentPage === totalPages"
+                class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel p-4 rounded-xl" x-show="filteredKnowledgeBase.length === 0" style="display: none;">
+    <p class="text-xs text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No matching concepts found. Try a broader search or change filters.</p>
   </div>
 
   <!-- Use the concept modal component -->
