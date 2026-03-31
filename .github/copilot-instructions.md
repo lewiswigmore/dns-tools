@@ -96,4 +96,5 @@ tests/                        Pytest security and regression checks
 - **2026-03-30** — `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent Skills section above).
 - **2026-03-30** — Flask API write operations now enforce CSRF: client code must fetch token from `/api/csrf-token` (or read template-provided token) and send it in `X-CSRF-Token`; otherwise API responds `403 Invalid or missing CSRF token`.
 - **2026-03-30** — CSP `connect-src` uses `https:` (all HTTPS origins) because RDAP servers span hundreds of different domains; this is necessary for the WHOIS/RDAP lookup feature to reach arbitrary registry servers.
+- **2026-03-31** — RDAP `nameservers` frequently omit `ipAddresses` for NS hostnames (for example `gov.uk`); UI should treat empty IPv4/IPv6 as expected and optionally enrich via DNS A/AAAA lookups as fallback.
 

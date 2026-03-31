@@ -72,22 +72,42 @@
           <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registrar</p>
           <p class="text-sm font-semibold text-[#c9d1d9] truncate" x-text="result?.registrar?.name || 'N/A'" :title="result?.registrar?.name"></p>
         </div>
+        <!-- Domain ID -->
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Domain ID</p>
+          <p class="text-sm font-semibold text-[#c9d1d9] font-mono truncate" x-text="result?.handle || '—'" :title="result?.handle || 'Unavailable'"></p>
+        </div>
         <!-- Registered -->
         <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
           <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registered</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.events?.registration?.date)"></p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.registration)"></p>
         </div>
         <!-- Expires -->
         <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
           <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Expires</p>
           <p class="text-sm font-semibold" 
-             :class="result?.events?.expiration?.date && new Date(result.events.expiration.date) < new Date(Date.now() + 30*86400000) ? 'text-[#f85149]' : 'text-[#c9d1d9]'"
-             x-text="formatDate(result?.events?.expiration?.date)"></p>
+             :class="result?.keyDates?.expiration && new Date(result.keyDates.expiration) < new Date(Date.now() + 30*86400000) ? 'text-[#f85149]' : 'text-[#c9d1d9]'"
+             x-text="formatDate(result?.keyDates?.expiration)"></p>
         </div>
         <!-- Last Updated -->
         <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
           <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Last Updated</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.events?.['last changed']?.date)"></p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.lastChanged)"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registrar ID</p>
+          <p class="text-sm font-semibold text-[#c9d1d9] font-mono" x-text="result?.registrar?.handle || '—'"></p>
+        </div>
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Last RDAP DB Update</p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.lastRdapUpdate)"></p>
+        </div>
+        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Transferred</p>
+          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.transfer)"></p>
         </div>
       </div>
 
@@ -101,15 +121,27 @@
         </div>
       </div>
 
+      <div x-show="result?.rdapConformance?.length > 0" class="mb-4">
+        <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2">RDAP Profiles</p>
+        <div class="flex flex-wrap gap-1.5">
+          <template x-for="profile in result?.rdapConformance || []" :key="profile">
+            <span class="pill pill-outline pill-blue text-[10px]" x-text="profile"></span>
+          </template>
+        </div>
+      </div>
+
       <!-- RDAP Server Info -->
       <div class="text-[10px] text-[#6e7681]">
-        <i class="fas fa-server mr-1"></i> Queried: <span x-text="serverUrl"></span>
+        <i class="fas fa-server mr-1"></i> Queried: <span x-text="serverUrl || 'Unknown server'"></span>
       </div>
     </div>
 
     <!-- Nameservers -->
     <div x-show="result?.nameservers?.length > 0" class="panel rounded-xl p-4">
-      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-server mr-2 text-[#58a6ff]"></i>Nameservers</h4>
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="text-sm font-semibold text-[#c9d1d9]"><i class="fas fa-server mr-2 text-[#58a6ff]"></i>Nameservers</h4>
+        <span x-show="resolvingNameservers" style="display: none;" class="text-[10px] text-[#8b949e]"><i class="fas fa-spinner fa-spin mr-1"></i>Resolving A/AAAA fallback</span>
+      </div>
       <div class="overflow-x-auto">
         <table class="w-full text-xs responsive-table">
           <thead>
@@ -161,12 +193,32 @@
               <div class="bg-[#0d1117] rounded-lg p-2 border border-[#30363d] text-[11px] font-mono text-[#8b949e]">
                 Key Tag: <span class="text-[#c9d1d9]" x-text="ds.keyTag"></span> &middot;
                 Algorithm: <span class="text-[#c9d1d9]" x-text="ds.algorithm"></span> &middot;
-                Digest Type: <span class="text-[#c9d1d9]" x-text="ds.digestType"></span>
+                Digest Type: <span class="text-[#c9d1d9]" x-text="ds.digestType"></span> &middot;
+                Digest: <span class="text-[#c9d1d9] break-all" x-text="ds.digest || '—'"></span>
               </div>
             </template>
           </div>
         </div>
       </template>
+    </div>
+
+    <!-- Notices / Remarks -->
+    <div x-show="(result?.notices?.length || 0) > 0 || (result?.remarks?.length || 0) > 0" class="panel rounded-xl p-4">
+      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-file-circle-info mr-2 text-[#58a6ff]"></i>Registry Notes</h4>
+      <div class="space-y-2">
+        <template x-for="(note, idx) in result?.notices || []" :key="'notice-' + idx">
+          <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+            <p class="text-[11px] font-semibold text-[#c9d1d9]" x-text="note.title || 'Notice'"></p>
+            <p class="text-[11px] text-[#8b949e] mt-1" x-text="note.text || 'No additional details provided by the registry.'"></p>
+          </div>
+        </template>
+        <template x-for="(remark, idx) in result?.remarks || []" :key="'remark-' + idx">
+          <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
+            <p class="text-[11px] font-semibold text-[#c9d1d9]" x-text="remark.title || 'Remark'"></p>
+            <p class="text-[11px] text-[#8b949e] mt-1" x-text="remark.text || 'No additional details provided by the registry.'"></p>
+          </div>
+        </template>
+      </div>
     </div>
 
     <!-- Raw RDAP JSON Toggle -->

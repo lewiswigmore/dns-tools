@@ -1,5 +1,6 @@
 import { addHistory, exportJSON } from '../utils.js';
 import { queryDomain, preloadBootstrap } from '../rdap-client.js';
+import { DNSClient } from '../dns-client.js';
 
 export function WhoisPage() {
   return {
@@ -7,6 +8,7 @@ export function WhoisPage() {
     result: null,
     serverUrl: null,
     loading: false,
+    resolvingNameservers: false,
     error: '',
     searchPerformed: false,
     showRaw: false,
@@ -39,6 +41,9 @@ export function WhoisPage() {
         this.result = result;
         this.serverUrl = server;
 
+        // RDAP frequently omits nameserver glue addresses; enrich with DoH A/AAAA lookups.
+        this.enrichNameserverIPs();
+
         const duration = (Date.now() - startTime) / 1000;
         addHistory({
           query: this.domain,
@@ -65,6 +70,68 @@ export function WhoisPage() {
         this.loading = false;
         if (window.dashboardInstance) window.dashboardInstance.refreshStats();
       }
+    },
+
+    async enrichNameserverIPs() {
+      if (!this.result?.nameservers?.length) return;
+
+      const needsFallback = this.result.nameservers.some(ns =>
+        (!Array.isArray(ns.ipv4) || ns.ipv4.length === 0) &&
+        (!Array.isArray(ns.ipv6) || ns.ipv6.length === 0)
+      );
+
+      if (!needsFallback) return;
+
+      this.resolvingNameservers = true;
+      const dnsClient = new DNSClient();
+
+      try {
+        await Promise.all(this.result.nameservers.map(async ns => {
+          const host = this.normaliseHost(ns?.ldhName);
+          if (!host) return;
+
+          const missingV4 = !Array.isArray(ns.ipv4) || ns.ipv4.length === 0;
+          const missingV6 = !Array.isArray(ns.ipv6) || ns.ipv6.length === 0;
+          if (!missingV4 && !missingV6) return;
+
+          const [aRecords, aaaaRecords] = await Promise.all([
+            missingV4 ? dnsClient.queryDNS(host, 'A') : Promise.resolve([]),
+            missingV6 ? dnsClient.queryDNS(host, 'AAAA') : Promise.resolve([]),
+          ]);
+
+          if (missingV4) {
+            ns.ipv4 = [...new Set((aRecords || [])
+              .map(r => r?.value)
+              .filter(v => typeof v === 'string' && this.isIPv4(v)))];
+          }
+
+          if (missingV6) {
+            ns.ipv6 = [...new Set((aaaaRecords || [])
+              .map(r => r?.value)
+              .filter(v => typeof v === 'string' && this.isIPv6(v)))];
+          }
+        }));
+
+        // Force reactive update after nested object mutations.
+        this.result = { ...this.result, nameservers: [...this.result.nameservers] };
+      } catch (err) {
+        console.warn('Nameserver IP enrichment failed:', err);
+      } finally {
+        this.resolvingNameservers = false;
+      }
+    },
+
+    normaliseHost(host) {
+      if (!host || typeof host !== 'string') return '';
+      return host.trim().replace(/\.+$/, '').toLowerCase();
+    },
+
+    isIPv4(value) {
+      return /^((25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(25[0-5]|2[0-4]\d|1?\d?\d)$/.test(value);
+    },
+
+    isIPv6(value) {
+      return value.includes(':');
     },
 
     /** Format an ISO date string for display. */
@@ -103,16 +170,23 @@ export function WhoisPage() {
       const r = this.result;
       let text = `# WHOIS / RDAP for ${r.ldhName}\n\n`;
       text += `**Date:** ${new Date().toLocaleString()}\n\n`;
+      if (r.handle) text += `**Domain ID:** ${r.handle}\n`;
       if (r.registrar) text += `**Registrar:** ${r.registrar.name}\n`;
-      if (r.events.registration) text += `**Registered:** ${this.formatDate(r.events.registration.date)}\n`;
-      if (r.events.expiration) text += `**Expires:** ${this.formatDate(r.events.expiration.date)}\n`;
-      if (r.events['last changed']) text += `**Updated:** ${this.formatDate(r.events['last changed'].date)}\n`;
+      if (r.registrar?.handle) text += `**Registrar ID:** ${r.registrar.handle}\n`;
+      if (r.keyDates?.registration) text += `**Registered:** ${this.formatDate(r.keyDates.registration)}\n`;
+      if (r.keyDates?.expiration) text += `**Expires:** ${this.formatDate(r.keyDates.expiration)}\n`;
+      if (r.keyDates?.lastChanged) text += `**Updated:** ${this.formatDate(r.keyDates.lastChanged)}\n`;
+      if (r.keyDates?.lastRdapUpdate) text += `**RDAP DB Updated:** ${this.formatDate(r.keyDates.lastRdapUpdate)}\n`;
+      if (r.keyDates?.transfer) text += `**Transferred:** ${this.formatDate(r.keyDates.transfer)}\n`;
       text += `**Status:** ${r.status.join(', ')}\n`;
       if (r.nameservers.length) {
         text += `\n**Nameservers:**\n`;
         r.nameservers.forEach(ns => { text += `- ${ns.ldhName}\n`; });
       }
       if (r.secureDNS) text += `\n**DNSSEC:** ${r.secureDNS.delegationSigned ? 'Signed' : 'Unsigned'}\n`;
+      if (r.rdapConformance?.length) {
+        text += `\n**RDAP Profiles:** ${r.rdapConformance.join(', ')}\n`;
+      }
       await this.copyToClipboard(text);
     },
   };

@@ -64,20 +64,35 @@ function parseResponse(json) {
     unicodeName: json.unicodeName || null,
     handle: json.handle || null,
     status: json.status || [],
+    eventActions: [],
     events: {},
+    keyDates: {
+      registration: null,
+      expiration: null,
+      lastChanged: null,
+      lastRdapUpdate: null,
+      transfer: null,
+    },
     registrar: null,
+    roles: {
+      registrant: null,
+      abuse: null,
+      reseller: null,
+    },
     nameservers: [],
     secureDNS: null,
     links: json.links || [],
     rdapConformance: json.rdapConformance || [],
     port43: json.port43 || null,
-    notices: json.notices || [],
+    notices: normaliseTextSections(json.notices),
+    remarks: normaliseTextSections(json.remarks),
     raw: json,
   };
 
   // Events (registration, expiration, last changed, etc.)
   if (Array.isArray(json.events)) {
     for (const ev of json.events) {
+      if (ev?.eventAction) result.eventActions.push(ev.eventAction);
       result.events[ev.eventAction] = {
         date: ev.eventDate,
         actor: ev.eventActor || null,
@@ -85,11 +100,38 @@ function parseResponse(json) {
     }
   }
 
+  result.keyDates.registration = result.events.registration?.date || null;
+  result.keyDates.expiration = result.events.expiration?.date || null;
+  result.keyDates.lastChanged = result.events['last changed']?.date || null;
+  result.keyDates.lastRdapUpdate = result.events['last update of RDAP database']?.date || null;
+  result.keyDates.transfer = result.events.transfer?.date || null;
+
   // Entities — find registrar
   if (Array.isArray(json.entities)) {
     for (const entity of json.entities) {
       if (Array.isArray(entity.roles) && entity.roles.includes('registrar')) {
         result.registrar = {
+          name: extractEntityName(entity),
+          handle: entity.handle || null,
+          url: extractEntityUrl(entity),
+        };
+      }
+      if (Array.isArray(entity.roles) && entity.roles.includes('registrant')) {
+        result.roles.registrant = {
+          name: extractEntityName(entity),
+          handle: entity.handle || null,
+          url: extractEntityUrl(entity),
+        };
+      }
+      if (Array.isArray(entity.roles) && entity.roles.includes('abuse')) {
+        result.roles.abuse = {
+          name: extractEntityName(entity),
+          handle: entity.handle || null,
+          url: extractEntityUrl(entity),
+        };
+      }
+      if (Array.isArray(entity.roles) && entity.roles.includes('reseller')) {
+        result.roles.reseller = {
           name: extractEntityName(entity),
           handle: entity.handle || null,
           url: extractEntityUrl(entity),
@@ -118,6 +160,20 @@ function parseResponse(json) {
   }
 
   return result;
+}
+
+function normaliseTextSections(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map(item => {
+    const title = item?.title || 'Notice';
+    const lines = Array.isArray(item?.description)
+      ? item.description.filter(Boolean)
+      : [];
+    return {
+      title,
+      text: lines.length ? lines.join(' ') : null,
+    };
+  });
 }
 
 function extractEntityName(entity) {
