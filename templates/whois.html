@@ -22,7 +22,7 @@
         <input x-model="domain" @keyup.enter="performLookup" type="text"
                class="w-full px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9] text-sm"
            placeholder="example.com or 8.8.8.8" />
-         <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run. Queries the authoritative registry RDAP server directly from your browser.</p>
+        <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run. Domains, IPv4/IPv6, and full URLs are accepted (host is extracted automatically).</p>
         <div class="mt-2 flex flex-wrap items-center gap-2">
           <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
           <template x-for="preset in presets" :key="preset.value">

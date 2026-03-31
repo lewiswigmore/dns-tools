@@ -34,6 +34,17 @@ export function WhoisPage() {
     async performLookup() {
       if (this.loading || !this.domain.trim()) return;
 
+      let target;
+      try {
+        target = this.normalizeTargetInput(this.domain);
+      } catch (validationErr) {
+        this.error = validationErr.message;
+        this.searchPerformed = true;
+        this.result = null;
+        this.serverUrl = null;
+        return;
+      }
+
       this.loading = true;
       this.error = '';
       this.result = null;
@@ -43,7 +54,8 @@ export function WhoisPage() {
 
       const startTime = Date.now();
       try {
-        const { result, server, queryType } = await queryTarget(this.domain.trim().toLowerCase());
+        const { result, server, queryType } = await queryTarget(target);
+        this.domain = target;
         this.result = result;
         this.serverUrl = server;
 
@@ -78,6 +90,52 @@ export function WhoisPage() {
         this.loading = false;
         if (window.dashboardInstance) window.dashboardInstance.refreshStats();
       }
+    },
+
+    normalizeTargetInput(raw) {
+      if (!raw || typeof raw !== 'string') {
+        throw new Error('Please enter a domain, IP address, or URL.');
+      }
+
+      let candidate = raw.trim();
+      if (!candidate) {
+        throw new Error('Please enter a domain, IP address, or URL.');
+      }
+
+      // Accept full URLs and extract hostname automatically.
+      candidate = this.extractHostIfUrl(candidate);
+      candidate = candidate.trim().replace(/\.+$/, '').toLowerCase();
+
+      if (this.isIPv4(candidate) || this.isIPv6(candidate)) {
+        return candidate;
+      }
+
+      if (this.isValidDomain(candidate)) {
+        return candidate;
+      }
+
+      throw new Error('Input is not valid. Enter a domain, IPv4/IPv6 address, or URL (e.g. example.com, 8.8.8.8, https://example.com).');
+    },
+
+    extractHostIfUrl(value) {
+      const hasScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value);
+      const maybeUrlLike = /[/?#]/.test(value);
+
+      if (!hasScheme && !maybeUrlLike) return value;
+
+      try {
+        const parsed = hasScheme ? new URL(value) : new URL(`https://${value}`);
+        return parsed.hostname || value;
+      } catch {
+        return value;
+      }
+    },
+
+    isValidDomain(domain) {
+      if (!domain || domain.includes('..')) return false;
+      if (!domain.includes('.')) return false;
+      const domainRegex = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/i;
+      return domainRegex.test(domain);
     },
 
     async applyPreset(value) {
@@ -144,7 +202,8 @@ export function WhoisPage() {
     },
 
     isIPv6(value) {
-      return value.includes(':');
+      // Accept compressed/expanded IPv6 forms while rejecting malformed patterns.
+      return /^[0-9a-f:]+$/i.test(value) && value.includes(':');
     },
 
     isIpResult() {
