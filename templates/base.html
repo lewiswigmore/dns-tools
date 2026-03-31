@@ -173,8 +173,8 @@
                 <a href="{{ url_for('lookup_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='lookup' else 'text-[#c9d1d9]' }}"><i class="fas fa-search w-4 mr-2"></i>DNS Lookup</a>
                 <a href="{{ url_for('mx_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='mx' else 'text-[#c9d1d9]' }}"><i class="fas fa-envelope w-4 mr-2"></i>MX Lookup</a>
                 <a href="{{ url_for('dmarc_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='dmarc' else 'text-[#c9d1d9]' }}"><i class="fas fa-shield-alt w-4 mr-2"></i>DMARC Lookup</a>
-                <a href="{{ url_for('headers_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
                 <a href="{{ url_for('whois_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='whois' else 'text-[#c9d1d9]' }}"><i class="fas fa-id-card w-4 mr-2"></i>WHOIS Lookup</a>
+                <a href="{{ url_for('headers_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='headers' else 'text-[#c9d1d9]' }}"><i class="fas fa-file-alt w-4 mr-2"></i>Email Headers</a>
                 <a href="{{ url_for('tools_page') }}" @click="mobileMenuOpen = false" class="block px-3 py-2 rounded-md nav-item-hover {{ 'nav-item-active' if active_page=='tools' else 'text-[#c9d1d9]' }}"><i class="fas fa-external-link-alt w-4 mr-2"></i>External Resources</a>
             </div>
 
