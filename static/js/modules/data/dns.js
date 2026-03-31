@@ -318,5 +318,99 @@ example.com. IN MX 20 backup.mail.example.com.</pre>
             
             <p class="text-sm text-[#8b949e] mt-2">The resolver queries one of these root servers to find the TLD servers (like .com or .net), and walks down the tree from there.</p>
         `
+    },
+    {
+        id: 'whois-vs-rdap',
+        title: 'WHOIS vs RDAP',
+        icon: 'fas fa-id-card',
+        iconColor: 'text-[#bc8cff]',
+        tags: ['DNS', 'WHOIS', 'RDAP', 'Basics'],
+        complexity: 'Beginner',
+        summary: 'Why RDAP replaced legacy WHOIS and what changes in practice.',
+        content: `
+            <h4>Legacy WHOIS vs Modern RDAP</h4>
+            <p>WHOIS is an older text-based protocol with inconsistent output formats across registries. RDAP (Registration Data Access Protocol) is the modern replacement that returns structured JSON and standardised field names.</p>
+
+            <h4>Why RDAP is Better</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li><strong>Structured Responses:</strong> JSON fields are predictable and easier to parse.</li>
+                <li><strong>Internationalisation:</strong> Better Unicode and localisation support.</li>
+                <li><strong>Security and Policy:</strong> Cleaner support for redaction and policy notices.</li>
+                <li><strong>Hypermedia Links:</strong> Responses can include links to related objects.</li>
+            </ul>
+
+            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
+                <p class="text-sm text-[#8b949e]">In this app, WHOIS lookups are performed using RDAP under the hood via IANA bootstrap data and authoritative registry endpoints.</p>
+            </div>
+        `
+    },
+    {
+        id: 'rdap-status-codes',
+        title: 'RDAP Domain Status Codes',
+        icon: 'fas fa-tags',
+        iconColor: 'text-[#58a6ff]',
+        tags: ['DNS', 'WHOIS', 'RDAP', 'Security'],
+        complexity: 'Intermediate',
+        summary: 'How to interpret common domain status values returned by registries.',
+        content: `
+            <h4>Understanding Domain Status</h4>
+            <p>RDAP exposes domain lifecycle and lock states using standard status values (often derived from EPP). These can explain transfer failures, update restrictions, and suspension behavior.</p>
+
+            <h4>Common Statuses</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li><strong>clientTransferProhibited / serverTransferProhibited:</strong> Domain transfers are locked.</li>
+                <li><strong>clientUpdateProhibited / serverUpdateProhibited:</strong> DNS/contact changes are restricted.</li>
+                <li><strong>clientDeleteProhibited / serverDeleteProhibited:</strong> Deletion is blocked.</li>
+                <li><strong>inactive / hold:</strong> Delegation may be disabled; resolution can fail.</li>
+            </ul>
+
+            <p class="text-sm text-[#8b949e]">Tip: Multiple statuses together are normal. A production domain often has several "prohibited" statuses as protection against unauthorized changes.</p>
+        `
+    },
+    {
+        id: 'rdap-redaction',
+        title: 'RDAP Redaction & GDPR',
+        icon: 'fas fa-user-shield',
+        iconColor: 'text-[#3fb950]',
+        tags: ['DNS', 'WHOIS', 'RDAP', 'Privacy'],
+        complexity: 'Beginner',
+        summary: 'Why registrant contact details are often missing in modern domain lookups.',
+        content: `
+            <h4>Why Contact Details Are Missing</h4>
+            <p>Many RDAP responses are intentionally redacted for privacy and compliance reasons (for example GDPR). This is expected behavior, not a lookup error.</p>
+
+            <h4>What You Usually Still Get</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li>Registrar identity</li>
+                <li>Domain lifecycle dates (when provided)</li>
+                <li>Nameservers and DNSSEC status</li>
+                <li>Policy notices and registry remarks</li>
+            </ul>
+
+            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
+                <p class="text-sm text-[#8b949e]">If you need non-public ownership data, you usually must use registrar or registry legal/disclosure workflows.</p>
+            </div>
+        `
+    },
+    {
+        id: 'rdap-nameserver-ip-fallback',
+        title: 'Why NS IPv4/IPv6 Can Be Empty',
+        icon: 'fas fa-server',
+        iconColor: 'text-[#d29922]',
+        tags: ['DNS', 'WHOIS', 'RDAP', 'Troubleshooting'],
+        complexity: 'Intermediate',
+        summary: 'RDAP often returns NS hostnames without glue IPs; additional DNS lookups may be needed.',
+        content: `
+            <h4>Empty Nameserver IP Columns Explained</h4>
+            <p>RDAP frequently includes only nameserver hostnames (for example <code>dns1.nic.uk</code>) and omits <code>ipAddresses</code>. This varies by registry policy and response profile.</p>
+
+            <h4>Glue vs Resolver Lookups</h4>
+            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+                <li><strong>Glue data:</strong> Optional IPs embedded in RDAP nameserver objects.</li>
+                <li><strong>Resolver data:</strong> A/AAAA records queried separately from DNS-over-HTTPS.</li>
+            </ul>
+
+            <p class="text-sm text-[#8b949e]">DNSTools enriches missing RDAP nameserver IPs by querying A/AAAA records as fallback when possible.</p>
+        `
     }
 ];
