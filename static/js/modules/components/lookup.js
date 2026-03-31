@@ -8,6 +8,9 @@ export function LookupPage() {
       results:[],
       comparisonResults: [],
       compareMode: false,
+      maxInlineRecords: 8,
+      maxCopyRecordsPerType: 50,
+      expandedRecordSets: {},
       loading:false,
       autoGrow,
       init(){
@@ -95,6 +98,49 @@ export function LookupPage() {
       },
       exportResults(){ exportJSON(this.compareMode ? this.comparisonResults : this.results); },
 
+      getRecordSetKey(row, recordType) {
+        return `${row.domain}::${recordType}`;
+      },
+
+      isRecordSetExpanded(row, recordType) {
+        return !!this.expandedRecordSets[this.getRecordSetKey(row, recordType)];
+      },
+
+      toggleRecordSet(row, recordType) {
+        const key = this.getRecordSetKey(row, recordType);
+        this.expandedRecordSets = {
+          ...this.expandedRecordSets,
+          [key]: !this.expandedRecordSets[key],
+        };
+      },
+
+      getVisibleRecords(row, recordType) {
+        const records = row.records?.[recordType] || [];
+        if (this.isRecordSetExpanded(row, recordType)) return records;
+        return records.slice(0, this.maxInlineRecords);
+      },
+
+      hasHiddenRecords(row, recordType) {
+        const records = row.records?.[recordType] || [];
+        return records.length > this.maxInlineRecords && !this.isRecordSetExpanded(row, recordType);
+      },
+
+      getHiddenRecordCount(row, recordType) {
+        const records = row.records?.[recordType] || [];
+        return Math.max(0, records.length - this.maxInlineRecords);
+      },
+
+      formatRecordValue(value, maxLength = 220) {
+        if (typeof value !== 'string') return value;
+        if (value.length <= maxLength) return value;
+        return `${value.slice(0, maxLength)}...`;
+      },
+
+      getLimitedRecords(records) {
+        if (!Array.isArray(records)) return [];
+        return records.slice(0, this.maxCopyRecordsPerType);
+      },
+
       getShareUrl() {
         const url = new URL(window.location.href);
         url.searchParams.set('domains', this.domains.trim());
@@ -146,8 +192,12 @@ export function LookupPage() {
                 providers.forEach(provider => {
                   const res = row.comparisons[type][provider];
                   if (res) {
-                    const records = res.records.map(r => r.value).join(', ') || 'No records';
+                    const limitedRecords = this.getLimitedRecords(res.records);
+                    const records = limitedRecords.map(r => r.value).join(', ') || 'No records';
                     text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+                    if (Array.isArray(res.records) && res.records.length > this.maxCopyRecordsPerType) {
+                      text += `| ${provider} | ℹ️ | — | _Truncated ${res.records.length - this.maxCopyRecordsPerType} additional records in copy output_ |\n`;
+                    }
                   }
                 });
                 text += '\n';
@@ -161,12 +211,16 @@ export function LookupPage() {
             
             this.selectedRecordTypes.forEach(type => {
               if (row.records && row.records[type] && row.records[type].length > 0) {
+                const limitedRecords = this.getLimitedRecords(row.records[type]);
                 text += `### ${type} Records\n`;
                 text += `| Value | TTL |\n`;
                 text += `|-------|-----|\n`;
-                row.records[type].forEach(rec => {
+                limitedRecords.forEach(rec => {
                   text += `| \`${rec.value}\` | ${rec.ttl} |\n`;
                 });
+                if (row.records[type].length > this.maxCopyRecordsPerType) {
+                  text += `\n_Truncated ${row.records[type].length - this.maxCopyRecordsPerType} additional ${type} records in copy output._\n`;
+                }
                 text += '\n';
               }
             });

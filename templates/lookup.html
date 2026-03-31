@@ -126,9 +126,9 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                 <td class="px-3 py-2" :data-label="rt + ' Records'">
                   <template x-if="row.records[rt] && row.records[rt].length">
                     <div class="space-y-1 w-full">
-                      <template x-for="(rec, recIndex) in row.records[rt]" :key="rt + '_' + index + '_' + recIndex">
+                      <template x-for="(rec, recIndex) in getVisibleRecords(row, rt)" :key="rt + '_' + index + '_' + recIndex">
                         <div class="flex items-center justify-between bg-[#0d1117] rounded px-2 py-1 border border-[#30363d] group">
-                          <span class="font-mono text-[10px] truncate max-w-[150px] sm:max-w-[200px]" :title="rec.value" x-text="rec.value"></span>
+                          <span class="font-mono text-[10px] truncate max-w-[150px] sm:max-w-[200px]" :title="rec.value" x-text="formatRecordValue(rec.value)"></span>
                           <div class="flex items-center gap-2">
                             <span class="text-[10px] text-[#8b949e]" x-text="'TTL '+rec.ttl"></span>
                             <button x-data="{ copied: false }" 
@@ -141,6 +141,16 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                           </div>
                         </div>
                       </template>
+                      <button x-show="hasHiddenRecords(row, rt)"
+                              @click="toggleRecordSet(row, rt)"
+                              class="text-[10px] text-[#58a6ff] hover:text-[#79c0ff] underline mt-1">
+                        Show <span x-text="getHiddenRecordCount(row, rt)"></span> more
+                      </button>
+                      <button x-show="isRecordSetExpanded(row, rt) && row.records[rt].length > maxInlineRecords"
+                              @click="toggleRecordSet(row, rt)"
+                              class="text-[10px] text-[#8b949e] hover:text-[#c9d1d9] underline mt-1">
+                        Show less
+                      </button>
                     </div>
                   </template>
                   <span x-show="!row.records[rt] || !row.records[rt].length" class="text-[10px] text-[#8b949e]">—</span>
