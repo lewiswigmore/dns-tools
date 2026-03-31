@@ -17,6 +17,7 @@ export function DashboardPage() {
       quickIntelQuery: '',
       featuredConcept: null,
       recentActivity: [],
+      recentWhoisActivity: [],
       topSearches: [],
       currentTip: '',
       showSessionModal: false,
@@ -154,6 +155,18 @@ export function DashboardPage() {
           type: this.getQueryType(h.recordTypes)
         }));
 
+        this.recentWhoisActivity = history
+          .filter(h => {
+            const t = this.getQueryType(h.recordTypes);
+            return t === 'WHOIS' || t === 'WHOIS-IP';
+          })
+          .slice(0, 5)
+          .map(h => ({
+            ...h,
+            timeAgo: this.getTimeAgo(h.timestamp),
+            type: this.getQueryType(h.recordTypes),
+          }));
+
         // Calculate Top Searches
         const searchCounts = {};
         history.forEach(h => {
@@ -236,6 +249,8 @@ export function DashboardPage() {
       
       getQueryType(recordTypes){
         if (!recordTypes || !Array.isArray(recordTypes) || recordTypes.length === 0) return 'DNS';
+        if (recordTypes.includes && recordTypes.includes('WHOIS-IP')) return 'WHOIS-IP';
+        if (recordTypes.includes && recordTypes.includes('WHOIS')) return 'WHOIS';
         if (recordTypes.includes && recordTypes.includes('MX')) return 'MX';
         if (recordTypes.includes && recordTypes.includes('DMARC')) return 'DMARC';
         if (recordTypes.includes && recordTypes.includes('Headers')) return 'Headers';
@@ -376,7 +391,7 @@ export function DashboardPage() {
           
           // Update Type Chart
           if (typeChartInstance) {
-              const types = { 'DNS': 0, 'MX': 0, 'DMARC': 0, 'Headers': 0, 'Intel': 0 };
+              const types = { 'DNS': 0, 'MX': 0, 'DMARC': 0, 'Headers': 0, 'Intel': 0, 'WHOIS': 0, 'WHOIS-IP': 0 };
               let total = 0;
               
               if (hasHistory) {
@@ -396,10 +411,10 @@ export function DashboardPage() {
                   typeChartInstance.options.plugins.tooltip = { enabled: false };
               } else {
                   typeChartInstance.data.datasets[0].data = [
-                      types['DNS'], types['MX'], types['DMARC'], types['Headers'], types['Intel']
+                      types['DNS'], types['MX'], types['DMARC'], types['Headers'], types['Intel'], types['WHOIS'], types['WHOIS-IP']
                   ];
-                  typeChartInstance.data.datasets[0].backgroundColor = ['#3fb950', '#58a6ff', '#d29922', '#a855f7', '#f85149'];
-                  typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers', 'Intel'];
+                    typeChartInstance.data.datasets[0].backgroundColor = ['#3fb950', '#58a6ff', '#d29922', '#a855f7', '#f85149', '#bc8cff', '#79c0ff'];
+                    typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers', 'Intel', 'WHOIS', 'WHOIS-IP'];
                   typeChartInstance.options.plugins.tooltip = { enabled: true };
               }
               
@@ -413,6 +428,10 @@ export function DashboardPage() {
       
       rerunQuery(activity){
         const type = activity.type.toLowerCase();
+        if (type === 'whois' || type === 'whois-ip') {
+          window.location = 'whois.html?target=' + encodeURIComponent(activity.query.trim());
+          return;
+        }
         if (type === 'headers') {
           // For headers, store the data in localStorage if available
           if (activity.results && activity.results.headers) {

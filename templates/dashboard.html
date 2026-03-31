@@ -310,7 +310,9 @@
                    'pill-green': activity.type === 'DNS',
                    'pill-blue': activity.type === 'MX', 
                    'pill-orange': activity.type === 'DMARC',
-                   'pill-purple': activity.type === 'Headers'
+                   'pill-purple': activity.type === 'Headers',
+                   'pill-orange': activity.type === 'WHOIS',
+                   'pill-blue': activity.type === 'WHOIS-IP'
                  }" x-text="activity.type"></span>
             <button @click="rerunQuery(activity)" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs">
               <i class="fas fa-redo"></i>
@@ -321,6 +323,40 @@
       <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-6">
         <i class="fas fa-chart-line text-2xl mb-2"></i>
         <p class="text-xs">No activity yet. Start by running some DNS lookups!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent WHOIS/IP Activity -->
+  <div class="panel p-4 rounded-xl">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
+        <i class="fas fa-id-card text-[#bc8cff]"></i>
+        Recent WHOIS / IP RDAP
+      </h3>
+      <a href="{{ url_for('whois_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs font-medium">
+        Open WHOIS
+      </a>
+    </div>
+    <div class="space-y-2">
+      <template x-for="entry in recentWhoisActivity" :key="entry.timestamp">
+        <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
+          <div class="min-w-0">
+            <p class="text-[#c9d1d9] text-xs truncate" x-text="entry.query"></p>
+            <p class="text-[#8b949e] text-[10px]" x-text="entry.timeAgo"></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="pill pill-outline text-[10px]"
+                  :class="entry.type === 'WHOIS-IP' ? 'pill-blue' : 'pill-orange'"
+                  x-text="entry.type"></span>
+            <button @click="rerunQuery(entry)" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
+      </template>
+      <div x-show="recentWhoisActivity.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
+        No WHOIS/IP lookups yet.
       </div>
     </div>
   </div>

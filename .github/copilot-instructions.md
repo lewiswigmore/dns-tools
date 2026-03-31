@@ -82,9 +82,10 @@ tests/                        Pytest security and regression checks
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
-- WHOIS/RDAP lookups in `rdap-client.js` use IANA bootstrap (`data.iana.org/rdap/dns.json`) to find authoritative RDAP servers and query them directly from the browser
+- WHOIS/RDAP lookups in `rdap-client.js` use IANA bootstrap (`data.iana.org/rdap/dns.json`, `ipv4.json`, `ipv6.json`) to find authoritative RDAP servers for domains and IPs and query them directly from the browser
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
+- Content Library pagination state is URL-driven (`q`, `complexity`, `page`, `size`) via `resources.js` so filtered views are shareable
 
 ## Known Gotchas
 

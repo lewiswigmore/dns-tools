@@ -82,6 +82,19 @@
       </p>
 
       <div class="flex items-center gap-2">
+        <label class="text-[11px] text-[#8b949e]">Per page</label>
+        <select x-model.number="pageSize"
+                @change="setPageSize(pageSize)"
+                class="bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-[11px] text-[#c9d1d9]">
+          <template x-for="size in pageSizeOptions" :key="size">
+            <option :value="size" x-text="size"></option>
+          </template>
+        </select>
+        <button @click="goToFirstPage()"
+                :disabled="currentPage === 1"
+                class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fas fa-angles-left"></i>
+        </button>
         <button @click="previousPage()"
                 :disabled="currentPage === 1"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
@@ -94,6 +107,11 @@
                 :disabled="currentPage === totalPages"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
           <i class="fas fa-chevron-right"></i>
+        </button>
+        <button @click="goToLastPage()"
+                :disabled="currentPage === totalPages"
+                class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
+          <i class="fas fa-angles-right"></i>
         </button>
       </div>
     </div>

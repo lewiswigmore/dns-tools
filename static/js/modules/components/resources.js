@@ -14,6 +14,7 @@ export function ResourcesPage() {
       searchQuery: '',
       currentPage: 1,
       pageSize: 20,
+      pageSizeOptions: [10, 20, 50],
       
       get filteredKnowledgeBase() {
         let items = this.knowledgeBase;
@@ -85,10 +86,45 @@ export function ResourcesPage() {
 
       resetPage() {
         this.currentPage = 1;
+        this.updateUrlState();
       },
 
       goToPage(page) {
         this.currentPage = Math.max(1, Math.min(page, this.totalPages));
+        this.updateUrlState();
+      },
+
+      goToFirstPage() {
+        this.goToPage(1);
+      },
+
+      goToLastPage() {
+        this.goToPage(this.totalPages);
+      },
+
+      setPageSize(size) {
+        this.pageSize = size;
+        this.currentPage = 1;
+        this.updateUrlState();
+      },
+
+      updateUrlState() {
+        const url = new URL(window.location.href);
+        const params = url.searchParams;
+
+        if (this.searchQuery.trim()) params.set('q', this.searchQuery.trim());
+        else params.delete('q');
+
+        if (this.complexityFilter !== 'All') params.set('complexity', this.complexityFilter);
+        else params.delete('complexity');
+
+        if (this.categoryFilter !== 'All') params.set('category', this.categoryFilter);
+        else params.delete('category');
+
+        params.set('page', String(this.currentPage));
+        params.set('size', String(this.pageSize));
+
+        history.replaceState({}, '', `${url.pathname}?${params.toString()}`);
       },
 
       previousPage() {
@@ -112,6 +148,24 @@ export function ResourcesPage() {
           this.resetPage();
         }
 
+        const q = urlParams.get('q');
+        if (q) this.searchQuery = q;
+
+        const complexity = urlParams.get('complexity');
+        if (complexity && ['All', 'Beginner', 'Intermediate', 'Advanced'].includes(complexity)) {
+          this.complexityFilter = complexity;
+        }
+
+        const size = Number(urlParams.get('size'));
+        if (this.pageSizeOptions.includes(size)) {
+          this.pageSize = size;
+        }
+
+        const page = Number(urlParams.get('page'));
+        if (Number.isInteger(page) && page > 0) {
+          this.currentPage = page;
+        }
+
         const concept = urlParams.get('concept');
         if (concept) {
             // Wait a tick for Alpine to initialize
@@ -119,6 +173,8 @@ export function ResourcesPage() {
                 this.showConcept(decodeURIComponent(concept));
             });
         }
+
+        this.updateUrlState();
       },
       
       initRandomPulseAnimations() {

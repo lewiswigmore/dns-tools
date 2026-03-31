@@ -20,6 +20,12 @@ export function LookupPage() {
             this.selectedRecordTypes = validTypes;
           }
         }
+
+        const params = new URLSearchParams(window.location.search);
+        const compare = params.get('compare');
+        if (compare === '1' || compare === 'true') {
+          this.compareMode = true;
+        }
         
         // Auto-execute if we have preset domains
         if (this.domains.trim()) {
@@ -88,6 +94,25 @@ export function LookupPage() {
         }
       },
       exportResults(){ exportJSON(this.compareMode ? this.comparisonResults : this.results); },
+
+      getShareUrl() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('domains', this.domains.trim());
+        url.searchParams.set('types', this.selectedRecordTypes.join(','));
+        url.searchParams.set('compare', this.compareMode ? '1' : '0');
+
+        const providers = (window?.Alpine?.store('settings')?.config?.providers || []).join(',');
+        if (providers) {
+          url.searchParams.set('providers', providers);
+        }
+
+        return url.toString();
+      },
+
+      async copyShareUrl() {
+        const shareUrl = this.getShareUrl();
+        await this.copyToClipboard(shareUrl);
+      },
       
       async copyToClipboard(text) {
         try {

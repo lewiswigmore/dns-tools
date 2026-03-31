@@ -77,6 +77,8 @@ export function HistoryPage() {
           case 'DMARC': return baseClass + 'pill-purple';
           case 'Headers': return baseClass + 'pill-yellow';
           case 'Intel': return baseClass + 'pill-red';
+          case 'WHOIS': return baseClass + 'pill-orange';
+          case 'WHOIS-IP': return baseClass + 'pill-blue';
           case 'Concept': return baseClass + 'pill-blue';
           default: return baseClass + 'pill-blue';
         }
@@ -162,6 +164,8 @@ export function HistoryPage() {
           // Extract concept ID from results
           const conceptId = item.results && item.results.id ? item.results.id : item.query;
           window.location = 'intel.html?concept=' + encodeURIComponent(conceptId);
+        } else if (type === 'WHOIS' || type === 'WHOIS-IP') {
+          window.location = 'whois.html?target=' + encodeURIComponent(item.query.trim());
         } else {
           // For DNS lookups, pass domains and record types
           const recordTypes = item.recordTypes ? item.recordTypes.join(',') : 'A';
@@ -179,6 +183,8 @@ export function HistoryPage() {
       
       getQueryType(recordTypes){
         if (!recordTypes || recordTypes.length === 0) return 'DNS';
+        if (recordTypes.includes('WHOIS-IP')) return 'WHOIS-IP';
+        if (recordTypes.includes('WHOIS')) return 'WHOIS';
         if (recordTypes.includes('MX')) return 'MX';
         if (recordTypes.includes('DMARC')) return 'DMARC';
         if (recordTypes.includes('Headers')) return 'Headers';

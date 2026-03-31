@@ -61,6 +61,16 @@
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             Headers (<span x-text="getTypeCount('Headers')"></span>)
           </button>
+          <button @click="toggleTypeFilter('WHOIS')"
+                  :class="typeFilter === 'WHOIS' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            WHOIS (<span x-text="getTypeCount('WHOIS')"></span>)
+          </button>
+          <button @click="toggleTypeFilter('WHOIS-IP')"
+                  :class="typeFilter === 'WHOIS-IP' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
+            WHOIS IP (<span x-text="getTypeCount('WHOIS-IP')"></span>)
+          </button>
         </div>
       </div>
       

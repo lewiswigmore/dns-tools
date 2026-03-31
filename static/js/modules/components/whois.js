@@ -5,6 +5,12 @@ import { DNSClient } from '../dns-client.js';
 export function WhoisPage() {
   return {
     domain: '',
+    presets: [
+      { label: 'google.com', value: 'google.com' },
+      { label: 'gov.uk', value: 'gov.uk' },
+      { label: '8.8.8.8', value: '8.8.8.8' },
+      { label: '2001:4860:4860::8888', value: '2001:4860:4860::8888' },
+    ],
     result: null,
     serverUrl: null,
     loading: false,
@@ -72,6 +78,11 @@ export function WhoisPage() {
         this.loading = false;
         if (window.dashboardInstance) window.dashboardInstance.refreshStats();
       }
+    },
+
+    async applyPreset(value) {
+      this.domain = value;
+      await this.performLookup();
     },
 
     async enrichNameserverIPs() {
@@ -142,6 +153,42 @@ export function WhoisPage() {
 
     isDomainResult() {
       return this.result?.kind !== 'ip';
+    },
+
+    getDataQuality() {
+      if (!this.result) {
+        return { label: 'Unknown', className: 'pill-blue', summary: 'Run a lookup to assess response quality.' };
+      }
+
+      const r = this.result;
+      const checks = [];
+
+      if (r.kind === 'ip') {
+        checks.push(!!r.networkName);
+        checks.push(!!(r.startAddress && r.endAddress));
+        checks.push(Array.isArray(r.cidrBlocks) && r.cidrBlocks.length > 0);
+        checks.push(!!r.country);
+        checks.push(Array.isArray(r.status) && r.status.length > 0);
+        checks.push(!!(r.roles?.registrant?.name || r.roles?.abuse?.name));
+      } else {
+        checks.push(!!r.registrar?.name);
+        checks.push(!!r.keyDates?.registration);
+        checks.push(!!r.keyDates?.expiration);
+        checks.push(Array.isArray(r.status) && r.status.length > 0);
+        checks.push(Array.isArray(r.nameservers) && r.nameservers.length > 0);
+        checks.push(!!r.secureDNS);
+      }
+
+      const score = checks.filter(Boolean).length / checks.length;
+      const hasRedactionHints = Array.isArray(r.rdapConformance) && r.rdapConformance.includes('redacted');
+
+      if (score >= 0.8) {
+        return { label: 'Registry Complete', className: 'pill-green', summary: 'Most key fields are present.' };
+      }
+      if (hasRedactionHints || score >= 0.45) {
+        return { label: 'Partial / Redacted', className: 'pill-orange', summary: 'Registry policy redaction or sparse response is expected.' };
+      }
+      return { label: 'Sparse Response', className: 'pill-red', summary: 'The registry returned minimal metadata for this object.' };
     },
 
     /** Format an ISO date string for display. */
