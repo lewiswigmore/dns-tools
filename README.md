@@ -1,47 +1,78 @@
 # DNS Tools
 
+[![Deploy to GitHub Pages](https://github.com/lewiswigmore/dns-tools/actions/workflows/deploy.yml/badge.svg)](https://github.com/lewiswigmore/dns-tools/actions/workflows/deploy.yml)
+[![CodeQL](https://github.com/lewiswigmore/dns-tools/actions/workflows/codeql.yml/badge.svg)](https://github.com/lewiswigmore/dns-tools/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Web UI](https://img.shields.io/badge/GitHub_Pages-Open_Site-blue)](https://lewiswigmore.github.io/dns-tools/)
 
-A privacy-focused, client-side web toolkit for DNS lookups, WHOIS/RDAP domain registration queries, email security analysis, and threat intelligence.
+A privacy-focused, client-side web toolkit for DNS lookups, WHOIS/RDAP domain registration queries, email security analysis, and threat intelligence — deployed as a static site on GitHub Pages.
 
 ## Features
 
-- DNS record lookups (A, AAAA, CNAME, MX, TXT, NS) via DNS-over-HTTPS
-- WHOIS/RDAP domain registration lookups via IANA bootstrap (client-side, no proxy)
-- MX record analysis with priority and configuration details
-- DMARC policy parsing and validation
-- Email header analysis including SPF, DKIM, and DMARC authentication
-- Threat intelligence lookups and reputation checks
-- Local session-based activity tracking and statistics
-- Search history with result caching
-- Documentation and resources for DNS and email security
+### DNS & Domain Analysis
+- **DNS Lookups** — query A, AAAA, CNAME, MX, TXT, and NS records via DNS-over-HTTPS (DoH)
+- **Provider Comparison** — compare results across Google, Cloudflare, and Quad9 DNS resolvers
+- **WHOIS / RDAP** — domain registration data (registrar, dates, nameservers, DNSSEC) via IANA bootstrap, queried directly from the browser
 
-## Setup
+### Email Security
+- **MX Records** — mail server analysis with priority and configuration details
+- **DMARC** — policy parsing and validation for domain email authentication
+- **Email Headers** — parse raw headers and check SPF, DKIM, and DMARC authentication results
 
-1. Clone the repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the application: `python app.py`
-4. Open your browser to `http://localhost:5000`
+### Threat Intelligence
+- **Deep Links** — launch lookups against VirusTotal, AbuseIPDB, Shodan, and more for IPs, domains, and file hashes
+- **Knowledge Base** — curated reference material on DNS, email, networking, security, and cloud topics
+
+### Privacy & UX
+- **100% client-side queries** — DNS and RDAP requests go directly from your browser to public resolvers; no server proxy
+- **No telemetry** — no analytics, no tracking, no cookies beyond CSRF protection
+- **Local history & settings** — stored in `localStorage`; never leaves your browser
+- **Dashboard** — session statistics, recent lookups, and quick access to tools
+- **Command Palette** — press `/` for keyboard-driven navigation
+
+## Quick Start
+
+```bash
+git clone https://github.com/lewiswigmore/dns-tools.git
+cd dns-tools
+pip install -r requirements.txt
+python app.py
+# Open http://localhost:5000
+```
 
 ## GitHub Pages Deployment
 
-This project includes a static site generator for GitHub Pages deployment:
+The site is automatically deployed on every push to `main` via GitHub Actions:
 
-1. Run `python generate_static.py` to create static files
-2. Enable GitHub Pages in repository settings
-3. The GitHub Actions workflow will automatically deploy changes
+1. `generate_static.py` renders Jinja2 templates into a `dist/` folder
+2. The [deploy workflow](.github/workflows/deploy.yml) uploads and publishes to GitHub Pages
 
-## Usage
+To deploy manually:
 
-The interface provides separate tools for different types of DNS analysis:
-
-- **DNS Lookup**: Query multiple domains for various record types
-- **WHOIS Lookup**: Domain registration data via RDAP (registrar, dates, nameservers, DNSSEC)
-- **MX Records**: Analyse mail server configurations
-- **DMARC**: Check domain's DMARC policy implementation
-- **Email Headers**: Parse and analyze email headers for authentication results
-- **Threat Intel**: Reputation and security intelligence lookups
+```bash
+python generate_static.py   # outputs to dist/
+```
 
 ## Technology
 
-Built with Flask and Alpine.js. Uses DNS-over-HTTPS (Google, Cloudflare, Quad9) and IANA RDAP bootstrap for fully client-side lookups.
+| Layer     | Stack                                      |
+| --------- | ------------------------------------------ |
+| Backend   | Python / Flask (template rendering only)   |
+| Frontend  | Alpine.js, Tailwind CSS                    |
+| DNS       | DNS-over-HTTPS (Google, Cloudflare, Quad9) |
+| WHOIS     | IANA RDAP Bootstrap (client-side)          |
+| Hosting   | GitHub Pages (static)                      |
+| CI/CD     | GitHub Actions                             |
+| Security  | CodeQL, Dependabot, CSP, CSRF, rate limits |
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the security policy and vulnerability reporting instructions.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
