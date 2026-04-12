@@ -30,11 +30,11 @@ DNS Tools is designed with a **privacy-first, client-side architecture**:
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do not** open a public issue
-2. Email **[security@lewiswigmore.com](mailto:security@lewiswigmore.com)** with:
+2. Use [GitHub's private vulnerability reporting](https://github.com/lewiswigmore/dns-tools/security/advisories/new) to submit a report with:
    - A description of the vulnerability
    - Steps to reproduce
    - Potential impact
-3. You will receive an acknowledgement within **48 hours**
-4. A fix will be developed and released as soon as possible
+3. You will receive an acknowledgement as soon as possible
+4. A fix will be developed and released promptly
 
 Thank you for helping keep DNS Tools secure.
