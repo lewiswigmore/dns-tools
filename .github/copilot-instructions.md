@@ -1,6 +1,6 @@
-# GitHub Copilot Instructions — dns-tools
+# GitHub Copilot instructions for dns-tools
 
-## Self-Improvement Rules
+## Self-improvement rules
 
 This file is a **living document**. You (the AI agent) are expected to keep it accurate and complete. Apply these rules on every session:
 
@@ -10,7 +10,7 @@ This file is a **living document**. You (the AI agent) are expected to keep it a
 4. **Update Key Conventions** when a new recurring pattern is established (e.g. a new naming rule, a new shared utility, a security practice).
 5. **Record known gotchas** in the Gotchas section below when a bug, edge case, or non-obvious behaviour is encountered and resolved.
 6. **Commit this file atomically** with the code change that prompted the update, or as a standalone `docs: update Copilot instructions` commit if the update is purely documentary.
-7. **Do not remove** entries unless they are factually wrong — prefer marking them obsolete with a `~~strikethrough~~` note and the date.
+7. **Do not remove** entries unless they are factually wrong. Prefer marking them obsolete with a `~~strikethrough~~` note and the date.
 8. **Security headers, rate-limiting, and CSRF rules defined in `app.py` are non-negotiable.** Never suggest removing or weakening them.
 
 > **For contributors:** If the agent has not updated this file after a significant change, prompt it with: *"Update copilot-instructions.md to reflect what we just did."*
@@ -18,17 +18,17 @@ This file is a **living document**. You (the AI agent) are expected to keep it a
 ---
 
 
-## Project Stack
+## Project stack
 
-- **Backend:** Python / Flask (`app.py`) — serves API endpoints and renders Jinja2 templates
+- **Backend:** Python / Flask (`app.py`), serves API endpoints and renders Jinja2 templates
 - **Frontend:** Vanilla JavaScript (ES modules) in `static/js/modules/`
 - **Styling:** Tailwind CSS (CDN) across all templates in `templates/`
 - **Static build:** `generate_static.py` converts Flask templates to a `dist/` folder
 - **Deployment:** GitHub Pages via `.github/workflows/deploy.yml` (pushes `dist/` on every merge to `main`)
 
-## Agent Skills
+## Agent skills
 
-Skills are **local developer tools** that extend AI assistant capabilities with domain-specific knowledge. They are **not committed to the repository** — each developer installs them locally.
+Skills are **local developer tools** that extend AI assistant capabilities with domain-specific knowledge. They are **not committed to the repository**, each developer installs them locally.
 
 ### Skill location
 
@@ -49,8 +49,8 @@ Both directories and `skills-lock.json` are listed in `.gitignore`. When contrib
 | `flask` | Flask routing, blueprints, Jinja2, request handling | `npx skills add bobmatnyc/claude-mpm-skills@flask` |
 | `gh-pages-deploy` | GitHub Pages static deployment via `gh` CLI | `npx skills add aviz85/claude-skills-library@gh-pages-deploy` |
 | `csrf-protection` | CSRF token validation for Flask POST/PUT/DELETE endpoints | `npx skills add harperaa/secure-claude-skills@csrf-protection` |
-| `gh-cli` | GitHub CLI (`gh`) — PRs, issues, releases, Pages, Actions | `npx skills add github/awesome-copilot@gh-cli` |
-| `local-dev` | Local development setup — Flask dev server, static build, env config | *(local-only — create `.agents/skills/local-dev/SKILL.md` manually)* |
+| `gh-cli` | GitHub CLI (`gh`), PRs, issues, releases, Pages, Actions | `npx skills add github/awesome-copilot@gh-cli` |
+| `local-dev` | Local development setup, Flask dev server, static build, env config | *(local-only, create `.agents/skills/local-dev/SKILL.md` manually)* |
 
 ### Reinstall all skills at once
 
@@ -63,11 +63,11 @@ npx skills add harperaa/secure-claude-skills@csrf-protection
 npx skills add github/awesome-copilot@gh-cli
 ```
 
-## Project Structure
+## Project structure
 
 ```
 app.py                        Flask application and API routes
-generate_static.py            Static site generator (Flask → dist/)
+generate_static.py            Static site generator (Flask to dist/)
 templates/                    Jinja2 HTML templates
 static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components (lookup, whois, dmarc, etc.)
@@ -77,7 +77,7 @@ tests/                        Pytest security and regression checks
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
-## Key Conventions
+## Key conventions
 
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
@@ -88,18 +88,18 @@ tests/                        Pytest security and regression checks
 - Content Library pagination state is URL-driven (`q`, `complexity`, `page`, `size`) via `resources.js` so filtered views are shareable
 - The Threat Intelligence page (`intel.html`/`intel.js`) includes a client-side "Fraud Risk Indicators" panel for domains: it combines RDAP registration/status data with DNS presence and mail-auth (SPF/DMARC) checks into heuristic, non-authoritative signals. It runs only on explicit user action (not automatically) and never performs browser-side HTTP reachability checks (unreliable due to CORS)
 
-## Known Gotchas
+## Known gotchas
 
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
-> Format: `- **YYYY-MM-DD** — <symptom>: <root cause> → <fix/workaround>`
+> Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
-- **2026-03-30** — `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
-- **2026-03-30** — `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
-- **2026-03-30** — `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent Skills section above).
-- **2026-03-30** — Flask API write operations now enforce CSRF: client code must fetch token from `/api/csrf-token` (or read template-provided token) and send it in `X-CSRF-Token`; otherwise API responds `403 Invalid or missing CSRF token`.
-- **2026-03-30** — CSP `connect-src` uses `https:` (all HTTPS origins) because RDAP servers span hundreds of different domains; this is necessary for the WHOIS/RDAP lookup feature to reach arbitrary registry servers.
-- **2026-03-31** — RDAP `nameservers` frequently omit `ipAddresses` for NS hostnames (for example `gov.uk`); UI should treat empty IPv4/IPv6 as expected and optionally enrich via DNS A/AAAA lookups as fallback.
-- **2026-04-01** — Bulk domain input (lookup/comparison) in `dns-client.js` didn't strip wrapping quotes/brackets from pasted list-style text, silently dropping otherwise valid entries, and its validator accepted non-domain tokens (numeric-only TLDs) as lookup targets. Fixed via a shared `parseDomainList()`/`sanitizeDomainToken()` helper and a stricter `isValidDomain()` (rejects whitespace, requires an alphabetic ≥2-char TLD). Any future bulk-input parsing should go through this shared helper rather than re-duplicating the split/filter logic.
-- **2026-09-16** — Bulk lists commonly contain email addresses rather than bare domains (e.g. pasted from a contact export). Rejecting anything with `@` meant those rows silently disappeared from results instead of being looked up. `dns-client.js` now resolves a simple `local-part@domain` token to its domain before validation (via `extractDomainFromToken()`), so the domain is looked up as expected; tokens with more than one `@` are still dropped as ambiguous.
-- **2026-09-20** — `rdap-client.js`'s `queryDomain(domain)` resolves to `{ result, server }`, not the parsed RDAP object directly. Any new caller must destructure/`.then(r => r.result)` to reach `{keyDates, status, roles, registrar, nameservers, ...}` — a common trap when adding new features that consume RDAP data (e.g. the Fraud Risk Indicators panel in `intel.js`).
+- **2026-03-30**: `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
+- **2026-03-30**: `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
+- **2026-03-30**: `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent skills section above).
+- **2026-03-30**: Flask API write operations now enforce CSRF: client code must fetch token from `/api/csrf-token` (or read template-provided token) and send it in `X-CSRF-Token`; otherwise API responds `403 Invalid or missing CSRF token`.
+- **2026-03-30**: CSP `connect-src` uses `https:` (all HTTPS origins) because RDAP servers span hundreds of different domains; this is necessary for the WHOIS/RDAP lookup feature to reach arbitrary registry servers.
+- **2026-03-31**: RDAP `nameservers` frequently omit `ipAddresses` for NS hostnames (for example `gov.uk`); UI should treat empty IPv4/IPv6 as expected and optionally enrich via DNS A/AAAA lookups as fallback.
+- **2026-04-01**: Bulk domain input (lookup/comparison) in `dns-client.js` didn't strip wrapping quotes/brackets from pasted list-style text, silently dropping otherwise valid entries, and its validator accepted non-domain tokens (numeric-only TLDs) as lookup targets. Fixed via a shared `parseDomainList()`/`sanitizeDomainToken()` helper and a stricter `isValidDomain()` (rejects whitespace, requires an alphabetic 2+ character TLD). Any future bulk-input parsing should go through this shared helper rather than re-duplicating the split/filter logic.
+- **2026-09-16**: Bulk lists commonly contain email addresses rather than bare domains (e.g. pasted from a contact export). Rejecting anything with `@` meant those rows silently disappeared from results instead of being looked up. `dns-client.js` now resolves a simple `local-part@domain` token to its domain before validation (via `extractDomainFromToken()`), so the domain is looked up as expected; tokens with more than one `@` are still dropped as ambiguous.
+- **2026-09-20**: `rdap-client.js`'s `queryDomain(domain)` resolves to `{ result, server }`, not the parsed RDAP object directly. Any new caller must destructure/`.then(r => r.result)` to reach `{keyDates, status, roles, registrar, nameservers, ...}`, a common trap when adding new features that consume RDAP data (e.g. the Fraud Risk Indicators panel in `intel.js`).
 

@@ -368,7 +368,7 @@ function buildFraudIndicators({ domain, rdap, a, aaaa, mx, ns, txt, dmarcTxt }) 
         indicators.push({
             severity: 'medium',
             label: 'Unstable registry status',
-            detail: `Registry status includes "${riskyStatus}" — the domain may be expiring, suspended, or on hold.`
+            detail: `Registry status includes "${riskyStatus}", the domain may be expiring, suspended, or on hold.`
         });
     }
 
@@ -379,7 +379,7 @@ function buildFraudIndicators({ domain, rdap, a, aaaa, mx, ns, txt, dmarcTxt }) 
         indicators.push({
             severity: 'medium',
             label: 'No DNS records found',
-            detail: 'The domain has no A, AAAA, or NS records — it may be unregistered, parked, or inactive.'
+            detail: 'The domain has no A, AAAA, or NS records, it may be unregistered, parked, or inactive.'
         });
     } else if (!hasAny && hasNs) {
         indicators.push({
