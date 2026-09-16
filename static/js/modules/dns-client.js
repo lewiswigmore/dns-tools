@@ -35,28 +35,71 @@ export class DNSClient {
       return deobfuscated;
     }
     
+    // Strip characters commonly left over from pasted lists (quotes, brackets,
+    // list markers, trailing punctuation) so real domains embedded in that
+    // kind of input are still recognized, without weakening validation itself.
+    sanitizeDomainToken(token) {
+      if (!token) return '';
+      let value = token.trim();
+
+      // Remove wrapping quotes/brackets/braces/parentheses, e.g. ["example.com"]
+      value = value.replace(/^["'\[\]{}(),]+/, '').replace(/["'\[\]{}(),]+$/, '');
+
+      // Trim trailing punctuation left over from prose/sentences or a
+      // trailing-dot FQDN notation (e.g. "example.com.")
+      value = value.replace(/[.,;:!?]+$/, '');
+
+      return value.trim();
+    }
+
     isValidDomain(domain) {
       // Basic domain validation
-      if (!domain || domain.length === 0) return false;
-      if (domain === '.' || domain === '..') return false;
-      if (domain.startsWith('.') && domain.length === 1) return false;
-      if (domain.includes('..')) return false; // Double dots not allowed
-      
-      // Must contain at least one dot (except for localhost-style names)
-      if (!domain.includes('.') && domain !== 'localhost') return false;
-      
-      // Basic regex for domain format
-      const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$/;
-      return domainRegex.test(domain);
+      if (!domain || typeof domain !== 'string') return false;
+      const value = domain.trim();
+      if (value.length === 0 || value.length > 253) return false;
+      if (value === '.' || value === '..') return false;
+      if (value.includes('..')) return false; // Double dots not allowed
+
+      // Never treat email addresses (or anything containing whitespace) as domains
+      if (/[@\s]/.test(value)) return false;
+
+      if (value === 'localhost') return true;
+
+      // Must contain at least one dot to have a valid TLD
+      if (!value.includes('.')) return false;
+
+      const labels = value.split('.');
+      if (labels.length < 2) return false;
+
+      const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
+      if (!labels.every(label => labelRegex.test(label))) return false;
+
+      // Reject non-domain tokens such as "3.5" or "26.67": a real TLD is at
+      // least 2 characters and contains at least one letter (no numeric-only TLDs exist).
+      const tld = labels[labels.length - 1];
+      if (tld.length < 2 || !/[a-zA-Z]/.test(tld)) return false;
+
+      return true;
     }
-    
+
+    // Shared parsing used by both single-provider lookups and comparisons so
+    // bulk input (newline/comma/space separated, including pasted lists with
+    // quotes or brackets) is handled consistently.
+    parseDomainList(domains) {
+      return [...new Set(
+        (domains || '')
+          .split(/[\n,]+|\s+/)
+          .map(d => this.sanitizeDomainToken(d))
+          .filter(d => d.length > 0)
+          .map(d => this.deobfuscateDomain(d))
+          .filter(d => this.isValidDomain(d))
+      )];
+    }
+
     async performLookup(domains, recordTypes) {
       const results = [];
       // Split on newlines, commas, and spaces, then filter out empty entries and invalid domains
-      const domainsArray = [...new Set(domains.split(/[\n,\s]+/)
-        .filter(d => d.trim())
-        .map(d => this.deobfuscateDomain(d.trim()))
-        .filter(d => this.isValidDomain(d)))];
+      const domainsArray = this.parseDomainList(domains);
       
       for (const domain of domainsArray) {
         const domainResult = {
@@ -96,10 +139,7 @@ export class DNSClient {
 
     async performComparison(domains, recordTypes) {
       const results = [];
-      const domainsArray = [...new Set(domains.split(/[\n,\s]+/)
-        .filter(d => d.trim())
-        .map(d => this.deobfuscateDomain(d.trim()))
-        .filter(d => this.isValidDomain(d)))];
+      const domainsArray = this.parseDomainList(domains);
       
       const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
         name: name,
