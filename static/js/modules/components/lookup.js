@@ -1,4 +1,7 @@
 import { presetDomains, presetRecordTypes, addHistory, exportJSON, autoGrow } from '../utils.js';
+import { queryDomain } from '../rdap-client.js';
+import { DNSClient } from '../dns-client.js';
+import { buildFraudIndicators, computeRiskLevel, riskLabel, riskIcon, riskColorClass } from '../fraud-indicators.js';
 
 export function LookupPage() {
     return {
@@ -18,6 +21,11 @@ export function LookupPage() {
       expandedRecordSets: {},
       loading:false,
       autoGrow,
+      // Fraud risk indicators are opt-in per row (or all at once) since each
+      // check adds an RDAP lookup plus several DNS queries on top of the
+      // main lookup, and bulk lists here can run into the hundreds.
+      fraud: {},
+      fraudCheckingAll: false,
       init(){
         // Set preset record types if provided in URL
         const presetTypes = presetRecordTypes();
@@ -58,6 +66,7 @@ export function LookupPage() {
         this.loading=true;
         this.results = [];
         this.comparisonResults = [];
+        this.fraud = {};
         
         try {
           const startTime = Date.now();
@@ -106,6 +115,89 @@ export function LookupPage() {
         }
       },
       exportResults(){ exportJSON(this.compareMode ? this.comparisonResults : this.results); },
+
+      // --- Fraud Risk Indicators (per-row, on-demand) ---
+
+      fraudKey(domain) {
+        return (domain || '').trim().toLowerCase().replace(/\.+$/, '');
+      },
+
+      fraudState(domain) {
+        return this.fraud[this.fraudKey(domain)] || null;
+      },
+
+      riskLabel, riskIcon, riskColorClass,
+
+      async runFraudCheck(row) {
+        const key = this.fraudKey(row.domain);
+        if (!key) return;
+
+        this.fraud = {
+          ...this.fraud,
+          [key]: { loading: true, error: null, data: this.fraud[key]?.data || null }
+        };
+
+        try {
+          const dnsClient = new DNSClient();
+
+          const [rdapResult, aRecords, aaaaRecords, mxRecords, nsRecords, txtRecords, dmarcRecords] = await Promise.all([
+            queryDomain(key).then(r => r.result).catch(() => null),
+            dnsClient.queryDNS(key, 'A'),
+            dnsClient.queryDNS(key, 'AAAA'),
+            dnsClient.queryDNS(key, 'MX'),
+            dnsClient.queryDNS(key, 'NS'),
+            dnsClient.queryDNS(key, 'TXT'),
+            dnsClient.queryDNS(`_dmarc.${key}`, 'TXT')
+          ]);
+
+          const indicators = buildFraudIndicators({
+            domain: key,
+            rdap: rdapResult,
+            a: aRecords,
+            aaaa: aaaaRecords,
+            mx: mxRecords,
+            ns: nsRecords,
+            txt: txtRecords,
+            dmarcTxt: dmarcRecords
+          });
+
+          this.fraud = {
+            ...this.fraud,
+            [key]: {
+              loading: false,
+              error: null,
+              data: { indicators, riskLevel: computeRiskLevel(indicators), checkedAt: Date.now() }
+            }
+          };
+        } catch (error) {
+          this.fraud = {
+            ...this.fraud,
+            [key]: { loading: false, error: 'Check failed. Please try again.', data: this.fraud[key]?.data || null }
+          };
+        }
+      },
+
+      async runFraudCheckAll() {
+        if (this.fraudCheckingAll) return;
+        this.fraudCheckingAll = true;
+
+        try {
+          const rows = this.compareMode ? [] : this.results.filter(r => r.status === 'success');
+          for (const row of rows) {
+            await this.runFraudCheck(row);
+          }
+        } finally {
+          this.fraudCheckingAll = false;
+        }
+      },
+
+      fraudTooltip(domain) {
+        const state = this.fraudState(domain);
+        if (!state?.data) return '';
+        const { indicators } = state.data;
+        if (!indicators.length) return 'No strong risk signals detected.';
+        return indicators.map(i => `- ${i.label}`).join('\n');
+      },
 
       getRecordSetKey(row, recordType) {
         return `${row.domain}::${recordType}`;

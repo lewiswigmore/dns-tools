@@ -108,6 +108,14 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
           <span x-text="copied ? 'Copied!' : 'Copy as Markdown'"></span>
         </button>
         <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+        <button x-show="!compareMode"
+                @click="runFraudCheckAll()"
+                :disabled="fraudCheckingAll"
+                class="pill pill-purple"
+                :class="fraudCheckingAll ? 'opacity-60 cursor-not-allowed' : ''">
+          <i class="fas" :class="fraudCheckingAll ? 'fa-spinner fa-spin' : 'fa-shield-halved'"></i>
+          <span x-text="fraudCheckingAll ? 'Checking...' : 'Check Fraud Risk (All)'"></span>
+        </button>
       </div>
     </div>
     
@@ -120,6 +128,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
             <th class="px-3 py-2 text-left">Status</th>
             <template x-for="rt in selectedRecordTypes" :key="rt"><th class="px-3 py-2 text-left" x-text="rt+' Records'"></th></template>
             <th class="px-3 py-2 text-left">Issues</th>
+            <th class="px-3 py-2 text-left">Fraud Risk</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[#30363d]">
@@ -171,6 +180,34 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                   </div>
                 </template>
                 <span x-show="!row.errors || !row.errors.length" class="text-[10px] text-[#8b949e]">None</span>
+              </td>
+              <td class="px-3 py-2" data-label="Fraud Risk">
+                <template x-if="row.status !== 'success'">
+                  <span class="text-[10px] text-[#8b949e]">—</span>
+                </template>
+                <template x-if="row.status === 'success'">
+                  <div>
+                    <template x-if="!fraudState(row.domain)">
+                      <button @click="runFraudCheck(row)" class="pill pill-outline pill-purple text-[10px]">
+                        <i class="fas fa-shield-halved"></i><span>Check</span>
+                      </button>
+                    </template>
+                    <template x-if="fraudState(row.domain)?.loading">
+                      <span class="text-[10px] text-[#8b949e]"><i class="fas fa-spinner fa-spin"></i> Checking...</span>
+                    </template>
+                    <template x-if="fraudState(row.domain) && !fraudState(row.domain).loading && fraudState(row.domain).error">
+                      <span class="text-[10px] text-[#f85149]" x-text="fraudState(row.domain).error"></span>
+                    </template>
+                    <template x-if="fraudState(row.domain) && !fraudState(row.domain).loading && fraudState(row.domain).data">
+                      <span class="inline-flex items-center gap-1 text-[11px] cursor-help"
+                            :class="riskColorClass(fraudState(row.domain).data.riskLevel)"
+                            :title="fraudTooltip(row.domain)">
+                        <i class="fas" :class="riskIcon(fraudState(row.domain).data.riskLevel)"></i>
+                        <span x-text="riskLabel(fraudState(row.domain).data.riskLevel)"></span>
+                      </span>
+                    </template>
+                  </div>
+                </template>
               </td>
             </tr>
           </template>
