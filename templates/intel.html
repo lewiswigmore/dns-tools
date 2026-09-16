@@ -76,6 +76,52 @@
                     </a>
                 </template>
             </div>
+
+            <!-- Fraud Risk Indicators (domains only) -->
+            <div x-show="results?.type === 'Domain'" class="pt-4 border-t border-[#30363d] space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-user-secret text-[#8b949e]"></i>
+                        <h4 class="text-xs font-semibold text-[#c9d1d9]">Fraud Risk Indicators</h4>
+                    </div>
+                    <button @click="runFraudCheck()"
+                            :disabled="fraud.loading"
+                            class="bg-[#21262d] hover:bg-[#30363d] border border-[#30363d] text-[#c9d1d9] px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors disabled:opacity-50 flex items-center gap-2">
+                        <i class="fas fa-shield-halved" :class="fraud.loading ? 'fa-spin' : ''"></i>
+                        <span x-text="fraud.loading ? 'Checking...' : (fraud.data ? 'Re-check' : 'Run Check')"></span>
+                    </button>
+                </div>
+
+                <p class="text-[9px] text-[#8b949e]">Heuristic, client-side signals only. Not proof of fraud — always verify manually before acting.</p>
+
+                <p x-show="fraud.error" x-text="fraud.error" class="text-[10px] text-[#f85149]"></p>
+
+                <template x-if="fraud.data">
+                    <div class="space-y-2">
+                        <!-- Overall risk banner -->
+                        <div class="panel p-3 rounded-lg flex items-center gap-3 bg-[#0d1117]" :class="riskBannerClass(fraud.data.riskLevel)">
+                            <i class="fas text-base" :class="riskIcon(fraud.data.riskLevel)"></i>
+                            <div>
+                                <p class="text-xs font-bold" x-text="riskLabel(fraud.data.riskLevel)"></p>
+                                <p class="text-[10px] text-[#8b949e]">Based on <span x-text="fraud.data.indicators.length"></span> signal(s) from RDAP and DNS data.</p>
+                            </div>
+                        </div>
+
+                        <!-- Indicator list -->
+                        <div class="space-y-2">
+                            <template x-for="(ind, idx) in fraud.data.indicators" :key="idx">
+                                <div class="flex items-start gap-3 panel p-3 rounded-lg bg-[#0d1117]">
+                                    <span class="pill pill-outline text-[9px] shrink-0" :class="severityPillClass(ind.severity)" x-text="ind.severity.toUpperCase()"></span>
+                                    <div>
+                                        <p class="text-[11px] font-semibold text-[#c9d1d9]" x-text="ind.label"></p>
+                                        <p class="text-[10px] text-[#8b949e]" x-text="ind.detail"></p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 
