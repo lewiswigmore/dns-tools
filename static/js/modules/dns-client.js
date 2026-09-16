@@ -92,10 +92,34 @@ export class DNSClient {
       const labelRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/;
       if (!labels.every(label => labelRegex.test(label))) return false;
 
-      // Reject non-domain tokens such as "3.5" or "26.67": a real TLD is at
-      // least 2 characters and contains at least one letter (no numeric-only TLDs exist).
       const tld = labels[labels.length - 1];
-      if (tld.length < 2 || !/[a-zA-Z]/.test(tld)) return false;
+      if (tld.length < 2) return false;
+
+      // A real TLD is either plain letters (no real TLD contains a digit,
+      // so tokens like "6.2M" or "26.67" are rejected) or a punycode/IDN
+      // TLD in "xn--..." form, which may contain digits and hyphens.
+      const isPunycodeTld = /^xn--[a-z0-9-]+$/i.test(tld);
+      const isAlphaTld = /^[a-zA-Z]+$/.test(tld);
+      if (!isPunycodeTld && !isAlphaTld) return false;
+
+      // Real TLDs are consistently all-lowercase or all-uppercase; mixed
+      // case (e.g. "Read", "ReadWrite", "HttpLoggingMiddleware") is a
+      // strong signal of a pasted identifier, filename stem, or API scope
+      // rather than an actual domain, so reject it here.
+      if (isAlphaTld && tld !== tld.toLowerCase() && tld !== tld.toUpperCase()) return false;
+
+      // Common non-TLD file extensions frequently appear in bulk pastes
+      // alongside real domains (e.g. attachment or screenshot names) and
+      // would otherwise be treated as syntactically valid domains.
+      const commonFileExtensions = new Set([
+        'png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'ico', 'webp',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv',
+        'json', 'xml', 'log', 'md', 'yml', 'yaml', 'ini', 'cfg', 'conf',
+        'rar', 'tar', 'gz', '7z', 'exe', 'dll', 'msi', 'bat', 'ps1', 'sh',
+        'py', 'rb', 'java', 'cs', 'cpp', 'sql', 'html', 'htm', 'css', 'js', 'ts',
+        'mp3', 'wav', 'avi'
+      ]);
+      if (commonFileExtensions.has(tld.toLowerCase())) return false;
 
       return true;
     }
