@@ -52,6 +52,24 @@ export class DNSClient {
       return value.trim();
     }
 
+    // If a token is an email address, resolve it to the domain the user
+    // almost always actually means to look up (the part after "@").
+    // Anything else is returned unchanged.
+    extractDomainFromToken(token) {
+      if (!token || token.indexOf('@') === -1) return token;
+
+      const parts = token.split('@');
+      // Only handle the simple "local-part@domain" shape; anything with
+      // more than one "@" is ambiguous and left as-is (it will fail
+      // validation and be filtered out).
+      if (parts.length !== 2) return token;
+
+      const [localPart, domainPart] = parts;
+      if (!localPart || !domainPart) return token;
+
+      return domainPart;
+    }
+
     isValidDomain(domain) {
       // Basic domain validation
       if (!domain || typeof domain !== 'string') return false;
@@ -91,6 +109,7 @@ export class DNSClient {
           .split(/[\n,]+|\s+/)
           .map(d => this.sanitizeDomainToken(d))
           .filter(d => d.length > 0)
+          .map(d => this.extractDomainFromToken(d))
           .map(d => this.deobfuscateDomain(d))
           .filter(d => this.isValidDomain(d))
       )];
