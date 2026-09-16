@@ -1,5 +1,5 @@
 /**
- * RDAP Client — client-side domain registration lookups via IANA bootstrap.
+ * RDAP client, client-side domain registration lookups via IANA bootstrap.
  *
  * Uses the IANA RDAP bootstrap registry to resolve the authoritative RDAP
  * server for any TLD and queries it directly from the browser (no proxy).
@@ -240,7 +240,7 @@ function parseResponse(json) {
   result.keyDates.lastRdapUpdate = result.events['last update of RDAP database']?.date || null;
   result.keyDates.transfer = result.events.transfer?.date || null;
 
-  // Entities — find registrar
+  // Entities: find registrar
   if (Array.isArray(json.entities)) {
     for (const entity of json.entities) {
       if (Array.isArray(entity.roles) && entity.roles.includes('registrar')) {
@@ -352,7 +352,7 @@ function extractEntityUrl(entity) {
 }
 
 /**
- * Main public API — query RDAP for a domain.
+ * Main public API: query RDAP for a domain.
  * Returns { result, server } on success.
  * Throws on error with a user-friendly message.
  */
@@ -374,7 +374,7 @@ export async function queryDomain(domain) {
   } catch (err) {
     // Network / CORS error
     throw new Error(
-      'Unable to reach the RDAP server. This may be a CORS issue — the registry may not allow browser-based queries.'
+      'Unable to reach the RDAP server. This may be a CORS issue, the registry may not allow browser-based queries.'
     );
   }
 

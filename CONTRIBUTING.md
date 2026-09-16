@@ -2,16 +2,16 @@
 
 Thanks for your interest in contributing! Here's how to get started.
 
-## Getting Started
+## Getting started
 
 1. **Fork** the repository
 2. **Clone** your fork: `git clone https://github.com/<your-username>/dns-tools.git`
 3. **Install dependencies**: `pip install -r requirements.txt`
-4. **Run locally**: `python app.py` → open `http://localhost:5000`
+4. **Run locally**: `python app.py` then open `http://localhost:5000`
 
 ## Development
 
-### Project Structure
+### Project structure
 
 ```
 dns-tools/
@@ -25,26 +25,26 @@ dns-tools/
 └── dist/                   # Generated static site (git-ignored)
 ```
 
-### Key Principles
+### Key principles
 
-- **Client-side first** — DNS, RDAP, and analysis happen in the browser; no server proxying of user queries
-- **Privacy by design** — no telemetry, no server-side logging of lookups, `localStorage` only
-- **Minimal dependencies** — keep the stack lean (Flask + Alpine.js + Tailwind CSS)
+- **Client-side first**: DNS, RDAP, and analysis happen in the browser, no server proxying of user queries
+- **Privacy by design**: no telemetry, no server-side logging of lookups, `localStorage` only
+- **Minimal dependencies**: keep the stack lean (Flask + Alpine.js + Tailwind CSS)
 
-### Running Tests
+### Running tests
 
 ```bash
 python -m pytest tests/ -v
 ```
 
-## Submitting Changes
+## Submitting changes
 
 1. Create a **feature branch**: `git checkout -b feature/my-change`
 2. Make your changes with clear, descriptive commits
 3. Ensure tests pass: `python -m pytest tests/ -v`
-4. Push and open a **Pull Request** against `main`
+4. Push and open a **pull request** against `main`
 
-## Reporting Issues
+## Reporting issues
 
 Use the [issue templates](https://github.com/lewiswigmore/dns-tools/issues/new/choose) for bug reports, feature requests, or questions.
 
