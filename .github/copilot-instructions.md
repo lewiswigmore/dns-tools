@@ -86,6 +86,7 @@ tests/                        Pytest security and regression checks
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
 - Content Library pagination state is URL-driven (`q`, `complexity`, `page`, `size`) via `resources.js` so filtered views are shareable
+- The Threat Intelligence page (`intel.html`/`intel.js`) includes a client-side "Fraud Risk Indicators" panel for domains: it combines RDAP registration/status data with DNS presence and mail-auth (SPF/DMARC) checks into heuristic, non-authoritative signals. It runs only on explicit user action (not automatically) and never performs browser-side HTTP reachability checks (unreliable due to CORS)
 
 ## Known Gotchas
 
@@ -100,4 +101,5 @@ tests/                        Pytest security and regression checks
 - **2026-03-31** — RDAP `nameservers` frequently omit `ipAddresses` for NS hostnames (for example `gov.uk`); UI should treat empty IPv4/IPv6 as expected and optionally enrich via DNS A/AAAA lookups as fallback.
 - **2026-04-01** — Bulk domain input (lookup/comparison) in `dns-client.js` didn't strip wrapping quotes/brackets from pasted list-style text, silently dropping otherwise valid entries, and its validator accepted non-domain tokens (numeric-only TLDs) as lookup targets. Fixed via a shared `parseDomainList()`/`sanitizeDomainToken()` helper and a stricter `isValidDomain()` (rejects whitespace, requires an alphabetic ≥2-char TLD). Any future bulk-input parsing should go through this shared helper rather than re-duplicating the split/filter logic.
 - **2026-09-16** — Bulk lists commonly contain email addresses rather than bare domains (e.g. pasted from a contact export). Rejecting anything with `@` meant those rows silently disappeared from results instead of being looked up. `dns-client.js` now resolves a simple `local-part@domain` token to its domain before validation (via `extractDomainFromToken()`), so the domain is looked up as expected; tokens with more than one `@` are still dropped as ambiguous.
+- **2026-09-20** — `rdap-client.js`'s `queryDomain(domain)` resolves to `{ result, server }`, not the parsed RDAP object directly. Any new caller must destructure/`.then(r => r.result)` to reach `{keyDates, status, roles, registrar, nameservers, ...}` — a common trap when adding new features that consume RDAP data (e.g. the Fraud Risk Indicators panel in `intel.js`).
 
