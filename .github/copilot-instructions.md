@@ -73,7 +73,7 @@ static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components (lookup, whois, dmarc, etc.)
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
-tests/                        Pytest security and regression checks
+tests/                        Pytest security checks and Node.js regression tests
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
@@ -82,7 +82,8 @@ tests/                        Pytest security and regression checks
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
-- DNS-over-HTTPS TXT formatting varies by provider: Google can return unquoted values while Cloudflare returns DNS-style quoted values. The current dedicated DMARC parser does not normalize quotes and can report Cloudflare records as absent; normalize TXT data and test both providers when changing this code.
+- DNS-over-HTTPS TXT formatting varies by provider: DMARC lookups normalize unquoted or DNS-quoted, possibly split, TXT data for parsing while retaining the original record value for display and other lookup surfaces.
+- Run JavaScript regressions with `node --experimental-default-type=module --test`; both the Tests and Pages deployment workflows run them with Node 22.
 - WHOIS/RDAP lookups in `rdap-client.js` use IANA bootstrap (`data.iana.org/rdap/dns.json`, `ipv4.json`, `ipv6.json`) to find authoritative RDAP servers for domains and IPs and query them directly from the browser
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
@@ -94,6 +95,7 @@ tests/                        Pytest security and regression checks
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
+- **2026-11-03**: Cloudflare DMARC lookups falsely reported missing records because TXT values can contain quoted chunks; normalize complete DNS presentation strings for DMARC matching and parsing, but leave the original TXT values unchanged.
 - **2026-03-30**: `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
 - **2026-03-30**: `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
 - **2026-03-30**: `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent skills section above).

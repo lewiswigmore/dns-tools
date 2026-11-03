@@ -25,6 +25,11 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -33,6 +38,9 @@ jobs:
 
     - name: Run tests
       run: python -m pytest tests/ -v
+
+    - name: Run JavaScript tests
+      run: node --experimental-default-type=module --test
 
   build:
     runs-on: ubuntu-latest

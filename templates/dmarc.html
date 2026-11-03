@@ -158,7 +158,7 @@
     </div>
   </div>
 
-  <div x-show="searchPerformed && !loading && !error && !result && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
+  <div x-show="searchPerformed && !loading && !error && !result && !comparisonResult && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
     <p class="text-xs text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No DMARC record found for <span x-text="domain"></span>. This domain may not have DMARC configured.</p>
   </div>
 
