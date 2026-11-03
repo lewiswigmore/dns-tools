@@ -127,8 +127,11 @@ export function DMARCPage() {
           providers.forEach(provider => {
             const res = this.comparisonResult[provider];
             if (res) {
-              const record = res.records.length > 0 ? res.records[0].value : 'No record';
-              text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${record}\` |\n`;
+              const record = res.status === 'success'
+                ? (res.dmarc ? res.dmarc.raw : 'No DMARC record found')
+                : `Lookup failed: ${res.error}`;
+              const latency = res.status === 'success' ? `${res.latency}ms` : '-';
+              text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${latency} | \`${record}\` |\n`;
             }
           });
           

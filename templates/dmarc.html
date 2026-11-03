@@ -139,17 +139,16 @@
                   <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[#c9d1d9]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[#8b949e]')"></i>
                   <span class="text-[10px] font-semibold text-[#8b949e]" x-text="provider"></span>
                 </div>
-                <span class="text-[10px]" :class="comparisonResult[provider].status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult[provider].latency + 'ms'"></span>
+                <span class="text-[10px]" :class="comparisonResult[provider].status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="comparisonResult[provider].status === 'success' ? comparisonResult[provider].latency + 'ms' : 'Failed'"></span>
               </div>
-              <template x-if="comparisonResult[provider].records.length > 0">
-                <div class="space-y-1">
-                  <template x-for="rec in comparisonResult[provider].records">
-                    <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="rec.value" x-text="rec.value"></div>
-                  </template>
-                </div>
+              <template x-if="comparisonResult[provider].status === 'success' && comparisonResult[provider].dmarc">
+                <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] break-all" :title="comparisonResult[provider].dmarc.raw" x-text="comparisonResult[provider].dmarc.raw"></div>
               </template>
-              <template x-if="!comparisonResult[provider].records.length">
-                <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+              <template x-if="comparisonResult[provider].status === 'success' && !comparisonResult[provider].dmarc">
+                <div class="text-[10px] text-[#8b949e] italic">No DMARC record found</div>
+              </template>
+              <template x-if="comparisonResult[provider].status === 'error'">
+                <div class="text-[10px] text-[#f85149] break-words" x-text="'Lookup failed: ' + comparisonResult[provider].error"></div>
               </template>
             </div>
           </template>
