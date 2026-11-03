@@ -96,6 +96,7 @@ tests/                        Pytest security checks and Node.js regression test
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
 - **2026-11-03**: Cloudflare DMARC lookups falsely reported missing records because TXT values can contain quoted chunks; normalize complete DNS presentation strings for DMARC matching and parsing, but leave the original TXT values unchanged.
+- **2026-11-03**: Older Dependabot PRs cannot be rebased by the bot after their update configuration is removed (version updates are intentionally disabled here). Use `gh pr update-branch <number> --rebase`, then wait for fresh checks.
 - **2026-03-30**: `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
 - **2026-03-30**: `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
 - **2026-03-30**: `.agents/` and `skills-lock.json` are excluded from git. Skills must be reinstalled locally by each contributor (see Agent skills section above).
