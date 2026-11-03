@@ -5,6 +5,58 @@ const PROVIDER_URLS = {
   'Cloudflare': 'https://cloudflare-dns.com/dns-query'
 };
 
+function normalizeDMARCTxt(raw) {
+  if (typeof raw !== 'string') return '';
+  const text = raw.trim();
+  if (!text.startsWith('"')) return raw;
+
+  // Decode only complete DNS-quoted chunks; malformed presentation stays unmatched.
+  let value = '';
+  let index = 0;
+  while (index < text.length) {
+    if (text[index++] !== '"') return raw;
+    let closed = false;
+
+    while (index < text.length) {
+      const char = text[index++];
+      if (char === '"') {
+        closed = true;
+        break;
+      }
+      if (char !== '\\') {
+        value += char;
+        continue;
+      }
+
+      const decimal = text.slice(index, index + 3);
+      if (/^\d{3}$/.test(decimal)) {
+        const code = Number(decimal);
+        if (code > 255) return raw;
+        value += String.fromCharCode(code);
+        index += 3;
+      } else if (index < text.length && !/\d/.test(text[index])) {
+        value += text[index++];
+      } else {
+        return raw;
+      }
+    }
+
+    if (!closed) return raw;
+    while (index < text.length && /\s/.test(text[index])) index++;
+  }
+  return value;
+}
+
+function findDMARCRecord(records) {
+  for (const record of records) {
+    const value = normalizeDMARCTxt(record.value);
+    if (/^v=DMARC1(?=\s*(?:;|$))/.test(value)) {
+      return { raw: record.value, value };
+    }
+  }
+  return null;
+}
+
 export class DNSClient {
     constructor() {
       this.settings = loadSettings();
@@ -331,8 +383,7 @@ export class DNSClient {
           const records = await this.queryDNS(dmarcDomain, 'TXT', provider.url);
           const duration = Math.round(performance.now() - start);
           
-          // Find DMARC record
-          const dmarcRecord = records.find(r => r.value.startsWith('v=DMARC1'));
+          const dmarcRecord = findDMARCRecord(records);
           let parsed = null;
           
           if (dmarcRecord) {
@@ -342,7 +393,7 @@ export class DNSClient {
           return {
             provider: provider.name,
             records: records,
-            dmarc: dmarcRecord ? { raw: dmarcRecord.value, ...parsed } : null,
+            dmarc: dmarcRecord ? { ...parsed, raw: dmarcRecord.raw } : null,
             latency: duration,
             status: 'success'
           };
@@ -378,13 +429,13 @@ export class DNSClient {
         const dmarcDomain = `_dmarc.${domain}`;
         const records = await this.queryDNS(dmarcDomain, 'TXT');
         
-        const dmarcRecord = records.find(r => r.value.startsWith('v=DMARC1'));
+        const dmarcRecord = findDMARCRecord(records);
         
         if (dmarcRecord) {
           const parsedPolicy = this.parseDMARCPolicy(dmarcRecord.value);
           return {
             result: {
-              raw: dmarcRecord.value,
+              raw: dmarcRecord.raw,
               policy: parsedPolicy.p || 'none',  // Extract 'p' value for policy
               adkim: parsedPolicy.adkim,
               aspf: parsedPolicy.aspf,

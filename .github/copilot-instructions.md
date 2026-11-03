@@ -73,7 +73,7 @@ static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components (lookup, whois, dmarc, etc.)
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
-tests/                        Pytest security and regression checks
+tests/                        Pytest security checks and Node.js regression tests
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
@@ -82,6 +82,8 @@ tests/                        Pytest security and regression checks
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
+- DNS-over-HTTPS TXT formatting varies by provider: DMARC lookups normalize unquoted or DNS-quoted, possibly split, TXT data for parsing while retaining the original record value for display and other lookup surfaces.
+- Run JavaScript regressions with `node --experimental-default-type=module --test`; both the Tests and Pages deployment workflows run them with Node 22.
 - WHOIS/RDAP lookups in `rdap-client.js` use IANA bootstrap (`data.iana.org/rdap/dns.json`, `ipv4.json`, `ipv6.json`) to find authoritative RDAP servers for domains and IPs and query them directly from the browser
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
@@ -93,6 +95,7 @@ tests/                        Pytest security and regression checks
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
+- **2026-11-03**: Cloudflare DMARC lookups falsely reported missing records because TXT values can contain quoted chunks; normalize complete DNS presentation strings for DMARC matching and parsing, but leave the original TXT values unchanged.
 - **2026-11-03**: Older Dependabot PRs cannot be rebased by the bot after their update configuration is removed (version updates are intentionally disabled here). Use `gh pr update-branch <number> --rebase`, then wait for fresh checks.
 - **2026-03-30**: `generate_static.py` maps Flask `url_for()` endpoints to static paths; adding a new Flask route requires a matching entry in the `endpoint_map` dict inside `create_static_site()` or the static build will produce broken links.
 - **2026-03-30**: `dist/` is in `.gitignore`. It is built and deployed by GitHub Actions on every push to `main`; never manually commit the `dist/` folder.
@@ -104,4 +107,3 @@ tests/                        Pytest security and regression checks
 - **2026-09-16**: Bulk lists commonly contain email addresses rather than bare domains (e.g. pasted from a contact export). Rejecting anything with `@` meant those rows silently disappeared from results instead of being looked up. `dns-client.js` now resolves a simple `local-part@domain` token to its domain before validation (via `extractDomainFromToken()`), so the domain is looked up as expected; tokens with more than one `@` are still dropped as ambiguous.
 - **2026-09-20**: `rdap-client.js`'s `queryDomain(domain)` resolves to `{ result, server }`, not the parsed RDAP object directly. Any new caller must destructure/`.then(r => r.result)` to reach `{keyDates, status, roles, registrar, nameservers, ...}`, a common trap when adding new features that consume RDAP data (e.g. the Fraud Risk Indicators panel in `intel.js`).
 - **2026-09-16**: Bulk paste input (e.g. copying a whole incident timeline/table into the lookup box) commonly contains tokens that are syntactically domain-shaped but aren't real domains: counters like `6.2M`, filenames like `image.png`, and PascalCase identifiers like `Files.Read`, `User.ReadWrite` or a `Namespace.Class.Name` path. `isValidDomain()` in `dns-client.js` now rejects these via three targeted TLD checks: the TLD must be letters-only (or a valid `xn--` punycode form, so no digits), the TLD's case must be uniform (all-lower or all-upper, since real TLDs are never mixed/camelCase, unlike identifiers such as `ReadWrite` or `HttpLoggingMiddleware`), and the TLD isn't a common non-TLD file extension (`png`, `docx`, `json`, etc., kept as a small denylist rather than an allowlist so real-but-uncommon TLDs still work). `.zip`/`.mov` are deliberately left off that denylist since they're real registered gTLDs. This heuristic reduces noise but is not exhaustive; genuinely ambiguous tokens (e.g. a truncated FQDN missing its real suffix) will still pass and simply show "no records found".
-
