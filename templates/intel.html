@@ -24,6 +24,7 @@
                 </div>
                 <input type="text" 
                        x-model="query" 
+                       @input="resetFraudCheck()"
                        @keydown.enter="analyze()"
                        placeholder="Enter Domain, IP, or File Hash (e.g., example.com, 8.8.8.8, MD5)" 
                        class="w-full bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] text-xs rounded-md py-2 pl-9 pr-4 focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] placeholder-[#484f58]">
@@ -101,6 +102,7 @@
 
                 <template x-if="fraud.data">
                     <div class="space-y-2">
+                        <p class="text-[10px] text-[#8b949e] break-all">Checked domain: <span class="font-semibold text-[#c9d1d9]" x-text="fraud.data.domain"></span></p>
                         <!-- Overall risk banner -->
                         <div class="panel p-3 rounded-lg flex items-center gap-3 bg-[#0d1117]" :class="riskBannerClass(fraud.data.riskLevel)">
                             <i class="fas text-base" :class="riskIcon(fraud.data.riskLevel)"></i>
