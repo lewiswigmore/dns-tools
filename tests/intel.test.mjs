@@ -46,6 +46,74 @@ async function analyze(page, target) {
   await page.analyze();
 }
 
+function fraudControls(page) {
+  const template = readFileSync(new URL('../templates/intel.html', import.meta.url), 'utf8');
+  const button = template.match(/<button[^>]*@click="runFraudCheck\(\)"[^>]*>/)[0];
+  const evaluate = expression => runInNewContext(`with (page) { ${expression} }`, { page });
+  const guidance = template.match(/<p[^>]*id="fraud-target-guidance"[^>]*>([^<]+)<\/p>/);
+  return {
+    disabled: evaluate(button.match(/:disabled="([^"]+)"/)[1]),
+    guidance: guidance && evaluate(guidance[0].match(/x-show="([^"]+)"/)[1]) ? guidance[1].trim() : null,
+    click: () => evaluate(button.match(/@click="([^"]+)"/)[1])
+  };
+}
+
+for (const change of ['input', 'preset']) {
+  test(`${change} disables the stale panel with guidance until Analyze restores the check`, async t => {
+    const pending = mockLookups(t);
+    const page = IntelPage();
+    await analyze(page, 'google.com');
+    assert.equal(fraudControls(page).disabled, false);
+    assert.equal(fraudControls(page).guidance, null);
+
+    if (change === 'preset') page.applyPreset('github.com');
+    else {
+      page.query = 'github.com';
+      page.resetFraudCheck();
+    }
+    assert.equal(page.results.target, 'google.com', 'Editing does not analyze the new target');
+    assert.equal(fraudControls(page).disabled, true, 'The stale panel must not offer a no-op Run Check');
+    assert.match(fraudControls(page).guidance, /Analyze.*edited target/i);
+    await fraudControls(page).click();
+    assert.equal(pending.length, 0, 'Keep the method guard even if the disabled control is invoked');
+
+    await page.analyze();
+    assert.equal(page.results.target, 'github.com');
+    assert.equal(fraudControls(page).disabled, false);
+    assert.equal(fraudControls(page).guidance, null);
+    const check = fraudControls(page).click();
+    assert.equal(page.fraud.loading, true);
+    assert.equal(fraudControls(page).disabled, true);
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].domain, 'github.com');
+    pending[0].resolve([]);
+    await check;
+    assert.equal(fraudControls(page).disabled, false);
+    assert.equal(page.fraud.data.domain, 'github.com');
+  });
+}
+
+test('equivalent normalized input stays checkable but empty input requires analysis', async t => {
+  const pending = mockLookups(t);
+  const page = IntelPage();
+  await analyze(page, 'google.com');
+  page.query = ' GOOGLE.COM. ';
+  page.resetFraudCheck();
+  assert.equal(fraudControls(page).disabled, false);
+  assert.equal(fraudControls(page).guidance, null);
+  const check = fraudControls(page).click();
+  assert.equal(pending[0].domain, 'google.com');
+  pending[0].resolve([]);
+  await check;
+
+  page.query = '';
+  page.resetFraudCheck();
+  assert.equal(fraudControls(page).disabled, true);
+  assert.match(fraudControls(page).guidance, /Analyze.*edited target/i);
+  await page.analyze();
+  assert.equal(fraudControls(page).disabled, true, 'Empty Analyze cannot re-enable the old target');
+});
+
 test('completed assessment is attributed to its domain and cleared for a new target', async t => {
   const pending = mockLookups(t);
   const page = IntelPage();

@@ -137,11 +137,16 @@ export function IntelPage() {
             this.fraud = { loading: false, error: null, data: null };
         },
 
+        get fraudTargetMatches() {
+            return this.results?.type === 'Domain'
+                && this.results.target.trim().toLowerCase().replace(/\.+$/, '')
+                    === this.query.trim().toLowerCase().replace(/\.+$/, '');
+        },
+
         async runFraudCheck() {
-            if (!this.results || this.results.type !== 'Domain') return;
+            if (!this.fraudTargetMatches) return;
 
             const domain = this.results.target.trim().toLowerCase().replace(/\.+$/, '');
-            if (domain !== this.query.trim().toLowerCase().replace(/\.+$/, '')) return;
             const requestId = ++this.fraudRequestId;
             const isCurrent = () => requestId === this.fraudRequestId
                 && this.results?.type === 'Domain'

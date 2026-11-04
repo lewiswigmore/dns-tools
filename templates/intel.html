@@ -91,13 +91,15 @@
                         </div>
                     </div>
                     <button @click="runFraudCheck()"
-                            :disabled="fraud.loading"
-                            class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors disabled:opacity-50 flex items-center gap-2 shrink-0">
+                            :disabled="fraud.loading || !fraudTargetMatches"
+                            aria-describedby="fraud-target-guidance"
+                            class="bg-[#238636] hover:bg-[#2ea043] text-white px-3 py-1.5 rounded-md text-[10px] font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shrink-0">
                         <i class="fas fa-shield-halved" :class="fraud.loading ? 'fa-spin' : ''"></i>
                         <span x-text="fraud.loading ? 'Checking...' : (fraud.data ? 'Re-check' : 'Run Check')"></span>
                     </button>
                 </div>
 
+                <p id="fraud-target-guidance" x-show="!fraudTargetMatches" role="status" class="text-[10px] text-[#d29922]">Input changed. Select Analyze for the edited target before running a check.</p>
                 <p x-show="fraud.error" x-text="fraud.error" class="text-[10px] text-[#f85149]"></p>
 
                 <template x-if="fraud.data">
