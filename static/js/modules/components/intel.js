@@ -22,6 +22,7 @@ export function IntelPage() {
             error: null,
             data: null
         },
+        fraudRequestId: 0,
 
         // Knowledge Base State
         concepts: KNOWLEDGE_BASE,
@@ -84,6 +85,7 @@ export function IntelPage() {
         // --- Investigation Logic ---
 
         async analyze() {
+            this.resetFraudCheck();
             if (!this.query.trim()) return;
             
             this.loading = true;
@@ -124,15 +126,27 @@ export function IntelPage() {
         },
 
         applyPreset(value) {
+            this.resetFraudCheck();
             this.query = value;
         },
 
         // --- Fraud Risk Indicators ---
 
+        resetFraudCheck() {
+            this.fraudRequestId += 1;
+            this.fraud = { loading: false, error: null, data: null };
+        },
+
         async runFraudCheck() {
             if (!this.results || this.results.type !== 'Domain') return;
 
             const domain = this.results.target.trim().toLowerCase().replace(/\.+$/, '');
+            if (domain !== this.query.trim().toLowerCase().replace(/\.+$/, '')) return;
+            const requestId = ++this.fraudRequestId;
+            const isCurrent = () => requestId === this.fraudRequestId
+                && this.results?.type === 'Domain'
+                && this.results.target.trim().toLowerCase().replace(/\.+$/, '') === domain
+                && this.query.trim().toLowerCase().replace(/\.+$/, '') === domain;
 
             this.fraud.loading = true;
             this.fraud.error = null;
@@ -151,6 +165,8 @@ export function IntelPage() {
                     dnsClient.queryDNS(`_dmarc.${domain}`, 'TXT')
                 ]);
 
+                if (!isCurrent()) return;
+
                 const indicators = buildFraudIndicators({
                     domain,
                     rdap: rdapResult,
@@ -163,14 +179,15 @@ export function IntelPage() {
                 });
 
                 this.fraud.data = {
+                    domain,
                     indicators,
                     riskLevel: computeRiskLevel(indicators),
                     checkedAt: Date.now()
                 };
             } catch (error) {
-                this.fraud.error = 'Fraud risk check failed. Please try again.';
+                if (isCurrent()) this.fraud.error = 'Fraud risk check failed. Please try again.';
             } finally {
-                this.fraud.loading = false;
+                if (isCurrent()) this.fraud.loading = false;
             }
         },
 
