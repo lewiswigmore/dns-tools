@@ -363,7 +363,7 @@
 
   <!-- Session Info Modal -->
   <div x-show="showSessionModal" 
-       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010409]/80 backdrop-blur-sm"
+       class="mobile-dialog-shell fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010409]/80 backdrop-blur-sm"
        x-transition:enter="transition ease-out duration-200"
        x-transition:enter-start="opacity-0 scale-95"
        x-transition:enter-end="opacity-100 scale-100"
@@ -372,7 +372,7 @@
        x-transition:leave-end="opacity-0 scale-95"
        @keydown.escape.window="showSessionModal = false"
        style="display: none;">
-    <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl max-w-md w-full overflow-hidden" @click.away="showSessionModal = false">
+    <div class="mobile-dialog-card bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl max-w-md w-full" @click.away="showSessionModal = false">
       <div class="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#0d1117]">
         <h3 class="text-sm font-bold text-[#c9d1d9] flex items-center gap-2">
           <i class="fas fa-clock text-[#58a6ff]"></i> Session Information

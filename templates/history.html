@@ -34,39 +34,39 @@
       </div>
       
       <!-- Type Filter Pills -->
-      <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar w-full lg:w-auto">
+      <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto w-full lg:w-auto" role="group" aria-label="Filter by lookup type">
         <div class="flex min-w-max gap-1">
-          <button @click="toggleTypeFilter('all')" 
+          <button @click="toggleTypeFilter('all')" :aria-pressed="typeFilter === 'all'"
                   :class="typeFilter === 'all' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             All (<span x-text="history.length"></span>)
           </button>
-          <button @click="toggleTypeFilter('DNS')" 
+          <button @click="toggleTypeFilter('DNS')" :aria-pressed="typeFilter === 'DNS'"
                   :class="typeFilter === 'DNS' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             DNS (<span x-text="getTypeCount('DNS')"></span>)
           </button>
-          <button @click="toggleTypeFilter('MX')" 
+          <button @click="toggleTypeFilter('MX')" :aria-pressed="typeFilter === 'MX'"
                   :class="typeFilter === 'MX' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             MX (<span x-text="getTypeCount('MX')"></span>)
           </button>
-          <button @click="toggleTypeFilter('DMARC')" 
+          <button @click="toggleTypeFilter('DMARC')" :aria-pressed="typeFilter === 'DMARC'"
                   :class="typeFilter === 'DMARC' ? 'bg-[#a855f7] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             DMARC (<span x-text="getTypeCount('DMARC')"></span>)
           </button>
-          <button @click="toggleTypeFilter('Headers')" 
+          <button @click="toggleTypeFilter('Headers')" :aria-pressed="typeFilter === 'Headers'"
                   :class="typeFilter === 'Headers' ? 'bg-[#e3b341] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             Headers (<span x-text="getTypeCount('Headers')"></span>)
           </button>
-          <button @click="toggleTypeFilter('WHOIS')"
+          <button @click="toggleTypeFilter('WHOIS')" :aria-pressed="typeFilter === 'WHOIS'"
                   :class="typeFilter === 'WHOIS' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS (<span x-text="getTypeCount('WHOIS')"></span>)
           </button>
-          <button @click="toggleTypeFilter('WHOIS-IP')"
+          <button @click="toggleTypeFilter('WHOIS-IP')" :aria-pressed="typeFilter === 'WHOIS-IP'"
                   :class="typeFilter === 'WHOIS-IP' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS IP (<span x-text="getTypeCount('WHOIS-IP')"></span>)
@@ -170,10 +170,10 @@
   <!-- Preview Modal -->
   <div x-show="previewModal" 
        x-cloak
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50"
+       class="mobile-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50"
        @click="closePreview">
     <div @click.stop 
-         class="bg-[#161b22] border-0 sm:border border-[#30363d] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col">
+         class="mobile-modal-content bg-[#161b22] border-0 sm:border border-[#30363d] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-[#30363d] shrink-0">
@@ -212,7 +212,7 @@
                       <div class="space-y-1">
                         <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
                           <div class="flex items-center justify-between bg-[#0d1117] p-2 rounded border border-[#30363d] group">
-                            <div class="text-[11px] font-mono text-[#c9d1d9] truncate max-w-[200px] sm:max-w-[400px]" 
+                            <div class="mobile-record-value text-[11px] font-mono text-[#c9d1d9] truncate max-w-[200px] sm:max-w-[400px]"
                                  x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
                             <button x-data="{ copied: false }" 
                                     @click="copyToClipboard(typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 

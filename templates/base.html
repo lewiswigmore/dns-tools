@@ -69,6 +69,7 @@
         .result-actions > button{flex-shrink:0}
         .group:focus-within button{opacity:1}
         :focus-visible{outline:2px solid var(--color-accent);outline-offset:3px}
+        .peer + div{position:relative}
         .peer:focus-visible + div{outline:2px solid var(--color-accent);outline-offset:3px}
         .loading-skeleton{background:linear-gradient(90deg,var(--bg-muted) 25%,#30363d 50%,var(--bg-muted) 75%);background-size:200% 100%;animation:skeleton-shimmer 1.4s ease-in-out infinite;border-radius:.375rem}
         @keyframes skeleton-shimmer{to{background-position:-200% 0}}
@@ -79,12 +80,19 @@
             .mobile-header{position:sticky;top:0;z-index:30;background:#0d1117;padding-top:max(.5rem,env(safe-area-inset-top))}
             .page-content{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
             .app-sidebar{max-width:calc(100vw - 3rem);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-            button,select,.app-sidebar nav a,.page-content a.pill,.app-sidebar > div a{min-height:44px}
-            button{min-width:44px}
+            button{min-width:48px;min-height:48px}
+            select,.app-sidebar nav a,.page-content a.pill,.page-content a.block,.page-content a.inline-flex,.page-content a.flex,.app-sidebar > div a{min-height:44px}
+            .page-content a.block{display:flex;align-items:center}
             .app-sidebar nav a,.app-sidebar > div a{display:flex;align-items:center}
             input:not([type=checkbox]):not([type=radio]),textarea,select{font-size:16px;line-height:1.5}
             input:not([type=checkbox]):not([type=radio]){min-height:44px}
-            label:has(input[type=checkbox]){min-height:44px;flex-shrink:0}
+            label:has(input[type=checkbox]),label:has(input[type=radio]){min-height:44px}
+            label:has(input.peer){flex-shrink:0}
+            .mobile-modal{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+            .mobile-dialog-shell{padding:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-right)) max(1rem,env(safe-area-inset-bottom)) max(1rem,env(safe-area-inset-left))}
+            .mobile-dialog-card{max-height:calc(100dvh - max(1rem,env(safe-area-inset-top)) - max(1rem,env(safe-area-inset-bottom)));overflow-y:auto}
+            .mobile-modal-content{overflow-wrap:anywhere}
+            .mobile-record-value{max-width:none;white-space:normal;overflow-wrap:anywhere}
             .page-content [class~="text-[9px]"],.page-content [class~="text-[10px]"],.page-content [class~="text-[11px]"]{font-size:.75rem;line-height:1.4}
             .result-toolbar{align-items:flex-start}
             .result-toolbar > :first-child{flex-basis:100%}
@@ -271,7 +279,7 @@
          @click="close()"></div>
 
     <!-- Modal -->
-    <div class="fixed inset-0 z-10 overflow-y-auto p-0 sm:p-6 md:p-20">
+    <div class="mobile-modal fixed inset-0 z-10 overflow-y-auto p-0 sm:p-6 md:p-20">
         <div x-show="open" 
              @click.stop
              x-transition:enter="ease-out duration-300"
@@ -341,7 +349,7 @@
 
 <!-- Settings Panel -->
 <div x-data x-show="$store.settings.open" 
-     class="fixed inset-0 z-50 flex justify-end"
+     class="mobile-modal fixed inset-0 z-50 flex justify-end"
      role="dialog" aria-modal="true" x-cloak>
     
     <!-- Backdrop -->
@@ -452,9 +460,9 @@
 </div>
 
 <!-- Info Modal -->
-<div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+<div id="infoModal" class="mobile-dialog-shell fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
     <div onclick="event.stopPropagation()" 
-         class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
+         class="mobile-dialog-card bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h3>
             <button onclick="toggleInfoModal()" aria-label="Close about dialog"
@@ -535,10 +543,10 @@
     }
 }" 
 x-show="open" 
-class="fixed inset-0 z-[150] flex items-center justify-center p-4"
+class="mobile-dialog-shell fixed inset-0 z-[150] flex items-center justify-center p-4"
 x-cloak>
     <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="finish()"></div>
-    <div class="relative bg-[#161b22] border border-[#30363d] rounded-xl max-w-lg w-full p-6 shadow-2xl"
+    <div class="mobile-dialog-card relative bg-[#161b22] border border-[#30363d] rounded-xl max-w-lg w-full p-6 shadow-2xl"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 scale-90"
          x-transition:enter-end="opacity-100 scale-100">

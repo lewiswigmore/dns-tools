@@ -109,3 +109,39 @@ def test_interactive_cards_support_keyboard(route, action):
     assert card["tabindex"] == "0"
     assert any(key.startswith("@keydown.enter") for key in card)
     assert any(key.startswith("@keydown.space") for key in card)
+
+
+@pytest.mark.parametrize("route", ["/", "/lookup", "/mx", "/dmarc", "/whois", "/headers", "/history", "/resources", "/intel", "/tools"])
+def test_shared_touch_targets_and_safe_areas(route):
+    html = app.test_client().get(route).get_data(as_text=True)
+    assert "button{min-width:48px;min-height:48px}" in html
+    assert "env(safe-area-inset-left)" in html
+    assert ".peer + div{position:relative}" in html
+
+
+@pytest.mark.parametrize("route,field", [
+    ("/lookup", "lookup-domains"),
+    ("/whois", "whois-domain"),
+])
+def test_visible_lookup_labels_are_associated(route, field):
+    elements = Elements(app.test_client().get(route).get_data(as_text=True)).tags
+    assert any(attrs.get("id") == field for _, attrs in elements)
+    assert any(tag == "label" and attrs.get("for") == field for tag, attrs in elements)
+
+
+@pytest.mark.parametrize("route,group,count", [
+    ("/history", "Filter by lookup type", 7),
+    ("/resources", "Filter by complexity", 4),
+])
+def test_filters_expose_selected_state(route, group, count):
+    elements = Elements(app.test_client().get(route).get_data(as_text=True)).tags
+    assert any(attrs.get("role") == "group" and attrs.get("aria-label") == group for _, attrs in elements)
+    assert sum(tag == "button" and ":aria-pressed" in attrs for tag, attrs in elements) == count
+
+
+@pytest.mark.parametrize("route", ["/lookup", "/history"])
+def test_long_records_can_wrap_on_mobile(route):
+    html = app.test_client().get(route).get_data(as_text=True)
+    elements = Elements(html).tags
+    assert any("mobile-record-value" in attrs.get("class", "") for _, attrs in elements)
+    assert ".mobile-record-value{max-width:none;white-space:normal;overflow-wrap:anywhere}" in html
