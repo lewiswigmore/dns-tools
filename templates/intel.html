@@ -17,12 +17,12 @@
     <div class="panel p-4 rounded-xl space-y-4 border border-[#30363d] bg-[#161b22]">
         {{ ui.section_header('fa-search','Investigation Launcher') }}
         
-        <div class="flex gap-3">
+        <div class="flex flex-col sm:flex-row gap-3">
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-crosshairs text-[#8b949e] text-xs"></i>
                 </div>
-                <input type="text" 
+                <input type="text" aria-label="Domain, IP address, or file hash"
                        x-model="query" 
                        @input="resetFraudCheck()"
                        @keydown.enter="analyze()"
@@ -31,7 +31,7 @@
             </div>
             <button @click="analyze()" 
                     :disabled="loading || !query.trim()"
-                    class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 <i class="fas fa-search" :class="loading ? 'fa-spin' : ''"></i>
                 <span x-text="loading ? 'Analyzing...' : 'Analyze'"></span>
             </button>
@@ -184,7 +184,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             <template x-for="concept in filteredConcepts" :key="concept.id">
-                <div @click="showConcept(concept)" class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] hover:border-[#58a6ff] cursor-pointer transition-all group h-full flex flex-col">
+                <div @click="showConcept(concept)" role="button" tabindex="0" @keydown.enter.prevent="showConcept(concept)" @keydown.space.prevent="showConcept(concept)" class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] hover:border-[#58a6ff] cursor-pointer transition-all group h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="h-8 w-8 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center group-hover:border-[#58a6ff] transition-colors shrink-0">
                             <i :class="concept.icon + ' ' + concept.iconColor"></i>

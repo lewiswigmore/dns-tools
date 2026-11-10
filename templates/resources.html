@@ -15,7 +15,7 @@
         <!-- Search -->
         <div class="relative">
             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
-            <input type="text" 
+            <input type="text" aria-label="Search content library"
                    x-model="searchQuery"
                    @input="resetPage()"
                    placeholder="Search library..." 
@@ -46,7 +46,7 @@
   <div class="panel p-4 rounded-xl space-y-3" x-show="filteredKnowledgeBase.length > 0">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
       <template x-for="item in paginatedKnowledgeBase" :key="item.id">
-        <div @click="showConcept(item.title)" 
+        <div @click="showConcept(item.title)" role="button" tabindex="0" @keydown.enter.prevent="showConcept(item.title)" @keydown.space.prevent="showConcept(item.title)"
              class="panel p-3 rounded-lg concept-container cursor-pointer hover:border-[#58a6ff] transition-colors border border-[#30363d]"
              :class="conceptAnimations[item.title] ? 'concept-pulse' : ''">
             <div class="flex justify-between items-start mb-2">

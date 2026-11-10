@@ -82,6 +82,7 @@ tests/                        Pytest security checks and Node.js regression test
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - Responsive layout is shared in `templates/base.html`: result headers use `result-toolbar` / `result-actions`; secondary copy/share/export text uses `action-label` (visually hidden on phones, retained for screen readers). Keep primary and destructive actions labelled, and retain 44px mobile touch targets.
+- Shared dark-theme surface, border, accent and spacing tokens live in `templates/base.html`; asynchronous DNS/RDAP result pages use the `results_loading` macro for an accessible, reduced-motion-aware loading placeholder.
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - DNS-over-HTTPS TXT formatting varies by provider: DMARC lookups normalize unquoted or DNS-quoted, possibly split, TXT data for parsing while retaining the original record value for display and other lookup surfaces.
 - Run JavaScript regressions with `node --experimental-default-type=module --test`; both the Tests and Pages deployment workflows run them with Node 22.
@@ -97,6 +98,7 @@ tests/                        Pytest security checks and Node.js regression test
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
 - **2026-11-10**: Lookup result actions overflowed phone viewports after queries. Allow flex/grid children to shrink, wrap shared result toolbars, and use compact secondary action icons with accessible text. Mobile navigation must be inert while closed and return focus to its toggle when dismissed.
+- **2026-11-10**: The startup overlay delayed every dashboard visit after the page was ready and depended on session storage. Dismiss it on `DOMContentLoaded` without an artificial timer or storage dependency.
 - **2026-11-04**: Editing the Threat Intelligence input left an enabled Run Check that silently did nothing. Share normalized target eligibility between the method guard and button disabled state (`fraudTargetMatches`); show Analyze guidance while they differ. Analyze restores eligibility for the new domain without weakening request-identity guards.
 - **2026-11-04**: Fraud risk results could remain under a different Threat Intelligence target. Reset fraud state and invalidate pending requests on input edits, presets, and analysis (including empty/invalid/non-domain targets); guard success, error, and loading updates by request identity and target. Store and display the checked domain with each assessment. A domain comparison alone cannot stop an old request after switching away and back or starting a same-domain recheck.
 - **2026-11-03**: Cloudflare DMARC lookups falsely reported missing records because TXT values can contain quoted chunks; normalize complete DNS presentation strings for DMARC matching and parsing, but leave the original TXT values unchanged.
