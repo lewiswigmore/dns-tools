@@ -18,7 +18,7 @@
 
       <div class="mb-4">
         <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Enter domains:</label>
-    <textarea x-model="domains" x-ref="domainsBox" @input="autoGrow && autoGrow($refs.domainsBox)" @keydown.ctrl.enter="performLookup" x-init="autoGrow && autoGrow($refs.domainsBox)" placeholder="example.com
+    <textarea id="lookup-domains" aria-label="Domains to look up" autocapitalize="none" spellcheck="false" x-model="domains" x-ref="domainsBox" @input="autoGrow && autoGrow($refs.domainsBox)" @keydown.ctrl.enter="performLookup" x-init="autoGrow && autoGrow($refs.domainsBox)" placeholder="example.com
 microsoft.com
 google.com
 contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-xs leading-relaxed text-[#c9d1d9]"></textarea>
@@ -63,7 +63,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" x-model="compareMode" class="sr-only peer">
+          <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
           <div class="w-11 h-6 bg-[#30363d] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#58a6ff]"></div>
         </label>
       </div>
@@ -90,30 +90,33 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
   </div>
 
   <div x-show="(results && results.length>0) || (comparisonResults && comparisonResults.length>0)" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[#30363d] space-y-4">
-    <div class="flex justify-between items-center">
+    <div class="result-toolbar">
       <h2 class="text-base font-semibold text-[#c9d1d9]">DNS Analysis Results</h2>
-      <div class="flex gap-2">
+      <div class="result-actions">
         <button x-data="{ copied: false }"
                 @click="copyShareUrl(); copied = true; setTimeout(() => copied = false, 1500)"
+                title="Share results URL"
                 class="pill pill-outline pill-blue transition-all duration-200"
                 :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
           <i class="fas" :class="copied ? 'fa-check' : 'fa-link'"></i>
-          <span x-text="copied ? 'Link Copied!' : 'Share URL'"></span>
+          <span class="action-label" aria-live="polite" x-text="copied ? 'Link Copied!' : 'Share URL'"></span>
         </button>
         <button x-data="{ copied: false }" 
                 @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
+                title="Copy results as Markdown"
                 class="pill pill-outline pill-blue transition-all duration-200"
                 :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
           <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
-          <span x-text="copied ? 'Copied!' : 'Copy as Markdown'"></span>
+          <span class="action-label" aria-live="polite" x-text="copied ? 'Copied!' : 'Copy as Markdown'"></span>
         </button>
-        <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+        <button @click="exportResults" title="Export results" class="pill pill-outline pill-green"><i class="fas fa-download" aria-hidden="true"></i><span class="action-label">Export</span></button>
         <button x-show="!compareMode"
                 @click="runFraudCheckAll()"
                 :disabled="fraudCheckingAll"
+                title="Check fraud risk for all domains"
                 class="pill pill-purple"
                 :class="fraudCheckingAll ? 'opacity-60 cursor-not-allowed' : ''">
-          <i class="fas" :class="fraudCheckingAll ? 'fa-spinner fa-spin' : 'fa-shield-halved'"></i>
+          <i class="fas" :class="fraudCheckingAll ? 'fa-spinner fa-spin' : 'fa-shield-alt'" aria-hidden="true"></i>
           <span x-text="fraudCheckingAll ? 'Checking...' : 'Check Fraud Risk (All)'"></span>
         </button>
       </div>

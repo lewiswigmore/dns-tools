@@ -81,21 +81,21 @@
         <span class="text-[#c9d1d9]" x-text="filteredKnowledgeBase.length"></span>
       </p>
 
-      <div class="flex items-center gap-2">
-        <label class="text-[11px] text-[#8b949e]">Per page</label>
-        <select x-model.number="pageSize"
+      <div class="flex flex-wrap items-center gap-2">
+        <label for="library-page-size" class="text-[11px] text-[#8b949e]">Per page</label>
+        <select id="library-page-size" x-model.number="pageSize"
                 @change="setPageSize(pageSize)"
                 class="bg-[#0d1117] border border-[#30363d] rounded px-2 py-1 text-[11px] text-[#c9d1d9]">
           <template x-for="size in pageSizeOptions" :key="size">
             <option :value="size" x-text="size"></option>
           </template>
         </select>
-        <button @click="goToFirstPage()"
+        <button @click="goToFirstPage()" aria-label="First page" title="First page"
                 :disabled="currentPage === 1"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-angles-left"></i>
+          <i class="fas fa-angle-double-left" aria-hidden="true"></i>
         </button>
-        <button @click="previousPage()"
+        <button @click="previousPage()" aria-label="Previous page" title="Previous page"
                 :disabled="currentPage === 1"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
           <i class="fas fa-chevron-left"></i>
@@ -103,15 +103,15 @@
         <span class="text-[11px] text-[#8b949e]">
           Page <span class="text-[#c9d1d9]" x-text="currentPage"></span> / <span class="text-[#c9d1d9]" x-text="totalPages"></span>
         </span>
-        <button @click="nextPage()"
+        <button @click="nextPage()" aria-label="Next page" title="Next page"
                 :disabled="currentPage === totalPages"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
           <i class="fas fa-chevron-right"></i>
         </button>
-        <button @click="goToLastPage()"
+        <button @click="goToLastPage()" aria-label="Last page" title="Last page"
                 :disabled="currentPage === totalPages"
                 class="px-2.5 py-1 rounded border border-[#30363d] text-xs text-[#c9d1d9] hover:bg-[#21262d] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-angles-right"></i>
+          <i class="fas fa-angle-double-right" aria-hidden="true"></i>
         </button>
       </div>
     </div>

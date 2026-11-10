@@ -17,10 +17,10 @@
     <!-- Filter and Stats Bar -->
     <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">
       <!-- Search Filter -->
-      <div class="flex-1 max-w-md">
+      <div class="w-full flex-1 max-w-md">
         <div class="relative">
           <input type="text" 
-                 x-model="searchFilter" 
+                 x-model="searchFilter" aria-label="Filter search history"
                  @input="applyFilters"
                  placeholder="Filter by domain, type, or status..."
                  class="w-full px-3 py-1.5 pl-9 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#c9d1d9] placeholder-[#8b949e] focus:border-[#58a6ff] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] text-xs">
