@@ -18,7 +18,8 @@
     {% block head_extra %}{% endblock %}
     <style>
         [x-cloak]{display:none!important}
-        body{font-family:'Segoe UI','Roboto',sans-serif;background:#0d1117;color:#c9d1d9;font-size:0.875rem}
+        :root{color-scheme:dark;--bg-canvas:#0d1117;--bg-surface:#161b22;--bg-muted:#21262d;--text-main:#c9d1d9;--text-muted:#8b949e;--color-accent:#58a6ff;--border-default:#30363d;--radius-card:.75rem;--space-page:clamp(1rem,2vw,1.5rem)}
+        body{font-family:'Segoe UI','Roboto',sans-serif;background:var(--bg-canvas);color:var(--text-main);font-size:0.875rem}
         .logo-font{font-family:'Outfit',sans-serif;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;background:linear-gradient(to bottom right, #fff 30%, #8b949e 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         
         /* Custom Scrollbar */
@@ -27,9 +28,9 @@
         ::-webkit-scrollbar-thumb { background: #30363d; border: 2px solid #0d1117; border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #484f58; }
 
-        .panel{background:#161b22;border:1px solid #30363d;border-radius:12px;transition:border-color 0.2s ease;}
+        .panel{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-card);transition:border-color 0.2s ease;}
         .panel:hover{border-color:#444c56;}
-        .panel-flat{background:#161b22}
+        .panel-flat{background:var(--bg-surface)}
         .pill{border-radius:9999px;padding:0.25rem 0.65rem;font-size:0.65rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;line-height:1}
         .pill-outline{background:transparent;border:1px solid currentColor}
         .pill-green{color:#3fb950;border-color:#3fb950}
@@ -62,12 +63,15 @@
         /* Keep long DNS values inside their panel, not the application viewport. */
         .app-shell{height:100vh;height:100dvh}
         main,.grid > *,.flex > *{min-width:0}
-        .page-content{width:100%;max-width:1600px;margin-inline:auto;overflow-wrap:anywhere}
+        .page-content{width:100%;max-width:1600px;margin-inline:auto;padding:var(--space-page);overflow-wrap:anywhere}
         .result-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
         .result-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}
         .result-actions > button{flex-shrink:0}
         .group:focus-within button{opacity:1}
-        :focus-visible{outline:2px solid #58a6ff;outline-offset:3px}
+        :focus-visible{outline:2px solid var(--color-accent);outline-offset:3px}
+        .peer:focus-visible + div{outline:2px solid var(--color-accent);outline-offset:3px}
+        .loading-skeleton{background:linear-gradient(90deg,var(--bg-muted) 25%,#30363d 50%,var(--bg-muted) 75%);background-size:200% 100%;animation:skeleton-shimmer 1.4s ease-in-out infinite;border-radius:.375rem}
+        @keyframes skeleton-shimmer{to{background-position:-200% 0}}
         @media (hover:none){
             .group button{opacity:1!important}
         }
@@ -75,12 +79,13 @@
             .mobile-header{position:sticky;top:0;z-index:30;background:#0d1117;padding-top:max(.5rem,env(safe-area-inset-top))}
             .page-content{padding-bottom:max(1rem,env(safe-area-inset-bottom))}
             .app-sidebar{max-width:calc(100vw - 3rem);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-            button,select,.app-sidebar nav a{min-height:44px}
+            button,select,.app-sidebar nav a,.page-content a.pill,.app-sidebar > div a{min-height:44px}
             button{min-width:44px}
-            .app-sidebar nav a{display:flex;align-items:center}
-            input:not([type=checkbox]):not([type=radio]),.page-content textarea,.page-content select{font-size:16px;line-height:1.5}
+            .app-sidebar nav a,.app-sidebar > div a{display:flex;align-items:center}
+            input:not([type=checkbox]):not([type=radio]),textarea,select{font-size:16px;line-height:1.5}
             input:not([type=checkbox]):not([type=radio]){min-height:44px}
             label:has(input[type=checkbox]){min-height:44px;flex-shrink:0}
+            .page-content [class~="text-[9px]"],.page-content [class~="text-[10px]"],.page-content [class~="text-[11px]"]{font-size:.75rem;line-height:1.4}
             .result-toolbar{align-items:flex-start}
             .result-toolbar > :first-child{flex-basis:100%}
             .result-actions .action-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -109,7 +114,7 @@
         
         /* Global Loader */
         #global-loader {
-            position: fixed; inset: 0; background: #0d1117; z-index: 9999;
+            position: fixed; inset: 0; background: var(--bg-canvas); z-index: 9999;
             display: none; align-items: center; justify-content: center;
             transition: opacity 0.5s ease-out, visibility 0.5s;
         }
@@ -119,42 +124,21 @@
             flex-direction: column;
             align-items: center;
         }
-        .loader-bar-bg {
-            width: 100%;
-            height: 2px;
-            background: #30363d;
-            border-radius: 1px;
-            overflow: hidden;
-            margin-top: 12px;
-        }
-        .loader-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: #58a6ff;
-            transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1);
-        }
+        .loader-spinner{width:2rem;height:2rem;margin-top:1rem;border:2px solid var(--border-default);border-top-color:var(--color-accent);border-radius:50%;animation:loader-spin .8s linear infinite}
+        @keyframes loader-spin{to{transform:rotate(360deg)}}
         .loader-hidden { opacity: 0; visibility: hidden; }
     </style>
 </head>
 <body>
 <!-- Global Loader -->
-<div id="global-loader">
+<div id="global-loader" role="status" aria-label="Loading DNSTools">
     <div class="loader-content">
         <div class="text-[#8b949e] text-[10px] font-bold logo-font">DNSTOOLS</div>
-        <div class="loader-bar-bg">
-            <div id="loader-progress" class="loader-bar-fill"></div>
-        </div>
+        <div class="loader-spinner" aria-hidden="true"></div>
     </div>
 </div>
 <script>
-    // Show loader only if we haven't visited in this session OR we are on the root path
-    const path = window.location.pathname;
-    const isRoot = path === '/' || path.endsWith('/dns-tools/') || path.endsWith('/index.html');
-    const hasVisited = sessionStorage.getItem('dt_session_active');
-
-    if (!hasVisited || isRoot) {
-        document.getElementById('global-loader').style.display = 'flex';
-    }
+    document.getElementById('global-loader').style.display = 'flex';
 </script>
 
 <div x-data="{ mobileMenuOpen: false, desktopMenu: window.innerWidth >= 768 }"
@@ -302,6 +286,7 @@
                 <i class="fas fa-search absolute top-3.5 left-4 h-5 w-5 text-[#8b949e]"></i>
                 <input type="text" 
                        id="cmd-palette-input"
+                       aria-label="Search tools, concepts, and history"
                        class="h-12 w-full border-0 bg-transparent pl-11 pr-12 text-[#c9d1d9] placeholder-[#8b949e] focus:ring-0 sm:text-sm focus:outline-none" 
                        placeholder="Search tools, concepts, and history..." 
                        x-model="query"
@@ -314,7 +299,7 @@
                 </button>
             </div>
 
-            <ul x-show="items.length > 0" class="max-h-[calc(100vh-120px)] sm:max-h-96 scroll-py-3 overflow-y-auto p-3" id="options" role="listbox">
+            <ul x-show="items.length > 0" class="max-h-[calc(100vh-120px)] sm:max-h-96 scroll-py-3 overflow-y-auto p-3" id="options" role="listbox" aria-label="Search results">
                 <template x-for="(item, index) in items" :key="item.id">
                     <li :id="'cmd-item-' + index"
                         @click="execute(item)"
@@ -472,7 +457,7 @@
          class="bg-[#161b22] border border-[#30363d] rounded-xl max-w-md w-full p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h3>
-            <button onclick="toggleInfoModal()" 
+            <button onclick="toggleInfoModal()" aria-label="Close about dialog"
                     class="text-[#8b949e] hover:text-[#c9d1d9]">
                 <i class="fas fa-times"></i>
             </button>
@@ -516,26 +501,9 @@
     });
 
     // Handle Global Loader
-    window.addEventListener('load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const loader = document.getElementById('global-loader');
-        const progress = document.getElementById('loader-progress');
-        
-        if (loader && loader.style.display !== 'none') {
-            // Start progress bar animation
-            setTimeout(() => {
-                if (progress) progress.style.width = '100%';
-            }, 50);
-
-            // First visit: Show animation then hide
-            setTimeout(() => {
-                loader.classList.add('loader-hidden');
-                setTimeout(() => loader.remove(), 500);
-                sessionStorage.setItem('dt_session_active', 'true');
-            }, 1600); // Increased from 800ms for a "tiny bit longer" feel
-        } else if (loader) {
-            // Subsequent visits: Cleanup immediately
-            loader.remove();
-        }
+        if (loader) loader.remove();
     });
 
     // Prevent navigation to current page

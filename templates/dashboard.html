@@ -15,7 +15,7 @@
       <p class="text-[10px] font-bold text-[#58a6ff] uppercase tracking-wider mb-0.5">DNS Tip</p>
       <p class="text-xs text-[#c9d1d9]" x-text="currentTip"></p>
     </div>
-    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" aria-label="Show another DNS tip" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
       <i class="fas fa-sync-alt text-xs"></i>
     </button>
   </div>
@@ -31,7 +31,7 @@
                 <i class="fas fa-globe text-[#58a6ff]"></i> DNS Lookup
             </h3>
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()" 
+                <input type="text" aria-label="Domain for quick DNS lookup" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()"
                        placeholder="Enter domain (e.g. google.com)..." 
                        class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58]">
                 <button @click="performQuickLookup()" :disabled="!quickLookupDomain.trim()" 
@@ -47,7 +47,7 @@
                 <i class="fas fa-shield-alt text-[#f85149]"></i> Threat Intel
             </h3>
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()" 
+                <input type="text" aria-label="Target for threat intelligence" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()"
                        placeholder="Enter IP, Domain, or Hash..." 
                        class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#f85149] focus:ring-1 focus:ring-[#f85149] transition-all placeholder-[#484f58]">
                 <button @click="performIntelLookup()" :disabled="!quickIntelQuery.trim()" 
@@ -117,7 +117,7 @@
       </div>
     </div>
     
-    <div class="panel p-4 rounded-xl cursor-pointer hover:border-[#58a6ff] transition-colors group" @click="showSessionModal = true">
+    <div class="panel p-4 rounded-xl cursor-pointer hover:border-[#58a6ff] transition-colors group" role="button" tabindex="0" @click="showSessionModal = true" @keydown.enter.prevent="showSessionModal = true" @keydown.space.prevent="showSessionModal = true">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-[#8b949e] text-xs flex items-center gap-1">
@@ -377,7 +377,7 @@
         <h3 class="text-sm font-bold text-[#c9d1d9] flex items-center gap-2">
           <i class="fas fa-clock text-[#58a6ff]"></i> Session Information
         </h3>
-        <button @click="showSessionModal = false" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+        <button @click="showSessionModal = false" aria-label="Close session details" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>

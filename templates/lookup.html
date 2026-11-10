@@ -89,6 +89,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     </div>
   </div>
 
+  {{ ui.results_loading('Loading DNS results...') }}
   <div x-show="(results && results.length>0) || (comparisonResults && comparisonResults.length>0)" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[#30363d] space-y-4">
     <div class="result-toolbar">
       <h2 class="text-base font-semibold text-[#c9d1d9]">DNS Analysis Results</h2>
