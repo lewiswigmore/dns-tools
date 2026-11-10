@@ -44,6 +44,12 @@ def test_mobile_navigation_has_named_controls_and_focus_management():
     assert "$refs.menuClose.focus()" in toggle["@click"]
     main = next(attrs for tag, attrs in elements if tag == "main")
     assert main[":inert"] == "mobileMenuOpen"
+    settings = next(
+        attrs for tag, attrs in elements
+        if tag == "button" and attrs.get("aria-label") == "Settings"
+    )
+    assert "mobileMenuOpen = false" in settings["@click"]
+    assert "getElementById('settings-close').focus()" in settings["@click"]
 
 
 def test_library_icon_pagination_controls_have_names():

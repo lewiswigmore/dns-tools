@@ -187,12 +187,12 @@
             <div class="flex items-center justify-between mb-1">
                 <h1 class="text-[10px] font-bold text-white logo-font">DNSTools</h1>
                 <div class="flex items-center gap-2 md:gap-3">
-                    <button @click="$dispatch('open-command-palette')" 
+                    <button @click="mobileMenuOpen = false; $dispatch('open-command-palette')"
                             class="p-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
                             aria-label="Search tools" title="Search (Cmd+K)">
                         <i class="fas fa-search text-xs"></i>
                     </button>
-                    <button @click="$store.settings.toggle()" 
+                    <button @click="mobileMenuOpen = false; $store.settings.toggle(); $nextTick(() => document.getElementById('settings-close').focus())"
                             class="p-1.5 text-[#8b949e] hover:text-[#c9d1d9] transition-colors"
                             aria-label="Settings" title="Settings">
                         <i class="fas fa-cog text-xs"></i>
@@ -383,7 +383,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[#30363d]">
             <h2 class="text-sm font-bold text-[#c9d1d9] uppercase tracking-wider"><i class="fas fa-cog mr-2 text-[#58a6ff]"></i>Settings</h2>
-            <button @click="$store.settings.close()" aria-label="Close settings" class="text-[#8b949e] hover:text-[#c9d1d9]">
+            <button id="settings-close" @click="$store.settings.close()" aria-label="Close settings" class="text-[#8b949e] hover:text-[#c9d1d9]">
                 <i class="fas fa-times"></i>
             </button>
         </div>
