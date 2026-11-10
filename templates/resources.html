@@ -23,18 +23,18 @@
         </div>
 
         <!-- Complexity Filter -->
-        <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar">
+        <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto" role="group" aria-label="Filter by complexity">
             <div class="flex min-w-max">
-                <button @click="complexityFilter = 'All'; resetPage()" 
+                <button @click="complexityFilter = 'All'; resetPage()" :aria-pressed="complexityFilter === 'All'"
                         :class="complexityFilter === 'All' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">All</button>
-                <button @click="complexityFilter = 'Beginner'; resetPage()" 
+                <button @click="complexityFilter = 'Beginner'; resetPage()" :aria-pressed="complexityFilter === 'Beginner'"
                         :class="complexityFilter === 'Beginner' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Beginner</button>
-                <button @click="complexityFilter = 'Intermediate'; resetPage()" 
+                <button @click="complexityFilter = 'Intermediate'; resetPage()" :aria-pressed="complexityFilter === 'Intermediate'"
                         :class="complexityFilter === 'Intermediate' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Intermediate</button>
-                <button @click="complexityFilter = 'Advanced'; resetPage()" 
+                <button @click="complexityFilter = 'Advanced'; resetPage()" :aria-pressed="complexityFilter === 'Advanced'"
                         :class="complexityFilter === 'Advanced' ? 'bg-[#f85149] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Advanced</button>
             </div>
