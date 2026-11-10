@@ -69,17 +69,18 @@
   </div>
 
   <div x-show="result || comparisonResult" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
-    <div class="flex justify-between items-center">
+    <div class="result-toolbar">
       <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-shield-alt mr-2"></i>DMARC Policy for <span x-text="domain"></span></h3>
-      <div class="flex gap-2">
+      <div class="result-actions">
         <button x-data="{ copied: false }" 
-                @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
+                @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)"
+                title="Copy all results"
                 class="pill pill-outline pill-blue transition-all duration-200"
                 :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
           <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
-          <span x-text="copied ? 'Copied!' : 'Copy All'"></span>
+          <span class="action-label" aria-live="polite" x-text="copied ? 'Copied!' : 'Copy All'"></span>
         </button>
-        <button @click="exportResults" class="pill pill-outline pill-green"><i class="fas fa-download"></i><span>Export</span></button>
+        <button @click="exportResults" title="Export results" class="pill pill-outline pill-green"><i class="fas fa-download" aria-hidden="true"></i><span class="action-label">Export</span></button>
       </div>
     </div>
 
@@ -101,7 +102,7 @@
       <div x-show="result && result.raw" class="mt-4">
         <h4 class="font-semibold mb-2 text-[#c9d1d9] text-xs">Raw DMARC Record</h4>
         <div class="rounded-lg p-3 font-mono text-[10px] border border-[#30363d] bg-[#0d1117] text-[#8b949e] group relative">
-          <div x-text="result && result.raw ? result.raw : ''" class="pr-8 break-all"></div>
+          <div x-text="result && result.raw ? result.raw : ''" class="pr-12 break-all"></div>
           <button x-data="{ copied: false }" 
                   @click="copyToClipboard(result.raw); copied = true; setTimeout(() => copied = false, 1000)" 
                   class="absolute top-3 right-3 text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200"
