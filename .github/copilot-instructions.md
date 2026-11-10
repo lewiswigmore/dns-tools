@@ -82,6 +82,7 @@ tests/                        Pytest security checks and Node.js regression test
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
 - Responsive layout is shared in `templates/base.html`: result headers use `result-toolbar` / `result-actions`; secondary copy/share/export text uses `action-label` (visually hidden on phones, retained for screen readers). Keep primary and destructive actions labelled, and retain 44px mobile touch targets.
+- On mobile, shared button targets are at least 48px; use `mobile-modal` for full-screen dialogs and `mobile-dialog-shell` / `mobile-dialog-card` for inset dialogs so safe areas and short viewports remain usable. Use `mobile-record-value` for untruncated, wrapping DNS data.
 - Shared dark-theme surface, border, accent and spacing tokens live in `templates/base.html`; asynchronous DNS/RDAP result pages use the `results_loading` macro for an accessible, reduced-motion-aware loading placeholder.
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - DNS-over-HTTPS TXT formatting varies by provider: DMARC lookups normalize unquoted or DNS-quoted, possibly split, TXT data for parsing while retaining the original record value for display and other lookup surfaces.
