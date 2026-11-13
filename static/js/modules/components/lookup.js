@@ -1,4 +1,4 @@
-import { presetDomains, presetRecordTypes, addHistory, exportJSON, autoGrow } from '../utils.js';
+import { presetDomains, presetRecordTypes, addHistory, copyTextToClipboard, exportJSON, autoGrow } from '../utils.js';
 import { queryDomain } from '../rdap-client.js';
 import { DNSClient } from '../dns-client.js';
 import { buildFraudIndicators, computeRiskLevel, riskLabel, riskIcon, riskColorClass } from '../fraud-indicators.js';
@@ -262,12 +262,7 @@ export function LookupPage() {
       },
       
       async copyToClipboard(text) {
-        try {
-          await navigator.clipboard.writeText(text);
-          // Optional: Show a toast or tooltip feedback here
-        } catch (err) {
-          console.error('Failed to copy:', err);
-        }
+        return copyTextToClipboard(text);
       },
 
       async copyAllResults() {
