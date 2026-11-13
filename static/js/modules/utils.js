@@ -32,6 +32,14 @@ export const safeStorage = {
 
 export function safeJSONParse(str, fallback){ try { return JSON.parse(str); } catch { return fallback; } }
 
+export async function copyTextToClipboard(text, errorMessage = 'Failed to copy:') {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    console.error(errorMessage, error);
+  }
+}
+
 export function loadSettings() {
   const defaults = {
     providers: ['Google', 'Cloudflare'],
