@@ -190,7 +190,7 @@ export function DashboardPage() {
       },
 
       async checkProviderHealth() {
-        for (let provider of this.providerStatus) {
+        await Promise.all(this.providerStatus.map(async provider => {
           provider.status = 'checking';
           const start = performance.now();
           try {
@@ -212,7 +212,7 @@ export function DashboardPage() {
             // Check if it's likely a CSP or Block error (common with Cloudflare/Quad9 in browsers)
             provider.message = 'Blocked (CSP/Extension)';
           }
-        }
+        }));
       },
       
       updateSessionTime(){
