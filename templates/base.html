@@ -136,7 +136,7 @@
         .loader-hidden { opacity: 0; visibility: hidden; }
     </style>
 </head>
-<body>
+<body data-page="{{ active_page|default('dashboard') }}">
 <!-- Global Loader -->
 <div id="global-loader">
     <div class="loader-content">
@@ -671,7 +671,6 @@ x-cloak>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
