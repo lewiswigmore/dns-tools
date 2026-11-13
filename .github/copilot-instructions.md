@@ -71,6 +71,7 @@ generate_static.py            Static site generator (Flask to dist/)
 templates/                    Jinja2 HTML templates
 static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components (lookup, whois, dmarc, etc.)
+  utils.js                    Shared browser utilities and single-domain page setup
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
 tests/                        Pytest security checks and Node.js regression tests
@@ -81,7 +82,9 @@ tests/                        Pytest security checks and Node.js regression test
 
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
+- `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, and load command-palette knowledge-base data only when the palette is opened
 - Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
+- MX and DMARC pages share the `commonDomainPresets()` and `initializeDomainLookup()` helpers in `utils.js` for consistent presets and URL-driven auto-lookups
 - Responsive layout is shared in `templates/base.html`: result headers use `result-toolbar` / `result-actions`; secondary copy/share/export text uses `action-label` (visually hidden on phones, retained for screen readers). Keep primary and destructive actions labelled, and retain 44px mobile touch targets.
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - Keep DNS request fan-out bounded in both DNS clients; page components should dynamically import the knowledge base only when that page or feature needs it
@@ -98,7 +101,7 @@ tests/                        Pytest security checks and Node.js regression test
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
-- **2026-11-13**: Bulk DNS lookup paths could issue unbounded requests, repeatedly scan accumulated domains for deduplication/original input, and the shared entry point eagerly downloaded all knowledge-base data. Keep DoH fan-out at six concurrent requests, use sets/maps for batch indexing, and dynamically import the data only on the resources/intel/dashboard pages or when opening the command palette.
+- **2026-11-13**: Bulk DNS lookup paths could issue unbounded requests and repeatedly scan accumulated domains for deduplication/original input; static knowledge-base imports also delayed page-component initialization. Keep DoH fan-out at six concurrent requests, use sets/maps for batch indexing, and import the data after page initialization or when opening the command palette.
 - **2026-11-10**: Lookup result actions overflowed phone viewports after queries. Allow flex/grid children to shrink, wrap shared result toolbars, and use compact secondary action icons with accessible text. Mobile navigation must be inert while closed and return focus to its toggle when dismissed.
 - **2026-11-04**: Editing the Threat Intelligence input left an enabled Run Check that silently did nothing. Share normalized target eligibility between the method guard and button disabled state (`fraudTargetMatches`); show Analyze guidance while they differ. Analyze restores eligibility for the new domain without weakening request-identity guards.
 - **2026-11-04**: Fraud risk results could remain under a different Threat Intelligence target. Reset fraud state and invalidate pending requests on input edits, presets, and analysis (including empty/invalid/non-domain targets); guard success, error, and loading updates by request identity and target. Store and display the checked domain with each assessment. A domain comparison alone cannot stop an old request after switching away and back or starting a same-domain recheck.

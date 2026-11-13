@@ -5,7 +5,8 @@ export function CommandPalette() {
         selectedIndex: 0,
         items: [],
         allActions: [],
-        intelActionsPromise: null,
+        conceptActionsLoaded: false,
+        conceptActionsPromise: null,
         inactivityTimer: null,
 
         init() {
@@ -58,7 +59,7 @@ export function CommandPalette() {
                 this.open = true;
                 this.query = '';
                 this.filterItems();
-                this.loadIntelActions();
+                this.loadConceptActions();
                 this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
@@ -71,7 +72,7 @@ export function CommandPalette() {
             if (this.open) {
                 this.query = '';
                 this.filterItems();
-                this.loadIntelActions();
+                this.loadConceptActions();
                 this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
@@ -87,29 +88,6 @@ export function CommandPalette() {
             this.clearTimer();
         },
 
-        loadIntelActions() {
-            if (this.intelActionsPromise) return this.intelActionsPromise;
-
-            this.intelActionsPromise = import('../data/index.js')
-                .then(({ KNOWLEDGE_BASE }) => {
-                    const intelActions = KNOWLEDGE_BASE.map(concept => ({
-                        id: `intel-${concept.id}`,
-                        title: concept.title,
-                        type: 'Security Concept',
-                        icon: 'fa-user-shield',
-                        url: `/intel?concept=${concept.id}`
-                    }));
-                    this.allActions.push(...intelActions);
-                    this.filterItems();
-                })
-                .catch(error => {
-                    this.intelActionsPromise = null;
-                    console.error('Failed to load command palette concepts:', error);
-                });
-
-            return this.intelActionsPromise;
-        },
-
         resetTimer() {
             this.clearTimer();
             // Auto-close after 15 seconds of inactivity
@@ -123,6 +101,29 @@ export function CommandPalette() {
                 clearTimeout(this.inactivityTimer);
                 this.inactivityTimer = null;
             }
+        },
+
+        loadConceptActions() {
+            if (this.conceptActionsLoaded) return Promise.resolve();
+            if (this.conceptActionsPromise) return this.conceptActionsPromise;
+
+            this.conceptActionsPromise = import('../data/index.js').then(({ KNOWLEDGE_BASE }) => {
+                const intelConcepts = KNOWLEDGE_BASE.map(concept => ({
+                    id: `intel-${concept.id}`,
+                    title: concept.title,
+                    type: 'Security Concept',
+                    icon: 'fa-user-shield',
+                    url: `/intel?concept=${concept.id}`
+                }));
+                this.allActions.push(...intelConcepts);
+                this.conceptActionsLoaded = true;
+                if (this.open) this.filterItems();
+            }).catch(error => {
+                this.conceptActionsPromise = null;
+                console.error('Failed to load command palette concepts:', error);
+            });
+
+            return this.conceptActionsPromise;
         },
 
         filterItems() {
