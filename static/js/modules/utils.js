@@ -1,6 +1,22 @@
 const HISTORY_KEY = 'dns_history';
 const SETTINGS_KEY = 'dnstools_settings';
 
+export function commonDomainPresets() {
+  return [
+    { label: 'google.com', value: 'google.com' },
+    { label: 'microsoft.com', value: 'microsoft.com' },
+    { label: 'openai.com', value: 'openai.com' },
+  ];
+}
+
+export function initializeDomainLookup(page) {
+  const domain = new URLSearchParams(window.location.search).get('domain');
+  if (!domain) return;
+
+  page.domain = domain;
+  setTimeout(() => page.performLookup(), 100);
+}
+
 export const safeStorage = {
   getItem: (key) => {
     try {

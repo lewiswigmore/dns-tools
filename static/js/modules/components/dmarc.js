@@ -1,22 +1,11 @@
-import { addHistory, copyTextToClipboard, exportJSON } from '../utils.js';
+import { addHistory, commonDomainPresets, copyTextToClipboard, exportJSON, initializeDomainLookup } from '../utils.js';
 
 export function DMARCPage() {
     return {
-      presets: [
-        { label: 'google.com', value: 'google.com' },
-        { label: 'microsoft.com', value: 'microsoft.com' },
-        { label: 'openai.com', value: 'openai.com' },
-      ],
+      presets: commonDomainPresets(),
       domain:'', result:null, comparisonResult: null, compareMode: false, loading:false, error:'', searchPerformed:false,
       init(){
-        // Check for domain parameter in URL
-        const params = new URLSearchParams(window.location.search);
-        const domainParam = params.get('domain');
-        if (domainParam) {
-          this.domain = domainParam;
-          // Auto-execute the lookup
-          setTimeout(() => this.performLookup(), 100);
-        }
+        initializeDomainLookup(this);
       },
       async performLookup(){
         if(this.loading || !this.domain.trim()) return;
