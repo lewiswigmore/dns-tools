@@ -16,6 +16,8 @@ from functools import wraps
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+MAX_CONCURRENT_DNS_REQUESTS = 6
+
 app = Flask(__name__)
 # Use environment variable for secret key in production, fallback for development
 app.secret_key = os.environ.get('SECRET_KEY', 'dns-intelligence-platform-secret-key-change-in-production')
@@ -239,10 +241,12 @@ class DNSLookup:
         domains = re.split(r'[,;\n\r\s]+', domains_input)
         
         normalized = []
+        seen_domains = set()
         for domain in domains:
             original_domain = domain.strip()
             normalized_domain = self.normalize_domain(domain)
-            if normalized_domain and normalized_domain not in [d['domain'] for d in normalized]:
+            if normalized_domain and normalized_domain not in seen_domains:
+                seen_domains.add(normalized_domain)
                 normalized.append({
                     'domain': normalized_domain,
                     'original': original_domain if original_domain != normalized_domain else None
@@ -321,32 +325,32 @@ class DNSLookup:
         Perform DNS lookups for multiple domains asynchronously
         """
         async with aiohttp.ClientSession(timeout=self.session_timeout) as session:
-            tasks = []
-            
-            for domain_obj in domain_objects:
-                domain = domain_obj['domain']
-                for record_type in record_types:
-                    task = self.fetch_dns_record(session, domain, record_type)
-                    tasks.append(task)
+            semaphore = asyncio.Semaphore(MAX_CONCURRENT_DNS_REQUESTS)
+
+            async def fetch_with_limit(domain, record_type):
+                async with semaphore:
+                    return await self.fetch_dns_record(session, domain, record_type)
+
+            tasks = [
+                fetch_with_limit(domain_obj['domain'], record_type)
+                for domain_obj in domain_objects
+                for record_type in record_types
+            ]
             
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
             # Group results by domain
             domain_results = {}
+            original_domains = {}
+            for domain_obj in domain_objects:
+                original_domains.setdefault(domain_obj['domain'], domain_obj.get('original'))
             for result in results:
                 if isinstance(result, dict):
                     domain = result['domain']
                     if domain not in domain_results:
-                        # Find original domain
-                        original = None
-                        for domain_obj in domain_objects:
-                            if domain_obj['domain'] == domain:
-                                original = domain_obj.get('original')
-                                break
-                        
                         domain_results[domain] = {
                             'domain': domain,
-                            'original': original,
+                            'original': original_domains.get(domain),
                             'records': {},
                             'status': 'success',
                             'errors': []

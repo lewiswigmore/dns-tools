@@ -1,5 +1,4 @@
 import { safeStorage, addHistory } from '../utils.js';
-import { KNOWLEDGE_BASE } from '../data/index.js';
 import { queryDomain } from '../rdap-client.js';
 import { DNSClient } from '../dns-client.js';
 import { buildFraudIndicators, computeRiskLevel, riskLabel, riskIcon, riskBannerClass } from '../fraud-indicators.js';
@@ -25,7 +24,7 @@ export function IntelPage() {
         fraudRequestId: 0,
 
         // Knowledge Base State
-        concepts: KNOWLEDGE_BASE,
+        concepts: [],
         conceptSearch: '',
         conceptFilter: 'Threat Intel',
         
@@ -37,6 +36,17 @@ export function IntelPage() {
         conceptError: '',
 
         init() {
+            const conceptsPromise = import('../data/index.js')
+                .then(({ KNOWLEDGE_BASE }) => {
+                    this.concepts = KNOWLEDGE_BASE;
+                    return KNOWLEDGE_BASE;
+                })
+                .catch(error => {
+                    console.error('Failed to load threat intelligence concepts:', error);
+                    this.conceptError = 'Failed to load the knowledge base.';
+                    return [];
+                });
+
             // Check for query param
             const params = new URLSearchParams(window.location.search);
             const q = params.get('q');
@@ -48,10 +58,10 @@ export function IntelPage() {
             }
             
             if (conceptId) {
-                const concept = this.concepts.find(c => c.id === conceptId);
-                if (concept) {
-                    this.showConcept(concept);
-                }
+                conceptsPromise.then(concepts => {
+                    const concept = concepts.find(c => c.id === conceptId);
+                    if (concept) this.showConcept(concept);
+                });
             }
         },
         

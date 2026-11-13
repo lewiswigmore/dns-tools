@@ -5,6 +5,23 @@ const PROVIDER_URLS = {
   'Cloudflare': 'https://cloudflare-dns.com/dns-query'
 };
 
+const MAX_CONCURRENT_DNS_REQUESTS = 6;
+
+async function mapWithConcurrency(items, concurrency, callback) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const workerCount = Math.min(concurrency, items.length);
+
+  await Promise.all(Array.from({ length: workerCount }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex++;
+      results[index] = await callback(items[index]);
+    }
+  }));
+
+  return results;
+}
+
 function normalizeDMARCTxt(raw) {
   if (typeof raw !== 'string') return '';
   const text = raw.trim();
@@ -192,35 +209,41 @@ export class DNSClient {
     }
 
     async performLookup(domains, recordTypes) {
-      const results = [];
-      // Split on newlines, commas, and spaces, then filter out empty entries and invalid domains
       const domainsArray = this.parseDomainList(domains);
-      
-      for (const domain of domainsArray) {
-        const domainResult = {
-          domain: domain,
-          records: {},
-          errors: []
-        };
-        
-        for (const recordType of recordTypes) {
-          try {
-            const records = await this.queryDNS(domain.trim(), recordType);
-            domainResult.records[recordType] = records;
-          } catch (error) {
-            domainResult.records[recordType] = [];
-            domainResult.errors.push(`${recordType} lookup failed: ${error.message}`);
-            console.warn(`Failed to lookup ${recordType} for ${domain}:`, error);
-          }
+      const results = domainsArray.map(domain => ({
+        domain,
+        records: {},
+        errors: []
+      }));
+      const tasks = domainsArray.flatMap((domain, domainIndex) =>
+        recordTypes.map(recordType => ({ domain, domainIndex, recordType }))
+      );
+
+      const taskResults = await mapWithConcurrency(tasks, MAX_CONCURRENT_DNS_REQUESTS, async task => {
+        try {
+          return {
+            task,
+            records: await this.queryDNS(task.domain.trim(), task.recordType)
+          };
+        } catch (error) {
+          return { task, error };
         }
-        
-        // Check if domain has no records at all
+      });
+
+      for (const { task, records, error } of taskResults) {
+        const domainResult = results[task.domainIndex];
+        domainResult.records[task.recordType] = error ? [] : records;
+        if (error) {
+          domainResult.errors.push(`${task.recordType} lookup failed: ${error.message}`);
+          console.warn(`Failed to lookup ${task.recordType} for ${task.domain}:`, error);
+        }
+      }
+
+      for (const domainResult of results) {
         const hasAnyRecords = Object.values(domainResult.records).some(records => records.length > 0);
         if (!hasAnyRecords && domainResult.errors.length === 0) {
-          domainResult.errors.push(`No DNS records found - domain may not exist`);
+          domainResult.errors.push('No DNS records found - domain may not exist');
         }
-        
-        results.push(domainResult);
       }
       
       return {
@@ -233,51 +256,49 @@ export class DNSClient {
     }
 
     async performComparison(domains, recordTypes) {
-      const results = [];
       const domainsArray = this.parseDomainList(domains);
-      
       const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
         name: name,
         url: PROVIDER_URLS[name]
       })).filter(p => p.url);
+      const results = domainsArray.map(domain => ({
+        domain,
+        comparisons: Object.fromEntries(recordTypes.map(recordType => [recordType, {}]))
+      }));
+      const tasks = domainsArray.flatMap((domain, domainIndex) =>
+        recordTypes.flatMap(recordType =>
+          activeProviders.map(provider => ({ domain, domainIndex, recordType, provider }))
+        )
+      );
 
-      for (const domain of domainsArray) {
-        const domainResult = {
-          domain: domain,
-          comparisons: {}
-        };
-
-        for (const recordType of recordTypes) {
-          domainResult.comparisons[recordType] = {};
-          
-          // Query all providers in parallel
-          const providerPromises = activeProviders.map(async (provider) => {
-            try {
-              const start = performance.now();
-              const records = await this.queryDNS(domain.trim(), recordType, provider.url);
-              const duration = Math.round(performance.now() - start);
-              return {
-                provider: provider.name,
-                records: records,
-                latency: duration,
-                status: 'success'
-              };
-            } catch (error) {
-              return {
-                provider: provider.name,
-                records: [],
-                error: error.message,
-                status: 'error'
-              };
+      const providerResults = await mapWithConcurrency(tasks, MAX_CONCURRENT_DNS_REQUESTS, async task => {
+        try {
+          const start = performance.now();
+          const records = await this.queryDNS(task.domain.trim(), task.recordType, task.provider.url);
+          return {
+            task,
+            result: {
+              provider: task.provider.name,
+              records,
+              latency: Math.round(performance.now() - start),
+              status: 'success'
             }
-          });
-
-          const providerResults = await Promise.all(providerPromises);
-          providerResults.forEach(res => {
-            domainResult.comparisons[recordType][res.provider] = res;
-          });
+          };
+        } catch (error) {
+          return {
+            task,
+            result: {
+              provider: task.provider.name,
+              records: [],
+              error: error.message,
+              status: 'error'
+            }
+          };
         }
-        results.push(domainResult);
+      });
+
+      for (const { task, result } of providerResults) {
+        results[task.domainIndex].comparisons[task.recordType][task.provider.name] = result;
       }
 
       return { results };

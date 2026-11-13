@@ -28,4 +28,5 @@ test('command palette loads searchable knowledge-base actions when opened', asyn
   palette.query = 'Azure Networking';
   palette.filterItems();
   assert.ok(palette.items.some(action => action.title === 'Azure Networking Basics'));
+  palette.close();
 });

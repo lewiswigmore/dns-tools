@@ -1,5 +1,3 @@
-import { KNOWLEDGE_BASE } from '../data/index.js';
-
 export function ResourcesPage() {
     return {
       conceptModal: false,
@@ -8,7 +6,7 @@ export function ResourcesPage() {
       loadingConcept: false,
       conceptError: '',
       conceptAnimations: {},
-      knowledgeBase: KNOWLEDGE_BASE,
+      knowledgeBase: [],
       complexityFilter: 'All',
       categoryFilter: 'All',
       searchQuery: '',
@@ -136,6 +134,17 @@ export function ResourcesPage() {
       },
 
       init() {
+        const knowledgeBasePromise = import('../data/index.js')
+          .then(({ KNOWLEDGE_BASE }) => {
+            this.knowledgeBase = KNOWLEDGE_BASE;
+            return KNOWLEDGE_BASE;
+          })
+          .catch(error => {
+            console.error('Failed to load resource knowledge base:', error);
+            this.conceptError = 'Failed to load the knowledge base.';
+            return [];
+          });
+
         // Initialize random pulse animations for DNS concepts
         this.initRandomPulseAnimations();
 
@@ -168,9 +177,10 @@ export function ResourcesPage() {
 
         const concept = urlParams.get('concept');
         if (concept) {
-            // Wait a tick for Alpine to initialize
-            this.$nextTick(() => {
-                this.showConcept(decodeURIComponent(concept));
+            knowledgeBasePromise.then(knowledgeBase => {
+              if (knowledgeBase.some(item => item.title === decodeURIComponent(concept))) {
+                this.$nextTick(() => this.showConcept(decodeURIComponent(concept)));
+              }
             });
         }
 
