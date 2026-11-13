@@ -1,4 +1,3 @@
-import { DNSClient } from './modules/dns-client.js';
 import { loadSettings, saveSettings } from './modules/utils.js';
 import { CommandPalette } from './modules/components/command-palette.js';
 
@@ -14,10 +13,16 @@ const pageComponentLoaders = {
     whois: () => import('./modules/components/whois.js').then(module => ['WhoisPage', module.WhoisPage])
 };
 
-const activePageComponent = await pageComponentLoaders[document.body.dataset.page]?.();
+const page = document.body.dataset.page;
+const needsSharedDnsClient = ['lookup', 'mx', 'dmarc'].includes(page);
+const [activePageComponent, dnsClientModule] = await Promise.all([
+    pageComponentLoaders[page]?.(),
+    needsSharedDnsClient ? import('./modules/dns-client.js') : Promise.resolve(null)
+]);
 
-// Initialize DNS Client
-window.dnsClient = new DNSClient();
+if (dnsClientModule) {
+    window.dnsClient = new dnsClientModule.DNSClient();
+}
 
 const registerComponents = () => {
     const Alpine = window.Alpine;
