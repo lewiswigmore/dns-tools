@@ -81,6 +81,7 @@ tests/                        Pytest security checks and Node.js regression test
 
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
+- Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
 - Responsive layout is shared in `templates/base.html`: result headers use `result-toolbar` / `result-actions`; secondary copy/share/export text uses `action-label` (visually hidden on phones, retained for screen readers). Keep primary and destructive actions labelled, and retain 44px mobile touch targets.
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - DNS-over-HTTPS TXT formatting varies by provider: DMARC lookups normalize unquoted or DNS-quoted, possibly split, TXT data for parsing while retaining the original record value for display and other lookup surfaces.

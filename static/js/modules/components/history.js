@@ -1,4 +1,4 @@
-import { loadHistory, saveHistory, exportJSON } from '../utils.js';
+import { loadHistory, saveHistory, copyTextToClipboard, exportJSON } from '../utils.js';
 
 export function HistoryPage() {
     return {
@@ -232,11 +232,7 @@ export function HistoryPage() {
       },
 
       async copyToClipboard(text) {
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch (err) {
-          console.error('Failed to copy:', err);
-        }
+        return copyTextToClipboard(text);
       },
 
       exportResults() {

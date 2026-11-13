@@ -1,4 +1,4 @@
-import { addHistory, exportJSON } from '../utils.js';
+import { addHistory, copyTextToClipboard, exportJSON } from '../utils.js';
 
 export function DMARCPage() {
     return {
@@ -99,11 +99,7 @@ export function DMARCPage() {
       },
 
       async copyToClipboard(text) {
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch (err) {
-          console.error('Failed to copy:', err);
-        }
+        return copyTextToClipboard(text);
       },
 
       exportResults() {

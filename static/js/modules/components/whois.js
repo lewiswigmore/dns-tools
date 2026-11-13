@@ -1,4 +1,4 @@
-import { addHistory, exportJSON } from '../utils.js';
+import { addHistory, copyTextToClipboard, exportJSON } from '../utils.js';
 import { queryTarget, preloadBootstrap } from '../rdap-client.js';
 import { DNSClient } from '../dns-client.js';
 
@@ -274,7 +274,7 @@ export function WhoisPage() {
     },
 
     async copyToClipboard(text) {
-      try { await navigator.clipboard.writeText(text); } catch (e) { console.error('Copy failed:', e); }
+      return copyTextToClipboard(text, 'Copy failed:');
     },
 
     exportResults() {
