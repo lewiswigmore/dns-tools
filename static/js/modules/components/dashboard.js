@@ -1,5 +1,4 @@
 import { loadHistory } from '../utils.js';
-import { KNOWLEDGE_BASE } from '../data/index.js';
 
 export function DashboardPage() {
     // Store chart instances outside the Alpine data object to prevent reactivity issues
@@ -48,10 +47,13 @@ export function DashboardPage() {
         this.checkProviderHealth();
         this.currentTip = this.dnsTips[Math.floor(Math.random() * this.dnsTips.length)];
         
-        // Pick a random concept
-        if (KNOWLEDGE_BASE && KNOWLEDGE_BASE.length > 0) {
-            this.featuredConcept = KNOWLEDGE_BASE[Math.floor(Math.random() * KNOWLEDGE_BASE.length)];
-        }
+        import('../data/index.js')
+          .then(({ KNOWLEDGE_BASE }) => {
+            if (KNOWLEDGE_BASE.length > 0) {
+              this.featuredConcept = KNOWLEDGE_BASE[Math.floor(Math.random() * KNOWLEDGE_BASE.length)];
+            }
+          })
+          .catch(error => console.error('Failed to load dashboard concepts:', error));
 
         // Initialize charts with more delay and only once
         setTimeout(() => {

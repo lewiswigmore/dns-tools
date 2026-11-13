@@ -1,5 +1,3 @@
-import { KNOWLEDGE_BASE } from '../data/index.js';
-
 export function CommandPalette() {
     return {
         open: false,
@@ -7,6 +5,7 @@ export function CommandPalette() {
         selectedIndex: 0,
         items: [],
         allActions: [],
+        intelActionsPromise: null,
         inactivityTimer: null,
 
         init() {
@@ -35,16 +34,7 @@ export function CommandPalette() {
                 url: `/resources?concept=${encodeURIComponent(c)}`
             }));
 
-            // Define Intel Concepts
-            const intelConcepts = KNOWLEDGE_BASE.map(k => ({
-                id: `intel-${k.id}`,
-                title: k.title,
-                type: 'Security Concept',
-                icon: 'fa-user-shield',
-                url: `/intel?concept=${k.id}`
-            }));
-
-            this.allActions = [...navActions, ...dnsConcepts, ...intelConcepts];
+            this.allActions = [...navActions, ...dnsConcepts];
             
             // Listen for keyboard shortcuts
             window.addEventListener('keydown', (e) => {
@@ -68,6 +58,7 @@ export function CommandPalette() {
                 this.open = true;
                 this.query = '';
                 this.filterItems();
+                this.loadIntelActions();
                 this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
@@ -80,6 +71,7 @@ export function CommandPalette() {
             if (this.open) {
                 this.query = '';
                 this.filterItems();
+                this.loadIntelActions();
                 this.resetTimer();
                 this.$nextTick(() => {
                     document.getElementById('cmd-palette-input').focus();
@@ -93,6 +85,29 @@ export function CommandPalette() {
             this.open = false;
             this.selectedIndex = 0;
             this.clearTimer();
+        },
+
+        loadIntelActions() {
+            if (this.intelActionsPromise) return this.intelActionsPromise;
+
+            this.intelActionsPromise = import('../data/index.js')
+                .then(({ KNOWLEDGE_BASE }) => {
+                    const intelActions = KNOWLEDGE_BASE.map(concept => ({
+                        id: `intel-${concept.id}`,
+                        title: concept.title,
+                        type: 'Security Concept',
+                        icon: 'fa-user-shield',
+                        url: `/intel?concept=${concept.id}`
+                    }));
+                    this.allActions.push(...intelActions);
+                    this.filterItems();
+                })
+                .catch(error => {
+                    this.intelActionsPromise = null;
+                    console.error('Failed to load command palette concepts:', error);
+                });
+
+            return this.intelActionsPromise;
         },
 
         resetTimer() {
