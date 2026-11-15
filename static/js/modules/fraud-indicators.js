@@ -187,12 +187,12 @@ export function riskColorClass(level) {
     }
 }
 
-/** Text + border classes, for a full banner/panel treatment. */
+/** Semantic text classes for the risk summary. */
 export function riskBannerClass(level) {
     switch (level) {
-        case 'high': return 'border border-[#f85149]/40 text-[#f85149]';
-        case 'medium': return 'border border-[#d29922]/40 text-[#d29922]';
-        case 'low': return 'border border-[#58a6ff]/40 text-[#58a6ff]';
-        default: return 'border border-[#3fb950]/40 text-[#3fb950]';
+        case 'high': return 'text-[color:var(--danger)]';
+        case 'medium': return 'text-[color:var(--warning)]';
+        case 'low': return 'text-[color:var(--text)]';
+        default: return 'text-[color:var(--success)]';
     }
 }

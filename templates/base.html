@@ -48,8 +48,9 @@
         ::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid var(--canvas); border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
 
-        .panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;transition:border-color 0.2s ease;}
-        .panel:hover{border-color:#444c56;}
+        .panel{background:var(--surface);border-radius:8px}
+        .panel.panel{border:0}
+        .panel[role=button]:hover{background:var(--surface-raised)}
         .panel-flat{background:var(--surface)}
         .pill{border-radius:9999px;padding:0.25rem 0.65rem;font-size:0.65rem;font-weight:600;display:inline-flex;align-items:center;gap:.35rem;line-height:1}
         .pill-outline{background:transparent;border:1px solid currentColor}

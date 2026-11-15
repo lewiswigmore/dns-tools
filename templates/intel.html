@@ -44,15 +44,10 @@
         <p x-show="error" x-text="error" class="text-[10px] text-[color:var(--danger)]"></p>
 
         <!-- Results Area -->
-        <div x-show="results" class="space-y-4 pt-4 border-t border-[var(--border)]" style="display: none;">
+        <div x-show="results" class="space-y-4 pt-4" style="display: none;">
 
             <!-- Target Info -->
             <div class="flex items-center gap-3">
-                <div class="h-10 w-10 rounded-full bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-center">
-                    <i class="fas fa-globe text-lg text-[color:var(--accent)]" x-show="results?.type === 'Domain'"></i>
-                    <i class="fas fa-network-wired text-lg text-[color:var(--accent)]" x-show="results?.type === 'IP Address'"></i>
-                    <i class="fas fa-file-code text-lg text-[color:var(--warning)]" x-show="results?.type === 'File Hash'"></i>
-                </div>
                 <div>
                     <h3 class="text-base font-bold text-[color:var(--text)]" x-text="results?.target"></h3>
                     <span class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider" x-text="results?.type"></span>
@@ -63,10 +58,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <template x-for="link in results?.links" :key="link.name">
                     <a :href="link.url" target="_blank" rel="noopener noreferrer"
-                       class="panel p-3 flex items-center gap-3 hover:border-[var(--accent)] group transition-all rounded-xl bg-[var(--canvas)]">
-                        <div class="h-8 w-8 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center group-hover:border-[var(--accent)] transition-colors">
-                            <i :class="link.icon + ' ' + link.color" class="text-sm"></i>
-                        </div>
+                       class="p-3 flex items-center gap-3 group rounded-lg bg-[var(--canvas)] hover:bg-[var(--surface-raised)] transition-colors">
                         <div>
                             <h4 class="text-xs font-semibold text-[color:var(--text)] group-hover:text-[color:var(--accent)] transition-colors" x-text="link.name"></h4>
                             <p class="text-[9px] text-[color:var(--muted)]">View Report <i class="fas fa-external-link-alt ml-1 text-[8px]"></i></p>
@@ -76,12 +68,9 @@
             </div>
 
             <!-- Fraud Risk Indicators (domains only) -->
-            <div x-show="results?.type === 'Domain'" class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--canvas)] space-y-3">
+            <div x-show="results?.type === 'Domain'" class="py-2 space-y-3">
                 <div class="flex items-center justify-between flex-wrap gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-lg bg-[var(--surface)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                            <i class="fas fa-user-secret text-[color:var(--warning)] text-sm"></i>
-                        </div>
                         <div>
                             <h4 class="text-xs font-bold text-[color:var(--text)]">Fraud Risk Indicators</h4>
                             <p class="text-[9px] text-[color:var(--muted)]">Heuristic, client-side signals only. Not proof of fraud, always verify manually before acting.</p>
@@ -103,7 +92,7 @@
                     <div class="space-y-2">
                         <p class="text-[10px] text-[color:var(--muted)] break-all">Checked domain: <span class="font-semibold text-[color:var(--text)]" x-text="fraud.data.domain"></span></p>
                         <!-- Overall risk banner -->
-                        <div class="panel p-3 rounded-lg flex items-center gap-3 bg-[var(--canvas)]" :class="riskBannerClass(fraud.data.riskLevel)">
+                        <div class="p-3 rounded-lg flex items-center gap-3" :class="riskBannerClass(fraud.data.riskLevel)">
                             <i class="fas text-base" :class="riskIcon(fraud.data.riskLevel)"></i>
                             <div>
                                 <p class="text-xs font-bold" x-text="riskLabel(fraud.data.riskLevel)"></p>
@@ -114,7 +103,7 @@
                         <!-- Indicator list -->
                         <div class="space-y-2">
                             <template x-for="(ind, idx) in fraud.data.indicators" :key="idx">
-                                <div class="flex items-start gap-3 panel p-3 rounded-lg bg-[var(--canvas)]">
+                                <div class="flex items-start gap-3 py-2">
                                     <span class="pill pill-outline text-[9px] shrink-0" :class="severityPillClass(ind.severity)" x-text="ind.severity.toUpperCase()"></span>
                                     <div>
                                         <p class="text-[11px] font-semibold text-[color:var(--text)]" x-text="ind.label"></p>

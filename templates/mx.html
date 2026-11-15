@@ -115,7 +115,7 @@
         </div>
       </div>
 
-      <div class="bg-[var(--canvas)] rounded-lg border border-[var(--border)] overflow-hidden">
+      <div class="bg-[var(--canvas)] rounded-lg overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--border)]">
           <template x-for="provider in Object.keys(comparisonResult).sort()" :key="provider">
             <div class="p-3 space-y-2">
@@ -129,7 +129,7 @@
               <template x-if="comparisonResult[provider].records.length > 0">
                 <div class="space-y-1">
                   <template x-for="rec in comparisonResult[provider].records">
-                    <div class="flex items-center justify-between bg-[var(--surface)] p-1.5 rounded border border-[var(--border)]">
+                    <div class="flex items-center justify-between bg-[var(--surface)] p-1.5 rounded">
                       <span class="text-[10px] font-mono truncate" :title="rec.exchange" x-text="rec.exchange"></span>
                       <span class="text-[9px] px-1.5 py-0.5 rounded bg-[var(--border)] text-[color:var(--text)]" x-text="'Pri: ' + rec.priority"></span>
                     </div>

@@ -70,11 +70,11 @@
     <!-- Standard Results -->
     <div x-show="!compareMode && result">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-        <div class="rounded-lg p-3 border border-[var(--border)] bg-[var(--canvas)]">
+        <div class="rounded-lg p-3 bg-[var(--canvas)]">
           <h4 class="font-semibold mb-2 text-[color:var(--text)]">Policy Action</h4>
           <span class="pill pill-outline" :class="{'pill-green': result && result.policy==='reject','pill-orange': result && result.policy==='quarantine','pill-blue': !result || !result.policy || result.policy==='none'}" x-text="result ? (result.policy||'none') : 'none'"></span>
         </div>
-        <div class="rounded-lg p-3 border border-[var(--border)] bg-[var(--canvas)]">
+        <div class="rounded-lg p-3 bg-[var(--canvas)]">
           <h4 class="font-semibold mb-2 text-[color:var(--text)]">Alignment</h4>
           <div class="space-y-1">
             <div x-show="result && result.adkim" class="text-[10px] text-[color:var(--text)]">DKIM: <span class="pill pill-outline pill-blue ml-1" x-text="result && result.adkim ? result.adkim : ''"></span></div>
@@ -84,7 +84,7 @@
       </div>
       <div x-show="result && result.raw" class="mt-4">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] text-xs">Raw DMARC Record</h4>
-        <div class="rounded-lg p-3 font-mono text-[10px] border border-[var(--border)] bg-[var(--canvas)] text-[color:var(--muted)] group relative">
+        <div class="rounded-lg p-3 font-mono text-[10px] bg-[var(--canvas)] text-[color:var(--muted)] group relative">
           <div x-text="result && result.raw ? result.raw : ''" class="pr-12 break-all"></div>
           <button x-data="{ copied: false }"
                   @click="copyToClipboard(result.raw); copied = true; setTimeout(() => copied = false, 1000)"
@@ -114,7 +114,7 @@
         </div>
       </div>
 
-      <div class="bg-[var(--canvas)] rounded-lg border border-[var(--border)] overflow-hidden">
+      <div class="bg-[var(--canvas)] rounded-lg overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--border)]">
           <template x-for="provider in Object.keys(comparisonResult).sort()" :key="provider">
             <div class="p-3 space-y-2">
@@ -126,7 +126,7 @@
                 <span class="text-[10px]" :class="comparisonResult[provider].status === 'success' ? 'text-[color:var(--success)]' : 'text-[color:var(--danger)]'" x-text="comparisonResult[provider].status === 'success' ? comparisonResult[provider].latency + 'ms' : 'Failed'"></span>
               </div>
               <template x-if="comparisonResult[provider].status === 'success' && comparisonResult[provider].dmarc">
-                <div class="text-[10px] font-mono bg-[var(--surface)] p-1.5 rounded border border-[var(--border)] break-all" :title="comparisonResult[provider].dmarc.raw" x-text="comparisonResult[provider].dmarc.raw"></div>
+                <div class="text-[10px] font-mono bg-[var(--surface)] p-1.5 rounded break-all" :title="comparisonResult[provider].dmarc.raw" x-text="comparisonResult[provider].dmarc.raw"></div>
               </template>
               <template x-if="comparisonResult[provider].status === 'success' && !comparisonResult[provider].dmarc">
                 <div class="text-[10px] text-[color:var(--muted)] italic">No DMARC record found</div>

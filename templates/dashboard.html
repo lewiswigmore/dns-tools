@@ -7,10 +7,7 @@
 {% block content %}
 <div x-data="DashboardPage()" x-init="init()" class="space-y-4">
   <!-- DNS Tip Banner -->
-  <div class="bg-[var(--accent-subtle)] border border-[var(--accent-border)] rounded-xl p-3 flex items-center gap-3 animate-fade-in">
-    <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-[var(--accent-fill)] text-white">
-      <i class="fas fa-lightbulb"></i>
-    </div>
+  <div class="bg-[var(--accent-subtle)] rounded-xl p-3 flex items-center gap-3 animate-fade-in">
     <div class="flex-1">
       <p class="text-[10px] font-bold text-[color:var(--accent)] uppercase tracking-wider mb-0.5">DNS Tip</p>
       <p class="text-xs text-[color:var(--text)]" x-text="currentTip"></p>
@@ -64,13 +61,10 @@
             <h3 class="text-sm font-semibold text-[color:var(--text)] flex items-center gap-2">
                 <i class="fas fa-lightbulb text-[color:var(--warning)]"></i> Featured Concept
             </h3>
-            <span class="text-[10px] text-[color:var(--muted)] border border-[var(--border)] rounded px-1.5 py-0.5" x-text="featuredConcept?.tags[0]"></span>
+            <span class="text-[10px] text-[color:var(--muted)]" x-text="featuredConcept?.tags[0]"></span>
         </div>
 
         <div class="flex items-start gap-3 flex-1">
-            <div class="h-10 w-10 rounded-lg bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                <i :class="featuredConcept?.icon + ' ' + featuredConcept?.iconColor" class="text-lg"></i>
-            </div>
             <div>
                 <h4 class="text-sm font-bold text-[color:var(--text)] mb-1" x-text="featuredConcept?.title"></h4>
                 <p class="text-xs text-[color:var(--muted)] line-clamp-2" x-text="featuredConcept?.summary"></p>
@@ -78,7 +72,7 @@
         </div>
 
         <a :href="'intel.html?concept=' + featuredConcept?.id"
-           class="mt-3 text-center w-full py-1.5 rounded border border-[var(--border)] bg-[var(--canvas)] text-[color:var(--accent)] text-xs hover:bg-[var(--border)] transition-colors font-medium">
+           class="mt-3 self-start py-1.5 text-[color:var(--accent)] text-xs hover:underline font-medium">
             Learn More <i class="fas fa-arrow-right ml-1 text-[10px]"></i>
         </a>
     </div>
@@ -96,9 +90,6 @@
           </p>
           <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.totalLookups"></p>
         </div>
-        <div class="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center">
-          <i class="fas fa-search text-[color:var(--text)] text-xs"></i>
-        </div>
       </div>
     </div>
 
@@ -110,9 +101,6 @@
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Percentage of queries that returned a successful response from the DoH provider"></i>
           </p>
           <p class="text-xl font-bold" :class="stats.successRate >= 90 ? 'text-[color:var(--success)]' : stats.successRate >= 70 ? 'text-[color:var(--warning)]' : 'text-[color:var(--danger)]'" x-text="stats.successRate + '%'"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center">
-          <i class="fas fa-chart-line text-[color:var(--text)] text-xs"></i>
         </div>
       </div>
     </div>
@@ -126,9 +114,6 @@
           </p>
           <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.sessionTime"></p>
         </div>
-        <div class="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center group-hover:border-[var(--accent)] transition-colors">
-          <i class="fas fa-clock text-[color:var(--text)] text-xs group-hover:text-[color:var(--accent)] transition-colors"></i>
-        </div>
       </div>
     </button>
 
@@ -140,9 +125,6 @@
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Average time taken for the DoH provider to respond to your queries"></i>
           </p>
           <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.avgResponseTime"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[var(--border)] bg-[var(--surface)] flex items-center justify-center">
-          <i class="fas fa-tachometer-alt text-[color:var(--text)] text-xs"></i>
         </div>
       </div>
     </div>
@@ -186,7 +168,7 @@
       </h3>
       <div class="space-y-2">
         <template x-for="(item, index) in topSearches" :key="item.query">
-          <div class="flex items-center justify-between p-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)]">
+          <div class="flex items-center justify-between py-2">
             <div class="flex items-center gap-2 overflow-hidden">
               <span class="text-[10px] font-bold text-[color:var(--muted)] w-4" x-text="(index + 1) + '.'"></span>
               <span class="text-[color:var(--text)] text-xs truncate" x-text="item.query"></span>
@@ -219,7 +201,7 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <template x-for="provider in providerStatus" :key="provider.name">
-          <div class="p-3 rounded-lg border border-[var(--border)] bg-[var(--canvas)] flex flex-col gap-2 relative group">
+          <div class="p-3 rounded-lg bg-[var(--canvas)] flex flex-col gap-2 relative group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-xs font-medium text-[color:var(--text)]" x-text="provider.name"></span>
@@ -247,10 +229,7 @@
         </template>
 
         <!-- Configure Card -->
-        <ui-dialog-trigger for="settings-dialog"><button class="p-3 rounded-lg border border-dashed border-[var(--border)] bg-[var(--canvas)]/50 hover:bg-[var(--surface)] hover:border-[var(--accent)] transition-all group flex flex-col items-center justify-center gap-2 h-full min-h-[80px]">
-            <div class="w-8 h-8 rounded-full bg-[var(--border)] group-hover:bg-[var(--accent-fill)] flex items-center justify-center transition-colors">
-                <i class="fas fa-cog text-[color:var(--muted)] group-hover:text-white transition-colors"></i>
-            </div>
+        <ui-dialog-trigger for="settings-dialog"><button class="p-3 rounded-lg bg-[var(--canvas)] hover:bg-[var(--surface-raised)] transition-colors group flex flex-col items-center justify-center gap-2 h-full min-h-[80px]">
             <span class="text-xs font-medium text-[color:var(--muted)] group-hover:text-[color:var(--text)]">Configure Providers</span>
         </button></ui-dialog-trigger>
       </div>
@@ -296,7 +275,7 @@
     </div>
     <div class="space-y-2">
       <template x-for="activity in recentActivity" :key="activity.timestamp">
-        <div class="flex items-center justify-between p-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)]">
+        <div class="flex items-center justify-between py-2">
           <div class="flex items-center space-x-3">
             <div class="flex-1">
               <p class="text-[color:var(--text)] font-medium text-sm" x-text="activity.query"></p>
@@ -339,7 +318,7 @@
     </div>
     <div class="space-y-2">
       <template x-for="entry in recentWhoisActivity" :key="entry.timestamp">
-        <div class="flex items-center justify-between p-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)]">
+        <div class="flex items-center justify-between py-2">
           <div class="min-w-0">
             <p class="text-[color:var(--text)] text-xs truncate" x-text="entry.query"></p>
             <p class="text-[color:var(--muted)] text-[10px]" x-text="entry.timeAgo"></p>

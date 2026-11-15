@@ -65,3 +65,26 @@ def test_library_icon_pagination_controls_have_names():
             if tag == "button" and attrs.get("@click") == action
         )
         assert button["aria-label"] == label
+
+
+def test_intelligence_pagination_is_not_repeated_per_concept():
+    class PaginationParser(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.template_depth = 0
+            self.next_page_depths = []
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == "template":
+                self.template_depth += 1
+            if tag == "button" and attrs.get("aria-label") == "Next page":
+                self.next_page_depths.append(self.template_depth)
+
+        def handle_endtag(self, tag):
+            if tag == "template":
+                self.template_depth -= 1
+
+    parser = PaginationParser()
+    parser.feed(app.test_client().get("/intel").get_data(as_text=True))
+    assert parser.next_page_depths == [0]

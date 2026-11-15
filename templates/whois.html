@@ -82,63 +82,63 @@
       <!-- Registration Overview -->
       <div x-show="isDomainResult()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <!-- Registrar -->
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registrar</p>
           <p class="text-sm font-semibold text-[color:var(--text)] truncate" x-text="result?.registrar?.name || 'N/A'" :title="result?.registrar?.name"></p>
         </div>
         <!-- Domain ID -->
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Domain ID</p>
           <p class="text-sm font-semibold text-[color:var(--text)] font-mono truncate" x-text="result?.handle || '—'" :title="result?.handle || 'Unavailable'"></p>
         </div>
         <!-- Registered -->
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registered</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.registration)"></p>
         </div>
         <!-- Expires -->
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Expires</p>
           <p class="text-sm font-semibold"
              :class="result?.keyDates?.expiration && new Date(result.keyDates.expiration) < new Date(Date.now() + 30*86400000) ? 'text-[color:var(--danger)]' : 'text-[color:var(--text)]'"
              x-text="formatDate(result?.keyDates?.expiration)"></p>
         </div>
         <!-- Last Updated -->
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Last Updated</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.lastChanged)"></p>
         </div>
       </div>
 
       <div x-show="isIpResult()" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Network Name</p>
           <p class="text-sm font-semibold text-[color:var(--text)] truncate" x-text="result?.networkName || '—'" :title="result?.networkName || 'Unavailable'"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">IP Range</p>
           <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="(result?.startAddress && result?.endAddress) ? `${result.startAddress} - ${result.endAddress}` : '—'"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">CIDR</p>
           <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="(result?.cidrBlocks || []).join(', ') || '—'"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Country</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.country || '—'"></p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1" x-text="isIpResult() ? 'Parent Handle' : 'Registrar ID'"></p>
           <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="isIpResult() ? (result?.parentHandle || '—') : (result?.registrar?.handle || '—')"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Last RDAP DB Update</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.lastRdapUpdate)"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Transferred</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.transfer)"></p>
         </div>
@@ -155,11 +155,11 @@
       </div>
 
       <div x-show="isIpResult()" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registrant</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.roles?.registrant?.name || '—'"></p>
         </div>
-        <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Abuse Contact</p>
           <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.roles?.abuse?.name || '—'"></p>
         </div>
@@ -235,7 +235,7 @@
           <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-2">DS Records</p>
           <div class="space-y-1">
             <template x-for="ds in result.secureDNS.dsData" :key="ds.keyTag + '-' + ds.digestType">
-              <div class="bg-[var(--canvas)] rounded-lg p-2 border border-[var(--border)] text-[11px] font-mono text-[color:var(--muted)]">
+              <div class="bg-[var(--canvas)] rounded-lg p-2 text-[11px] font-mono text-[color:var(--muted)]">
                 Key Tag: <span class="text-[color:var(--text)]" x-text="ds.keyTag"></span> &middot;
                 Algorithm: <span class="text-[color:var(--text)]" x-text="ds.algorithm"></span> &middot;
                 Digest Type: <span class="text-[color:var(--text)]" x-text="ds.digestType"></span> &middot;
@@ -252,13 +252,13 @@
       <h4 class="text-sm font-semibold text-[color:var(--text)] mb-3"><i class="fas fa-file-circle-info mr-2 text-[color:var(--accent)]"></i>Registry Notes</h4>
       <div class="space-y-2">
         <template x-for="(note, idx) in result?.notices || []" :key="'notice-' + idx">
-          <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+          <div class="bg-[var(--canvas)] rounded-lg p-3">
             <p class="text-[11px] font-semibold text-[color:var(--text)]" x-text="note.title || 'Notice'"></p>
             <p class="text-[11px] text-[color:var(--muted)] mt-1" x-text="note.text || 'No additional details provided by the registry.'"></p>
           </div>
         </template>
         <template x-for="(remark, idx) in result?.remarks || []" :key="'remark-' + idx">
-          <div class="bg-[var(--canvas)] rounded-lg p-3 border border-[var(--border)]">
+          <div class="bg-[var(--canvas)] rounded-lg p-3">
             <p class="text-[11px] font-semibold text-[color:var(--text)]" x-text="remark.title || 'Remark'"></p>
             <p class="text-[11px] text-[color:var(--muted)] mt-1" x-text="remark.text || 'No additional details provided by the registry.'"></p>
           </div>
@@ -273,7 +273,7 @@
         <span x-text="showRaw ? 'Hide Raw RDAP Response' : 'Show Raw RDAP Response'"></span>
       </button>
       <div x-show="showRaw" x-transition style="display: none;" class="mt-3">
-        <pre class="bg-[var(--canvas)] border border-[var(--border)] rounded-lg p-3 text-[11px] font-mono text-[color:var(--muted)] overflow-auto max-h-96" x-text="JSON.stringify(result?.raw, null, 2)"></pre>
+        <pre class="bg-[var(--canvas)] rounded-lg p-3 text-[11px] font-mono text-[color:var(--muted)] overflow-auto max-h-96" x-text="JSON.stringify(result?.raw, null, 2)"></pre>
       </div>
     </div>
   </div>

@@ -61,7 +61,7 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4" x-show="results">
-      <div class="rounded-lg p-3 border border-[var(--border)] bg-[var(--canvas)]">
+      <div class="rounded-lg p-3 bg-[var(--canvas)]">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] text-xs">Authentication Status</h4>
         <div class="space-y-2 text-xs">
           <div class="flex justify-between">
@@ -84,11 +84,11 @@
         </div>
       </div>
 
-      <div class="rounded-lg p-3 border border-[var(--border)] bg-[var(--canvas)]">
+      <div class="rounded-lg p-3 bg-[var(--canvas)]">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] text-xs">Delivery Path</h4>
         <div class="space-y-1 text-xs">
           <template x-for="hop in results?.delivery_path || []" :key="hop.server">
-            <div class="bg-[var(--surface)] rounded p-2 border border-[var(--border)]">
+            <div class="bg-[var(--surface)] rounded p-2">
               <div class="font-mono text-[10px] text-[color:var(--muted)]" x-text="hop.server"></div>
               <div class="text-[10px] text-[color:var(--subtle)]" x-text="hop.timestamp"></div>
             </div>
@@ -96,7 +96,7 @@
         </div>
       </div>
 
-      <div class="rounded-lg p-3 border border-[var(--border)] bg-[var(--canvas)]">
+      <div class="rounded-lg p-3 bg-[var(--canvas)]">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] text-xs">Security Indicators</h4>
         <div class="space-y-2 text-xs">
           <div x-show="results?.security?.tls" class="flex items-center gap-1">

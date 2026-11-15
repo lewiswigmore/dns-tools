@@ -106,7 +106,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     </div>
 
     <!-- Standard Results -->
-    <div x-show="!compareMode" class="overflow-x-auto rounded-md border border-[var(--border)]">
+    <div x-show="!compareMode" class="overflow-x-auto rounded-md">
       <table class="min-w-full text-xs responsive-table">
         <thead class="bg-[var(--surface)]">
           <tr>
@@ -130,7 +130,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                   <template x-if="row.records[rt] && row.records[rt].length">
                     <div class="space-y-1 w-full">
                       <template x-for="(rec, recIndex) in getVisibleRecords(row, rt)" :key="rt + '_' + index + '_' + recIndex">
-                        <div class="flex items-center justify-between bg-[var(--canvas)] rounded px-2 py-1 border border-[var(--border)] group">
+                        <div class="flex items-center justify-between bg-[var(--canvas)] rounded px-2 py-1 group">
                           <span class="font-mono text-[10px] truncate max-w-[150px] sm:max-w-[200px]" :title="rec.value" x-text="formatRecordValue(rec.value)"></span>
                           <div class="flex items-center gap-2">
                             <span class="text-[10px] text-[color:var(--muted)]" x-text="'TTL '+rec.ttl"></span>
@@ -223,7 +223,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
           <h3 class="text-sm font-semibold text-[color:var(--text)] border-b border-[var(--border)] pb-2" x-text="row.domain"></h3>
 
           <template x-for="rt in selectedRecordTypes" :key="'comp_rt_' + rt + '_' + index">
-            <div class="bg-[var(--canvas)] rounded-lg border border-[var(--border)] overflow-hidden">
+            <div class="bg-[var(--canvas)] rounded-lg overflow-hidden">
               <div class="bg-[var(--surface)] px-3 py-2 border-b border-[var(--border)] flex justify-between items-center">
                 <span class="text-xs font-semibold text-[color:var(--accent)]" x-text="rt + ' Records'"></span>
               </div>
@@ -240,7 +240,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                     <template x-if="row.comparisons[rt][provider].records.length > 0">
                       <div class="space-y-1">
                         <template x-for="rec in row.comparisons[rt][provider].records">
-                          <div class="text-[10px] font-mono bg-[var(--surface)] p-1.5 rounded border border-[var(--border)] truncate" :title="rec.value" x-text="rec.value"></div>
+                          <div class="text-[10px] font-mono bg-[var(--surface)] p-1.5 rounded truncate" :title="rec.value" x-text="rec.value"></div>
                         </template>
                       </div>
                     </template>
