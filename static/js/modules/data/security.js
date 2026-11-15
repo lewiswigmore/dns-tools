@@ -3,7 +3,7 @@ export const SECURITY_CONCEPTS = [
         id: 'iocs',
         title: 'Indicators of Compromise',
         icon: 'fas fa-fingerprint',
-        iconColor: 'text-[color:var(--warning)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Basics'],
         complexity: 'Beginner',
         summary: 'Forensic artifacts left behind by attackers, from file hashes to network signatures.',
@@ -34,12 +34,12 @@ export const SECURITY_CONCEPTS = [
             <h4>The Pyramid of Pain</h4>
             <p>The "Pyramid of Pain" describes how difficult it is for an attacker to change their indicators when you block them.</p>
             <ul class="space-y-2 mt-2">
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-red-900/30 text-red-400 px-1 rounded">TTPs</span> <span class="text-sm">Tough! (Tactics, Techniques, and Procedures)</span></li>
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-orange-900/30 text-orange-400 px-1 rounded">Tools</span> <span class="text-sm">Challenging</span></li>
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-yellow-900/30 text-yellow-400 px-1 rounded">Artifacts</span> <span class="text-sm">Annoying</span></li>
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-green-900/30 text-green-400 px-1 rounded">Domain Names</span> <span class="text-sm">Simple</span></li>
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-blue-900/30 text-blue-400 px-1 rounded">IP Addresses</span> <span class="text-sm">Easy</span></li>
-                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-gray-800 text-gray-400 px-1 rounded">Hash Values</span> <span class="text-sm">Trivial</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">TTPs</span> <span class="text-sm">Tough! (Tactics, Techniques, and Procedures)</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">Tools</span> <span class="text-sm">Challenging</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">Artifacts</span> <span class="text-sm">Annoying</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">Domain Names</span> <span class="text-sm">Simple</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">IP Addresses</span> <span class="text-sm">Easy</span></li>
+                <li class="flex items-center gap-2"><span class="w-20 text-xs font-mono bg-[var(--surface-raised)] text-[color:var(--text)] px-1 rounded">Hash Values</span> <span class="text-sm">Trivial</span></li>
             </ul>
         `
     },
@@ -47,7 +47,7 @@ export const SECURITY_CONCEPTS = [
         id: 'ip-reputation',
         title: 'IP Reputation',
         icon: 'fas fa-globe-americas',
-        iconColor: 'text-[color:var(--accent)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Beginner',
         summary: 'Understand how IP addresses are scored, why they get blacklisted, and the concept of reputation decay.',
@@ -72,7 +72,7 @@ export const SECURITY_CONCEPTS = [
         id: 'passive-dns',
         title: 'Passive DNS',
         icon: 'fas fa-history',
-        iconColor: 'text-[#a855f7]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Intermediate',
         summary: 'Explore historical DNS data to pivot between infrastructure and reconstruct attack timelines.',
@@ -100,7 +100,7 @@ export const SECURITY_CONCEPTS = [
         id: 'malware-analysis',
         title: 'Malware Analysis',
         icon: 'fas fa-bug',
-        iconColor: 'text-[color:var(--danger)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Malware', 'Basics'],
         complexity: 'Intermediate',
         summary: 'The difference between Static and Dynamic analysis, sandboxing, and reverse engineering basics.',
@@ -136,7 +136,7 @@ export const SECURITY_CONCEPTS = [
         id: 'phishing',
         title: 'Phishing & Social Engineering',
         icon: 'fas fa-user-secret',
-        iconColor: 'text-[#7ee787]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Basics'],
         complexity: 'Beginner',
         summary: 'Common techniques like Typosquatting, Homoglyphs, and Subdomain abuse used to deceive users.',
@@ -189,7 +189,7 @@ export const SECURITY_CONCEPTS = [
         id: 'osint-tools',
         title: 'OSINT Tools',
         icon: 'fas fa-tools',
-        iconColor: 'text-[#79c0ff]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Tools'],
         complexity: 'Beginner',
         summary: 'Overview of essential tools like VirusTotal, Shodan, AbuseIPDB, and Urlscan.io.',
@@ -221,7 +221,7 @@ export const SECURITY_CONCEPTS = [
         id: 'yara-rules',
         title: 'YARA Rules',
         icon: 'fas fa-code',
-        iconColor: 'text-[#d2a8ff]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Malware', 'Tools'],
         complexity: 'Advanced',
         summary: 'The standard for malware description and pattern matching. Learn how rules are structured.',
@@ -249,7 +249,7 @@ rule SilentBanker_Trojan {
         id: 'ddos-attacks',
         title: 'DDoS Attacks',
         icon: 'fas fa-radiation',
-        iconColor: 'text-[color:var(--danger)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Network Security', 'Threat Intel'],
         complexity: 'Intermediate',
         summary: 'Distributed Denial of Service: Overwhelming targets with a flood of internet traffic.',
@@ -282,7 +282,7 @@ rule SilentBanker_Trojan {
         id: 'domain-generation-algorithms',
         title: 'Domain Generation Algorithms (DGA)',
         icon: 'fas fa-random',
-        iconColor: 'text-[color:var(--warning)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Malware'],
         complexity: 'Advanced',
         summary: 'How malware generates thousands of domains to evade blacklisting and maintain C2 communication.',
@@ -305,7 +305,7 @@ rule SilentBanker_Trojan {
         id: 'fast-flux',
         title: 'Fast Flux',
         icon: 'fas fa-sync-alt',
-        iconColor: 'text-[color:var(--danger)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Advanced',
         summary: 'A DNS technique used by botnets to hide phishing and malware delivery sites behind an ever-changing network of compromised hosts.',
@@ -333,7 +333,7 @@ rule SilentBanker_Trojan {
         id: 'file-hash-analysis',
         title: 'File Hash Analysis',
         icon: 'fas fa-file-signature',
-        iconColor: 'text-[#a855f7]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Malware'],
         complexity: 'Beginner',
         summary: 'Using cryptographic hashes (MD5, SHA256) to identify known malicious files without executing them.',
@@ -356,7 +356,7 @@ rule SilentBanker_Trojan {
         id: 'dns-sinkhole',
         title: 'DNS Sinkhole',
         icon: 'fas fa-filter',
-        iconColor: 'text-[color:var(--success)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Intermediate',
         summary: 'A defense mechanism that intercepts DNS queries for malicious domains and redirects them to a safe IP.',
@@ -383,7 +383,7 @@ rule SilentBanker_Trojan {
         id: 'fuzzy-hashing',
         title: 'Fuzzy Hashing (SSDEEP)',
         icon: 'fas fa-fingerprint',
-        iconColor: 'text-[#d2a8ff]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Malware'],
         complexity: 'Advanced',
         summary: 'Unlike standard hashes (MD5), fuzzy hashes can detect similarities between two files, even if they are not identical.',
@@ -402,7 +402,7 @@ rule SilentBanker_Trojan {
         id: 'ja3-fingerprinting',
         title: 'JA3 Fingerprinting',
         icon: 'fas fa-handshake',
-        iconColor: 'text-[color:var(--danger)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Advanced',
         summary: 'A method to fingerprint SSL/TLS client applications based on the unique way they initiate a connection.',

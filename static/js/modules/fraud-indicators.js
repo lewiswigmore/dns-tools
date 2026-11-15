@@ -180,10 +180,10 @@ export function riskIcon(level) {
 /** Text color class only, for compact inline indicators (icons, badges). */
 export function riskColorClass(level) {
     switch (level) {
-        case 'high': return 'text-[#f85149]';
-        case 'medium': return 'text-[#d29922]';
-        case 'low': return 'text-[#58a6ff]';
-        default: return 'text-[#3fb950]';
+        case 'high': return 'text-[color:var(--danger)]';
+        case 'medium': return 'text-[color:var(--warning)]';
+        case 'low': return 'text-[color:var(--text)]';
+        default: return 'text-[color:var(--success)]';
     }
 }
 

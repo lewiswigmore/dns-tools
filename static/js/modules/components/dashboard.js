@@ -311,7 +311,7 @@ export function DashboardPage() {
                 labels: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
                 datasets: [{
                   data: hourlyData,
-                  borderColor: '#c9d1d9',
+                  borderColor: '#dedede',
                   borderWidth: 2,
                   tension: 0.3,
                   pointRadius: 0,
@@ -323,8 +323,8 @@ export function DashboardPage() {
                 maintainAspectRatio: false,
                 plugins: { legend: false },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#8b949e', maxTicksLimit: 8 } },
-                    y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', stepSize: 1 }, beginAtZero: true }
+                    x: { grid: { display: false }, ticks: { color: '#a3a3a3', maxTicksLimit: 8 } },
+                    y: { grid: { color: '#383838' }, ticks: { color: '#a3a3a3', stepSize: 1 }, beginAtZero: true }
                 }
               }
             });
@@ -342,8 +342,8 @@ export function DashboardPage() {
                         labels: ['No Data'],
                         datasets: [{
                             data: [1],
-                            backgroundColor: ['#30363d'],
-                            borderColor: '#161b22',
+                            backgroundColor: ['#383838'],
+                            borderColor: '#1b1b1b',
                             borderWidth: 2
                         }]
                     },
@@ -354,7 +354,7 @@ export function DashboardPage() {
                         plugins: {
                             legend: {
                                 position: 'right',
-                                labels: { color: '#c9d1d9', boxWidth: 12, padding: 15, font: { size: 11 } }
+                                labels: { color: '#dedede', boxWidth: 12, padding: 15, font: { size: 11 } }
                             },
                             tooltip: { enabled: false }
                         }
@@ -408,14 +408,14 @@ export function DashboardPage() {
               // If no data, show a gray ring
               if (total === 0) {
                   typeChartInstance.data.datasets[0].data = [1];
-                  typeChartInstance.data.datasets[0].backgroundColor = ['#30363d'];
+                  typeChartInstance.data.datasets[0].backgroundColor = ['#383838'];
                   typeChartInstance.data.labels = ['No Data'];
                   typeChartInstance.options.plugins.tooltip = { enabled: false };
               } else {
                   typeChartInstance.data.datasets[0].data = [
                       types['DNS'], types['MX'], types['DMARC'], types['Headers'], types['Intel'], types['WHOIS'], types['WHOIS-IP']
                   ];
-                    typeChartInstance.data.datasets[0].backgroundColor = ['#c9d1d9', '#a8b1ba', '#8b949e', '#707983', '#59636e', '#484f58', '#343b44'];
+                    typeChartInstance.data.datasets[0].backgroundColor = ['#dedede', '#c1c1c1', '#a3a3a3', '#888888', '#707070', '#555555', '#404040'];
                     typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers', 'Intel', 'WHOIS', 'WHOIS-IP'];
                   typeChartInstance.options.plugins.tooltip = { enabled: true };
               }
@@ -516,8 +516,8 @@ export function DashboardPage() {
                     datasets: [{
                       label: 'Lookups per Hour',
                       data: [...data],
-                      borderColor: '#c9d1d9',
-                      backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                      borderColor: '#dedede',
+                      backgroundColor: 'rgba(222, 222, 222, 0.1)',
                       borderWidth: 2,
                       fill: true
                     }]
@@ -533,18 +533,18 @@ export function DashboardPage() {
                     scales: {
                       x: {
                         grid: { 
-                          color: '#30363d' 
+                          color: '#383838'
                         },
                         ticks: { 
-                          color: '#8b949e' 
+                          color: '#a3a3a3'
                         }
                       },
                       y: {
                         grid: { 
-                          color: '#30363d' 
+                          color: '#383838'
                         },
                         ticks: { 
-                          color: '#8b949e' 
+                          color: '#a3a3a3'
                         },
                         beginAtZero: true
                       }

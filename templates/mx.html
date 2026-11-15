@@ -121,7 +121,7 @@
             <div class="p-3 space-y-2">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                  <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[color:var(--text)]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[color:var(--muted)]')"></i>
+                  <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[color:var(--text)]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[color:var(--text)]' : 'fas fa-server text-[color:var(--muted)]')"></i>
                   <span class="text-[10px] font-semibold text-[color:var(--muted)]" x-text="provider"></span>
                 </div>
                 <span class="text-[10px]" :class="comparisonResult[provider].status === 'success' ? 'text-[color:var(--success)]' : 'text-[color:var(--danger)]'" x-text="comparisonResult[provider].latency + 'ms'"></span>

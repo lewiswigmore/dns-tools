@@ -19,23 +19,24 @@
     <style>
         :root {
             color-scheme: dark;
-            --canvas: #0d1117;
-            --surface: #161b22;
-            --surface-raised: #21262d;
-            --border: #30363d;
-            --border-strong: #484f58;
-            --text: #c9d1d9;
-            --muted: #8b949e;
-            --subtle: #8b949e;
-            --accent: #c9d1d9;
-            --accent-fill: #484f58;
-            --accent-subtle: rgba(201, 209, 217, .06);
-            --accent-border: rgba(201, 209, 217, .18);
-            --success: #3fb950;
-            --danger: #f85149;
-            --warning: #d29922;
-            --action: #30363d;
-            --action-hover: #484f58;
+            --canvas: #101010;
+            --surface: #1b1b1b;
+            --surface-raised: #282828;
+            --border: #383838;
+            --border-strong: #555555;
+            --text: #dedede;
+            --muted: #a3a3a3;
+            --subtle: #a3a3a3;
+            --accent: #dedede;
+            --accent-fill: #555555;
+            --accent-subtle: rgba(222, 222, 222, .06);
+            --accent-border: rgba(222, 222, 222, .18);
+            --success: #86c99b;
+            --danger: #ef8d88;
+            --danger-subtle: rgba(239, 141, 136, .1);
+            --warning: #d9b675;
+            --action: #383838;
+            --action-hover: #555555;
         }
         [x-cloak]{display:none!important}
         ui-dialog:not(:defined){display:none}
@@ -433,7 +434,7 @@
             </div>
 
             <div class="space-y-2 pt-2 border-t border-[var(--border)]">
-                <h4 class="font-medium text-[color:var(--text)] flex items-center"><i class="fas fa-user-shield mr-2 text-[color:var(--success)]"></i>Privacy First Architecture</h4>
+                <h4 class="font-medium text-[color:var(--text)] flex items-center"><i class="fas fa-user-shield mr-2 text-[color:var(--muted)]"></i>Privacy First Architecture</h4>
                 <ul class="text-xs text-[color:var(--muted)] space-y-1 list-disc pl-4">
                     <li><strong>100% Client-Side:</strong> All logic runs locally in your browser.</li>
                     <li><strong>No Backend Tracking:</strong> We do not store or see your queries.</li>
@@ -490,7 +491,7 @@ x-effect="$el.open = open"
             </div>
             <div class="space-y-3 mb-6">
                 <div class="flex items-start gap-3 p-3 rounded-lg bg-[var(--canvas)]">
-                    <i class="fas fa-shield-alt text-[color:var(--success)] mt-1"></i>
+                    <i class="fas fa-shield-alt text-[color:var(--muted)] mt-1"></i>
                     <div>
                         <h4 class="text-sm font-semibold text-[color:var(--text)]">100% Client-Side</h4>
                         <p class="text-xs text-[color:var(--muted)]">All queries run directly from your browser, DNS via DoH, WHOIS via RDAP. No backend tracking.</p>
@@ -503,7 +504,7 @@ x-effect="$el.open = open"
         <div x-show="step === 2" x-transition:enter="transition ease-out duration-300 delay-100">
             <div class="text-center mb-6">
                 <div class="w-16 h-16 bg-[var(--surface-raised)] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-keyboard text-2xl text-[color:var(--warning)]"></i>
+                    <i class="fas fa-keyboard text-2xl text-[color:var(--text)]"></i>
                 </div>
                 <h2 class="text-xl font-bold text-white mb-2">Power User? Use Ctrl+K</h2>
                 <p class="text-[color:var(--muted)] text-sm">Navigate anywhere without leaving your keyboard.</p>
@@ -537,15 +538,15 @@ x-effect="$el.open = open"
                     <p class="text-xs text-[color:var(--text)] font-medium">WHOIS</p>
                 </div>
                 <div class="p-3 rounded bg-[var(--canvas)] text-center">
-                    <i class="fas fa-envelope text-[color:var(--success)] mb-2 text-lg"></i>
+                    <i class="fas fa-envelope text-[color:var(--text)] mb-2 text-lg"></i>
                     <p class="text-xs text-[color:var(--text)] font-medium">MX & DMARC</p>
                 </div>
                 <div class="p-3 rounded bg-[var(--canvas)] text-center">
-                    <i class="fas fa-file-alt text-[color:var(--warning)] mb-2 text-lg"></i>
+                    <i class="fas fa-file-alt text-[color:var(--text)] mb-2 text-lg"></i>
                     <p class="text-xs text-[color:var(--text)] font-medium">Headers</p>
                 </div>
                 <div class="p-3 rounded bg-[var(--canvas)] text-center">
-                    <i class="fas fa-shield-virus text-[color:var(--danger)] mb-2 text-lg"></i>
+                    <i class="fas fa-shield-virus text-[color:var(--text)] mb-2 text-lg"></i>
                     <p class="text-xs text-[color:var(--text)] font-medium">Threat Intel</p>
                 </div>
             </div>

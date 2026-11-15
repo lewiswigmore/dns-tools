@@ -3,7 +3,7 @@ export const NETWORKING_CONCEPTS = [
         id: 'ip-addressing',
         title: 'IP Addressing & CIDR',
         icon: 'fas fa-network-wired',
-        iconColor: 'text-[color:var(--success)]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Networking', 'Basics'],
         complexity: 'Beginner',
         summary: 'Understanding IPv4, IPv6, Subnet Masks, and CIDR notation.',

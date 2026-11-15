@@ -74,7 +74,7 @@
       </div>
 
       <!-- Clear All Button -->
-      <button @click="clearAll" class="w-full lg:w-auto px-3 py-1.5 rounded-lg border border-[var(--danger)] text-[color:var(--danger)] hover:bg-[#f851491a] transition-colors text-[10px] font-medium">
+      <button @click="clearAll" class="w-full lg:w-auto px-3 py-1.5 rounded-lg border border-[var(--danger)] text-[color:var(--danger)] hover:bg-[var(--danger-subtle)] transition-colors text-[10px] font-medium">
         <i class="fas fa-trash mr-2"></i>Clear All
       </button>
     </div>
@@ -315,13 +315,13 @@
               <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Security Indicators</h5>
               <div class="space-y-2 text-[11px]">
                 <div class="flex items-center gap-2">
-                  <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-green-500' : 'fa-unlock text-red-500'"></i>
+                  <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-[color:var(--success)]' : 'fa-unlock text-[color:var(--danger)]'"></i>
                   <span x-text="previewData?.results?.security?.tls ? 'TLS Encrypted' : 'No TLS Encryption'"></span>
                 </div>
                 <div x-show="previewData?.results?.security?.warnings?.length > 0">
-                  <h6 class="font-medium text-red-400 mb-1">Security Warnings:</h6>
+                  <h6 class="font-medium text-[color:var(--danger)] mb-1">Security Warnings:</h6>
                   <template x-for="(warning, warningIndex) in (previewData?.results?.security?.warnings || [])" :key="'warning-' + warningIndex">
-                    <div class="bg-red-900/20 border border-red-700 rounded p-2 text-red-300 text-[10px]">
+                    <div class="bg-[var(--danger-subtle)] rounded p-2 text-[color:var(--danger)] text-[10px]">
                       <i class="fas fa-exclamation-triangle mr-1"></i>
                       <span x-text="warning"></span>
                     </div>

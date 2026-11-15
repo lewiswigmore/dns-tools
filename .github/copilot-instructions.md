@@ -85,7 +85,7 @@ docs/research/                Sourced research notes
 - JS modules use native ES module imports (no bundler)
 - The UI SDK is the exception: `static/js/ui-sdk.js` is bundled with esbuild into the ignored `static/js/ui-sdk.bundle.js` before running Flask or generating Pages. Keep the Pages build step in sync.
 - SDK dialogs driven by Alpine state synchronize the element's `open` property with `x-effect` and clear that state on `openchange` so Escape and outside dismissal remain in sync.
-- Shared theme colors are CSS custom properties in `templates/base.html`; use the semantic tokens instead of repeating their hex values in templates. Preserve semantic status colors.
+- Shared theme colors are CSS custom properties in `templates/base.html`; use the neutral palette for surfaces and decoration, and reserve semantic colors for status and risk. Keep chart colors aligned with the palette.
 - Keep operational UI flat and restrained: separate sections with spacing and surfaces, not nested borders or framed decorative icons; distinguish the sidebar and mobile result rows with surface shading. Retain input outlines and visible keyboard focus. Reuse the loading, pagination and provider-toggle macros in `components.html`; skeletons must match the content shape without implying actual results.
 - `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on lookup/MX/DMARC pages, and load command-palette knowledge-base data only when the palette is opened
 - Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
