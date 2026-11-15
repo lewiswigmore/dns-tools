@@ -75,6 +75,7 @@ static/js/modules/            Vanilla JS ES module frontend
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
 tests/                        Pytest security checks and Node.js regression tests
+docs/research/                Sourced research notes
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
