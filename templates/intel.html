@@ -9,20 +9,17 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-lg font-semibold text-[color:var(--text)]">Threat Intelligence</h2>
-            <p class="text-xs text-[color:var(--muted)]">Investigation Tools & Knowledge Base</p>
         </div>
     </div>
 
     <!-- Investigation Launcher -->
     <div class="panel p-4 rounded-xl space-y-4 border border-[var(--border)] bg-[var(--surface)]">
-        {{ ui.section_header('fa-search','Investigation Launcher') }}
-
         <div class="flex gap-3">
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fas fa-crosshairs text-[color:var(--muted)] text-xs"></i>
                 </div>
-                <input type="text"
+                <input type="text" aria-label="Domain, IP address, or file hash"
                        x-model="query"
                        @input="resetFraudCheck()"
                        @keydown.enter="analyze()"
@@ -53,7 +50,7 @@
             <div class="flex items-center gap-3">
                 <div class="h-10 w-10 rounded-full bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-center">
                     <i class="fas fa-globe text-lg text-[color:var(--accent)]" x-show="results?.type === 'Domain'"></i>
-                    <i class="fas fa-network-wired text-lg text-[#a855f7]" x-show="results?.type === 'IP Address'"></i>
+                    <i class="fas fa-network-wired text-lg text-[color:var(--accent)]" x-show="results?.type === 'IP Address'"></i>
                     <i class="fas fa-file-code text-lg text-[color:var(--warning)]" x-show="results?.type === 'File Hash'"></i>
                 </div>
                 <div>
@@ -144,33 +141,34 @@
             <div class="flex flex-col md:flex-row md:items-center gap-3">
                 <div class="relative">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--muted)] text-xs"></i>
-                    <input type="text"
+                    <input type="text" aria-label="Search knowledge base"
                            x-model="conceptSearch"
+                           @input="currentPage = 1"
                            placeholder="Search library..."
                            class="bg-[var(--canvas)] border border-[var(--border)] text-[color:var(--text)] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)] placeholder-[color:var(--muted)] w-full md:w-48">
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
                     <template x-for="tag in allTags.slice(0, 3)" :key="tag">
-                        <button @click="conceptFilter = tag"
+                        <button @click="conceptFilter = tag; currentPage = 1"
                                 :class="conceptFilter === tag ? 'bg-[var(--accent-fill)] text-white border-[var(--accent)]' : 'bg-[var(--surface)] text-[color:var(--muted)] border-[var(--border)] hover:border-[var(--muted)]'"
                                 class="px-3 py-1.5 rounded-full text-[10px] font-medium border transition-colors whitespace-nowrap"
                                 x-text="tag">
                         </button>
                     </template>
 
-                    <div x-show="allTags.length > 3" class="relative" x-data="{ open: false }" @click.away="open = false">
-                        <button @click="open = !open"
+                    <div x-show="allTags.length > 3" class="relative" x-data="{ open: false }" @click.away="open = false" @keydown.escape.stop="if (open) { open = false; $refs.filterMenuButton.focus() }">
+                        <button x-ref="filterMenuButton" @click="open = !open" :aria-expanded="open" aria-haspopup="true"
                                 :class="!allTags.slice(0, 3).includes(conceptFilter) ? 'bg-[var(--accent-subtle)] text-[color:var(--accent)] border-[var(--accent-border)]' : 'bg-[var(--surface)] text-[color:var(--muted)] border-[var(--border)]'"
                                 class="px-3 py-1.5 rounded-full text-[10px] font-medium border hover:border-[var(--muted)] transition-colors whitespace-nowrap flex items-center gap-1">
                             <span x-text="!allTags.slice(0, 3).includes(conceptFilter) ? conceptFilter : 'More'"></span>
                             <i class="fas fa-chevron-down text-[8px]"></i>
                         </button>
                         <div x-show="open"
-                             class="absolute right-0 mt-2 w-40 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-xl z-30 py-1 overflow-hidden"
+                             class="absolute right-0 mt-2 w-40 bg-[var(--surface)] border border-[var(--border)] rounded-lg z-30 py-1 overflow-hidden"
                              x-transition
                              style="display: none;">
                             <template x-for="tag in allTags.slice(3)" :key="tag">
-                                <button @click="conceptFilter = tag; open = false"
+                                <button @click="conceptFilter = tag; currentPage = 1; open = false"
                                         class="w-full text-left px-4 py-2 text-[10px] hover:bg-[var(--border)] transition-colors"
                                         :class="conceptFilter === tag ? 'text-[color:var(--accent)] font-bold' : 'text-[color:var(--muted)]'"
                                         x-text="tag">
@@ -182,19 +180,18 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            <template x-for="concept in filteredConcepts" :key="concept.id">
-                <div @click="showConcept(concept)" class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] hover:border-[var(--accent)] cursor-pointer transition-all group h-full flex flex-col">
+        {{ ui.library_skeleton('loadingLibrary') }}
+        <p x-show="!loadingLibrary && libraryError" x-cloak role="alert" class="text-xs text-[color:var(--danger)]" x-text="libraryError"></p>
+        <div x-show="!loadingLibrary && !libraryError" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <template x-for="concept in paginatedConcepts" :key="concept.id">
+                <div role="button" tabindex="0" @click="showConcept(concept)" @keydown.enter.prevent="showConcept(concept)" @keydown.space.prevent="showConcept(concept)" class="panel p-4 rounded-xl bg-[var(--surface)] cursor-pointer group h-full flex flex-col">
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="h-8 w-8 rounded-lg bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-center group-hover:border-[var(--accent)] transition-colors shrink-0">
-                            <i :class="concept.icon + ' ' + concept.iconColor"></i>
-                        </div>
                         <h4 class="text-xs font-bold text-[color:var(--text)] group-hover:text-[color:var(--accent)]" x-text="concept.title"></h4>
                     </div>
                     <p class="text-[10px] text-[color:var(--muted)] leading-relaxed flex-grow" x-text="concept.summary"></p>
                     <div class="mt-3 flex flex-wrap gap-1">
                         <template x-for="tag in concept.tags" :key="tag">
-                            <span class="px-1.5 py-0.5 rounded bg-[var(--canvas)] border border-[var(--border)] text-[9px] text-[color:var(--muted)]" x-text="tag"></span>
+                            <span class="px-1.5 py-0.5 rounded bg-[var(--canvas)] text-[9px] text-[color:var(--muted)]" x-text="tag"></span>
                         </template>
                     </div>
                 </div>
@@ -205,6 +202,9 @@
                 <i class="fas fa-search mb-2 text-xl"></i>
                 <p class="text-xs">No concepts found matching your search.</p>
             </div>
+        </div>
+        <div x-show="!loadingLibrary && !libraryError && totalPages > 1" x-cloak class="flex justify-end">
+            {{ ui.pagination('goToPage(1)', 'goToPage(currentPage - 1)', 'goToPage(currentPage + 1)', 'goToPage(totalPages)') }}
         </div>
     </div>
 

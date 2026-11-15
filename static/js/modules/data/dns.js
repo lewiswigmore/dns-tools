@@ -77,7 +77,7 @@ export const DNS_CONCEPTS = [
             
             <h4>Critical Limitations</h4>
             <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)] my-4">
-              <p class="text-[color:var(--danger)] font-semibold">⚠️ Important Restrictions:</p>
+              <p class="text-[color:var(--danger)] font-semibold">Important Restrictions:</p>
               <ul class="list-disc list-inside space-y-1 text-sm text-[color:var(--muted)] mt-2">
                 <li><strong>No CNAME at Zone Apex:</strong> Cannot use CNAME for the root domain (example.com)</li>
                 <li><strong>Exclusivity Rule:</strong> A hostname with a CNAME cannot have any other record types</li>
@@ -148,7 +148,7 @@ example.com. IN MX 20 backup.mail.example.com.</pre>
             <pre class="bg-[var(--canvas)] p-3 rounded border border-[var(--border)] text-xs font-mono text-[color:var(--text)]"><code>example.com. 86400 IN NS ns1.example-dns.com.</code></pre>
             
             <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)] my-4">
-              <p class="text-[color:var(--warning)] font-semibold">⚠️ Glue Records</p>
+              <p class="text-[color:var(--warning)] font-semibold">Glue Records</p>
               <p class="text-sm text-[color:var(--muted)] mt-1">When a name server is a subdomain of the domain it serves (e.g., ns1.example.com serving example.com), you must provide "Glue Records" (A records for the NS) at the registrar to prevent circular dependencies.</p>
             </div>
         `

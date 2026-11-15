@@ -43,15 +43,7 @@
   </div>
 
   <!-- Concepts Grid -->
-  <div x-show="loadingLibrary" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="status" aria-label="Loading library">
-    {% for item in range(3) %}
-    <div class="panel p-4 space-y-3" aria-hidden="true">
-      <div class="skeleton h-4 w-1/2"></div>
-      <div class="skeleton h-3 w-full"></div>
-      <div class="skeleton h-3 w-2/3"></div>
-    </div>
-    {% endfor %}
-  </div>
+  {{ ui.library_skeleton('loadingLibrary') }}
 
   <div class="panel p-4 rounded-xl space-y-3" x-show="!loadingLibrary && !libraryError && filteredKnowledgeBase.length > 0" x-cloak>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
@@ -93,29 +85,7 @@
             <option :value="size" x-text="size"></option>
           </template>
         </select>
-        <button @click="goToFirstPage()" aria-label="First page" title="First page"
-                :disabled="currentPage === 1"
-                class="px-2.5 py-1 rounded border border-[var(--border)] text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-angle-double-left" aria-hidden="true"></i>
-        </button>
-        <button @click="previousPage()" aria-label="Previous page" title="Previous page"
-                :disabled="currentPage === 1"
-                class="px-2.5 py-1 rounded border border-[var(--border)] text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        <span class="text-[11px] text-[color:var(--muted)]">
-          Page <span class="text-[color:var(--text)]" x-text="currentPage"></span> / <span class="text-[color:var(--text)]" x-text="totalPages"></span>
-        </span>
-        <button @click="nextPage()" aria-label="Next page" title="Next page"
-                :disabled="currentPage === totalPages"
-                class="px-2.5 py-1 rounded border border-[var(--border)] text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-        <button @click="goToLastPage()" aria-label="Last page" title="Last page"
-                :disabled="currentPage === totalPages"
-                class="px-2.5 py-1 rounded border border-[var(--border)] text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed">
-          <i class="fas fa-angle-double-right" aria-hidden="true"></i>
-        </button>
+        {{ ui.pagination() }}
       </div>
     </div>
   </div>

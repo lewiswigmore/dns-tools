@@ -27,22 +27,7 @@
         </div>
       </div>
 
-      <!-- Compare Providers Toggle -->
-      <div x-show="$store.settings.config.providers.length > 1" class="flex items-center justify-between mb-4 p-3 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-[var(--border)] rounded-full">
-            <i class="fas fa-balance-scale text-[color:var(--accent)]"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold text-[color:var(--text)]">Compare Providers</h3>
-            <p class="text-xs text-[color:var(--muted)]">Query selected providers simultaneously</p>
-          </div>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
-          <div class="relative w-11 h-6 bg-[var(--border)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--accent)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
-        </label>
-      </div>
+      {{ ui.compare_toggle() }}
 
       <button @click="performLookup"
               :disabled="loading || !domain.trim()"

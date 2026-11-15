@@ -6,6 +6,8 @@ export function HistoryPage() {
       filteredHistory: [],
       searchFilter: '',
       typeFilter: 'all',
+      currentPage: 1,
+      pageSize: 20,
       previewModal: false,
       previewData: null,
       
@@ -46,6 +48,20 @@ export function HistoryPage() {
         }
         
         this.filteredHistory = filtered;
+        this.currentPage = 1;
+      },
+
+      get totalPages() {
+        return Math.max(1, Math.ceil(this.filteredHistory.length / this.pageSize));
+      },
+
+      get paginatedHistory() {
+        const start = (this.currentPage - 1) * this.pageSize;
+        return this.filteredHistory.slice(start, start + this.pageSize);
+      },
+
+      goToPage(page) {
+        this.currentPage = Math.max(1, Math.min(page, this.totalPages));
       },
       
       toggleTypeFilter(type) {
@@ -266,7 +282,7 @@ export function HistoryPage() {
                   const res = row.comparisons[recType][provider];
                   if (res) {
                     const records = res.records.map(r => r.value).join(', ') || 'No records';
-                    text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+                    text += `| ${provider} | ${res.status === 'success' ? 'Success' : 'Error'} | ${res.latency}ms | \`${records}\` |\n`;
                   }
                 });
                 text += '\n';

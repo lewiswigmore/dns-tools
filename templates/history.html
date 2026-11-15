@@ -81,7 +81,7 @@
 
     <!-- Results Summary -->
     <div x-show="history.length > 0" class="text-xs text-[color:var(--muted)]">
-      Showing <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
+      <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
       <span x-show="searchFilter.length > 0">matching "<span x-text="searchFilter" class="text-[color:var(--text)]"></span>"</span>
     </div>
 
@@ -103,14 +103,13 @@
 
     <!-- History Items -->
     <div x-cloak x-show="filteredHistory.length > 0" class="space-y-3">
-      <template x-for="(item,i) in filteredHistory" :key="i">
-        <div @click="showPreview(item)"
-             class="panel p-3 rounded-lg border border-[var(--border)] hover:border-[var(--accent)] transition-colors cursor-pointer">
+      <template x-for="(item,i) in paginatedHistory" :key="i">
+        <div class="p-3 rounded-lg bg-[var(--canvas)]">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
             <!-- Main Info -->
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h4 class="font-semibold text-[color:var(--text)] text-base" x-text="getDisplayTitle(item)"></h4>
+                <h4 class="font-semibold text-[color:var(--text)] text-base"><button @click="showPreview(item)" class="text-left hover:underline" x-text="getDisplayTitle(item)"></button></h4>
                 <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-[10px] font-medium"></span>
               </div>
 
@@ -143,6 +142,9 @@
                     <template x-for="(type, typeIndex) in item.recordTypes" :key="'type-' + i + '-' + typeIndex">
                       <span class="px-1.5 py-0.5 bg-[var(--canvas)] border border-[var(--border)] rounded text-[color:var(--text)]" x-text="type"></span>
                     </template>
+                    <div x-show="totalPages > 1" class="flex justify-end pt-3">
+                      {{ ui.pagination('goToPage(1)', 'goToPage(currentPage - 1)', 'goToPage(currentPage + 1)', 'goToPage(totalPages)') }}
+                    </div>
                   </div>
                 </div>
               </div>

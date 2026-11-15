@@ -27,16 +27,10 @@
 
 {% macro help_card(title, icon, items) %}
 <div class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] h-full">
-  <h3 class="text-sm font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
-    <i class="fas {{ icon }} text-[color:var(--accent)]"></i>
-    {{ title }}
-  </h3>
+  <h3 class="text-sm font-semibold text-[color:var(--text)] mb-3">{{ title }}</h3>
   <ul class="space-y-2">
     {% for item in items %}
-    <li class="flex items-start gap-2 text-[11px] text-[color:var(--muted)]">
-      <i class="fas fa-check text-[color:var(--success)] mt-0.5 flex-shrink-0"></i>
-      <span>{{ item }}</span>
-    </li>
+    <li class="text-[11px] text-[color:var(--muted)]">{{ item }}</li>
     {% endfor %}
   </ul>
   <div class="mt-4 pt-3 border-t border-[var(--border)]">
@@ -60,6 +54,55 @@
     </div>
     {% endfor %}
   </div>
+</div>
+{% endmacro %}
+
+{% macro detail_skeleton() %}
+<div x-show="loading" x-cloak class="panel p-4" role="status" aria-label="Loading results">
+  <div aria-hidden="true" class="space-y-4">
+    <div class="skeleton h-4 w-36"></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for item in range(4) %}
+      <div class="space-y-2"><div class="skeleton h-3 w-1/2"></div><div class="skeleton h-4 w-3/4"></div></div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro library_skeleton(loading) %}
+<div x-show="{{ loading }}" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="status" aria-label="Loading library">
+  {% for item in range(3) %}
+  <div class="panel p-4 space-y-3" aria-hidden="true">
+    <div class="skeleton h-4 w-1/2"></div>
+    <div class="skeleton h-3 w-full"></div>
+    <div class="skeleton h-3 w-2/3"></div>
+  </div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro pagination(first='goToFirstPage()', previous='previousPage()', next='nextPage()', last='goToLastPage()') %}
+<div class="flex flex-wrap items-center gap-2" aria-label="Pagination">
+  <button @click="{{ first }}" aria-label="First page" title="First page" :disabled="currentPage === 1"
+          class="px-2.5 py-1 rounded text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed"><i class="fas fa-angle-double-left" aria-hidden="true"></i></button>
+  <button @click="{{ previous }}" aria-label="Previous page" title="Previous page" :disabled="currentPage === 1"
+          class="px-2.5 py-1 rounded text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+  <span class="text-[11px] text-[color:var(--muted)]">Page <span class="text-[color:var(--text)]" x-text="currentPage"></span> / <span class="text-[color:var(--text)]" x-text="totalPages"></span></span>
+  <button @click="{{ next }}" aria-label="Next page" title="Next page" :disabled="currentPage === totalPages"
+          class="px-2.5 py-1 rounded text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+  <button @click="{{ last }}" aria-label="Last page" title="Last page" :disabled="currentPage === totalPages"
+          class="px-2.5 py-1 rounded text-xs text-[color:var(--text)] hover:bg-[var(--surface-raised)] disabled:opacity-40 disabled:cursor-not-allowed"><i class="fas fa-angle-double-right" aria-hidden="true"></i></button>
+</div>
+{% endmacro %}
+
+{% macro compare_toggle() %}
+<div x-show="$store.settings.config.providers.length > 1" class="flex items-center justify-between gap-4 py-2">
+  <span class="text-sm font-semibold text-[color:var(--text)]">Compare providers</span>
+  <label class="relative inline-flex items-center cursor-pointer">
+    <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
+    <div class="relative w-11 h-6 bg-[var(--border)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--accent)] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:bg-[var(--accent-fill)]"></div>
+  </label>
 </div>
 {% endmacro %}
 

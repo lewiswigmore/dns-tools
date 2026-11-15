@@ -116,7 +116,7 @@ export function DMARCPage() {
                 ? (res.dmarc ? res.dmarc.raw : 'No DMARC record found')
                 : `Lookup failed: ${res.error}`;
               const latency = res.status === 'success' ? `${res.latency}ms` : '-';
-              text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${latency} | \`${record}\` |\n`;
+              text += `| ${provider} | ${res.status === 'success' ? 'Success' : 'Error'} | ${latency} | \`${record}\` |\n`;
             }
           });
           

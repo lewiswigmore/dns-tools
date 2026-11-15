@@ -379,6 +379,7 @@ test('copied comparison results distinguish policy, absence and explicit provide
 
   const text = copied.mock.calls[0].arguments[0];
   assert.ok(text.includes(policy));
+  assert.ok(text.includes('| Google | Success |'));
   assert.ok(text.includes('No DMARC record found'));
   assert.ok(!text.includes(unrelated));
 
@@ -391,6 +392,7 @@ test('copied comparison results distinguish policy, absence and explicit provide
   await page.copyAllResults();
 
   const failedText = copied.mock.calls[1].arguments[0];
+  assert.ok(failedText.includes('| Google | Error |'));
   assert.ok(failedText.includes('Lookup failed: Google resolver unavailable'));
   assert.ok(!failedText.includes('No DMARC record found'));
   assert.ok(!failedText.includes('undefined'));

@@ -25,8 +25,12 @@ export function IntelPage() {
 
         // Knowledge Base State
         concepts: [],
+        loadingLibrary: true,
+        libraryError: '',
         conceptSearch: '',
         conceptFilter: 'Threat Intel',
+        currentPage: 1,
+        pageSize: 20,
         
         // Modal State
         conceptModal: false,
@@ -43,9 +47,10 @@ export function IntelPage() {
                 })
                 .catch(error => {
                     console.error('Failed to load threat intelligence concepts:', error);
-                    this.conceptError = 'Failed to load the knowledge base.';
+                    this.libraryError = 'Could not load the library. Reload the page to try again.';
                     return [];
-                });
+                })
+                .finally(() => { this.loadingLibrary = false; });
 
             // Check for query param
             const params = new URLSearchParams(window.location.search);
@@ -90,6 +95,19 @@ export function IntelPage() {
             const tags = new Set(['All']);
             this.concepts.forEach(c => c.tags.forEach(t => tags.add(t)));
             return Array.from(tags);
+        },
+
+        get totalPages() {
+            return Math.max(1, Math.ceil(this.filteredConcepts.length / this.pageSize));
+        },
+
+        get paginatedConcepts() {
+            const start = (this.currentPage - 1) * this.pageSize;
+            return this.filteredConcepts.slice(start, start + this.pageSize);
+        },
+
+        goToPage(page) {
+            this.currentPage = Math.max(1, Math.min(page, this.totalPages));
         },
 
         // --- Investigation Logic ---

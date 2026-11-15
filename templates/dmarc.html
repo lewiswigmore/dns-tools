@@ -8,14 +8,11 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">DMARC Lookup</h2>
-      <p class="text-xs text-[color:var(--muted)]">Validate email authentication policies</p>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.info_banner('fa-shield-alt','DMARC Policy Information','DMARC builds on SPF & DKIM to define policy for handling authentication failures and reporting.') }}
-
       <div class="mb-4">
         <label class="block text-xs font-semibold text-[color:var(--text)] mb-2"><i class="fas fa-globe mr-2 text-[color:var(--accent)]"></i>Domain for DMARC lookup:</label>
         <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--canvas)] text-[color:var(--text)] text-sm" placeholder="example.com" />
@@ -30,22 +27,7 @@
         </div>
       </div>
 
-      <!-- Compare Providers Toggle -->
-      <div x-show="$store.settings.config.providers.length > 1" class="flex items-center justify-between mb-4 p-3 bg-[var(--surface)] rounded-lg border border-[var(--border)]">
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-[var(--border)] rounded-full">
-            <i class="fas fa-balance-scale text-[color:var(--accent)]"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold text-[color:var(--text)]">Compare Providers</h3>
-            <p class="text-xs text-[color:var(--muted)]">Query selected providers simultaneously</p>
-          </div>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
-          <div class="relative w-11 h-6 bg-[var(--border)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--accent)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
-        </label>
-      </div>
+      {{ ui.compare_toggle() }}
 
       <button @click="performLookup"
               :disabled="loading || !domain.trim()"
@@ -68,7 +50,8 @@
     </div>
   </div>
 
-  <div x-show="result || comparisonResult" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
+  {{ ui.detail_skeleton() }}
+  <div x-show="!loading && (result || comparisonResult)" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
     <div class="result-toolbar">
       <h3 class="text-base font-semibold text-[color:var(--text)]"><i class="fas fa-shield-alt mr-2"></i>DMARC Policy for <span x-text="domain"></span></h3>
       <div class="result-actions">
