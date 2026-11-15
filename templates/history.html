@@ -14,7 +14,7 @@
   <div class="panel p-4 rounded-xl space-y-4">
 
     <!-- Filter and Stats Bar -->
-    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between border-b border-[var(--border)] pb-4">
+    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between pb-4">
       <!-- Search Filter -->
       <div class="w-full flex-1 max-w-md">
         <div class="relative">
@@ -209,7 +209,7 @@
                       <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2" x-text="recordType + ' Records'"></h5>
                       <div class="space-y-1">
                         <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
-                          <div class="flex items-center justify-between bg-[var(--canvas)] p-2 rounded border border-[var(--border)] group">
+                          <div class="flex items-center justify-between bg-[var(--canvas)] p-2 rounded group">
                             <div class="text-[11px] font-mono text-[color:var(--text)] truncate max-w-[200px] sm:max-w-[400px]"
                                  x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
                             <button x-data="{ copied: false }"
@@ -233,7 +233,7 @@
           <div x-show="getQueryType(previewData?.recordTypes) === 'MX' && previewData?.results && Array.isArray(previewData.results)" class="space-y-2">
             <h4 class="font-semibold text-[color:var(--text)] mb-3 text-sm">MX Records</h4>
             <template x-for="(record, mxIndex) in (previewData?.results || [])" :key="'mx-record-' + mxIndex">
-              <div class="flex items-center justify-between bg-[var(--canvas)] p-3 rounded border border-[var(--border)] group">
+              <div class="flex items-center justify-between bg-[var(--canvas)] p-3 rounded group">
                 <div class="text-[11px] font-mono text-[color:var(--text)]"
                      x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
                 <button x-data="{ copied: false }"
@@ -255,7 +255,7 @@
               <!-- Raw DMARC Record -->
               <div>
                 <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2">Raw DMARC Record</h5>
-                <div class="text-[11px] font-mono bg-[var(--canvas)] p-3 rounded border border-[var(--border)] text-[color:var(--text)] break-all">
+                <div class="text-[11px] font-mono bg-[var(--canvas)] p-3 rounded text-[color:var(--text)] break-all">
                   <span x-text="previewData?.results?.result?.raw || 'No DMARC record found'"></span>
                 </div>
               </div>
@@ -263,7 +263,7 @@
               <!-- Parsed Policy Details -->
               <div x-show="previewData?.results?.result?.policy">
                 <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2">Policy Details</h5>
-                <div class="text-[11px] bg-[var(--canvas)] p-3 rounded border border-[var(--border)] text-[color:var(--text)] space-y-1">
+                <div class="text-[11px] bg-[var(--canvas)] p-3 rounded text-[color:var(--text)] space-y-1">
                   <div class="flex justify-between">
                     <span class="text-[color:var(--muted)]">Policy:</span>
                     <span class="font-mono" x-text="previewData?.results?.result?.policy"></span>
@@ -335,7 +335,7 @@
               <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Delivery Path</h5>
               <div class="space-y-1">
                 <template x-for="(hop, hopIndex) in (previewData?.results?.delivery_path || [])" :key="'hop-' + hopIndex">
-                  <div class="bg-[var(--canvas)] rounded p-2 border border-[var(--border)]">
+                  <div class="bg-[var(--canvas)] rounded p-2">
                     <div class="font-mono text-[11px] text-[color:var(--text)] break-all" x-text="hop.server"></div>
                     <div class="text-[10px] text-[color:var(--muted)]" x-text="hop.timestamp"></div>
                   </div>

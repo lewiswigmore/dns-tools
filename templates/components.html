@@ -11,7 +11,7 @@
 {% macro info_banner(icon='fa-info-circle', title='Information', body='') %}
 <div class="panel p-4 mb-4" role="note" aria-label="{{ title }}">
   <div class="flex items-start gap-3">
-    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-[var(--surface-raised)] border border-[var(--border)] text-[color:var(--accent)]" aria-hidden="true">
+    <div class="text-[color:var(--accent)]" aria-hidden="true">
       <i class="fas {{icon}}"></i>
     </div>
     <div class="text-sm">
@@ -30,7 +30,7 @@
     <li class="text-[11px] text-[color:var(--muted)]">{{ item }}</li>
     {% endfor %}
   </ul>
-  <div class="mt-4 pt-3 border-t border-[var(--border)]">
+  <div class="mt-4 pt-3">
     <a href="{{ url_for('resources_page') }}" class="text-[10px] text-[color:var(--accent)] hover:underline flex items-center gap-1">
       <i class="fas fa-book"></i>
       Learn more in Resources
