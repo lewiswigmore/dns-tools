@@ -3,7 +3,7 @@ export const SECURITY_CONCEPTS = [
         id: 'iocs',
         title: 'Indicators of Compromise',
         icon: 'fas fa-fingerprint',
-        iconColor: 'text-[#d29922]',
+        iconColor: 'text-[color:var(--warning)]',
         tags: ['Threat Intel', 'Basics'],
         complexity: 'Beginner',
         summary: 'Forensic artifacts left behind by attackers, from file hashes to network signatures.',
@@ -13,17 +13,17 @@ export const SECURITY_CONCEPTS = [
             
             <h4>Common Types of IOCs</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#58a6ff] font-semibold mb-1">Network Indicators</h5>
-                    <ul class="list-disc list-inside text-sm text-[#8b949e]">
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--accent)] font-semibold mb-1">Network Indicators</h5>
+                    <ul class="list-disc list-inside text-sm text-[color:var(--muted)]">
                         <li><strong>IP Addresses:</strong> Known C2 servers, botnets, or malware distribution sites.</li>
                         <li><strong>Domain Names:</strong> DGA domains, typosquatted domains.</li>
                         <li><strong>URLs:</strong> Specific paths hosting malicious payloads.</li>
                     </ul>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#58a6ff] font-semibold mb-1">Host Indicators</h5>
-                    <ul class="list-disc list-inside text-sm text-[#8b949e]">
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--accent)] font-semibold mb-1">Host Indicators</h5>
+                    <ul class="list-disc list-inside text-sm text-[color:var(--muted)]">
                         <li><strong>File Hashes:</strong> MD5, SHA1, SHA256 signatures of malware.</li>
                         <li><strong>Registry Keys:</strong> Persistence mechanisms.</li>
                         <li><strong>Mutexes:</strong> Unique identifiers used by malware.</li>
@@ -47,7 +47,7 @@ export const SECURITY_CONCEPTS = [
         id: 'ip-reputation',
         title: 'IP Reputation',
         icon: 'fas fa-globe-americas',
-        iconColor: 'text-[#58a6ff]',
+        iconColor: 'text-[color:var(--accent)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Beginner',
         summary: 'Understand how IP addresses are scored, why they get blacklisted, and the concept of reputation decay.',
@@ -56,7 +56,7 @@ export const SECURITY_CONCEPTS = [
             <p>IP Reputation is a score or classification assigned to an IP address based on its historical behavior. Security vendors aggregate data from honeypots, spam traps, and user reports to determine if an IP is "clean" or "malicious".</p>
 
             <h4>Why IPs get a "Bad" Reputation</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>Spamming:</strong> Sending high volumes of unsolicited email.</li>
                 <li><strong>Botnet Activity:</strong> Participating in DDoS attacks or credential stuffing.</li>
                 <li><strong>Malware Hosting:</strong> Serving malicious files or acting as a C2 server.</li>
@@ -82,13 +82,13 @@ export const SECURITY_CONCEPTS = [
 
             <h4>Key Use Cases</h4>
             <div class="space-y-4 my-4">
-                <div class="border-l-2 border-[#58a6ff] pl-4">
-                    <h5 class="font-semibold text-[#c9d1d9]">1. Infrastructure Pivoting</h5>
-                    <p class="text-sm text-[#8b949e]">You find a malicious domain <code>evil.com</code> pointing to IP <code>1.2.3.4</code>. Using pDNS, you can see that <code>1.2.3.4</code> also hosted <code>phishing-bank.com</code> and <code>malware-drop.net</code> last week. You've now expanded your investigation.</p>
+                <div class="border-l-2 border-[var(--accent)] pl-4">
+                    <h5 class="font-semibold text-[color:var(--text)]">1. Infrastructure Pivoting</h5>
+                    <p class="text-sm text-[color:var(--muted)]">You find a malicious domain <code>evil.com</code> pointing to IP <code>1.2.3.4</code>. Using pDNS, you can see that <code>1.2.3.4</code> also hosted <code>phishing-bank.com</code> and <code>malware-drop.net</code> last week. You've now expanded your investigation.</p>
                 </div>
-                <div class="border-l-2 border-[#58a6ff] pl-4">
-                    <h5 class="font-semibold text-[#c9d1d9]">2. Timeline Reconstruction</h5>
-                    <p class="text-sm text-[#8b949e]">Determine exactly when a legitimate website was compromised by seeing when its A record changed to a known malicious IP.</p>
+                <div class="border-l-2 border-[var(--accent)] pl-4">
+                    <h5 class="font-semibold text-[color:var(--text)]">2. Timeline Reconstruction</h5>
+                    <p class="text-sm text-[color:var(--muted)]">Determine exactly when a legitimate website was compromised by seeing when its A record changed to a known malicious IP.</p>
                 </div>
             </div>
 
@@ -100,7 +100,7 @@ export const SECURITY_CONCEPTS = [
         id: 'malware-analysis',
         title: 'Malware Analysis',
         icon: 'fas fa-bug',
-        iconColor: 'text-[#f85149]',
+        iconColor: 'text-[color:var(--danger)]',
         tags: ['Malware', 'Basics'],
         complexity: 'Intermediate',
         summary: 'The difference between Static and Dynamic analysis, sandboxing, and reverse engineering basics.',
@@ -110,9 +110,9 @@ export const SECURITY_CONCEPTS = [
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
                 <div>
-                    <h5 class="text-[#58a6ff] font-semibold border-b border-[#30363d] pb-2 mb-2">Static Analysis</h5>
-                    <p class="text-sm text-[#8b949e] mb-2">Examining the code without running it.</p>
-                    <ul class="list-disc list-inside text-xs text-[#c9d1d9] space-y-1">
+                    <h5 class="text-[color:var(--accent)] font-semibold border-b border-[var(--border)] pb-2 mb-2">Static Analysis</h5>
+                    <p class="text-sm text-[color:var(--muted)] mb-2">Examining the code without running it.</p>
+                    <ul class="list-disc list-inside text-xs text-[color:var(--text)] space-y-1">
                         <li><strong>Hashing:</strong> Identifying the file.</li>
                         <li><strong>Strings:</strong> Looking for IPs, URLs, or messages inside the binary.</li>
                         <li><strong>PE Headers:</strong> Checking compile time, imports, and exports.</li>
@@ -120,9 +120,9 @@ export const SECURITY_CONCEPTS = [
                     </ul>
                 </div>
                 <div>
-                    <h5 class="text-[#f85149] font-semibold border-b border-[#30363d] pb-2 mb-2">Dynamic Analysis</h5>
-                    <p class="text-sm text-[#8b949e] mb-2">Running the malware in a safe environment.</p>
-                    <ul class="list-disc list-inside text-xs text-[#c9d1d9] space-y-1">
+                    <h5 class="text-[color:var(--danger)] font-semibold border-b border-[var(--border)] pb-2 mb-2">Dynamic Analysis</h5>
+                    <p class="text-sm text-[color:var(--muted)] mb-2">Running the malware in a safe environment.</p>
+                    <ul class="list-disc list-inside text-xs text-[color:var(--text)] space-y-1">
                         <li><strong>Sandboxing:</strong> Automated execution (Cuckoo, Joe Sandbox).</li>
                         <li><strong>Network Monitoring:</strong> Watching for C2 callbacks.</li>
                         <li><strong>Process Monitoring:</strong> Watching for file creation or registry changes.</li>
@@ -146,17 +146,17 @@ export const SECURITY_CONCEPTS = [
 
             <h4>Common Techniques</h4>
             <ul class="space-y-3 my-4">
-                <li class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <strong class="text-[#c9d1d9]">Typosquatting (URL Hijacking)</strong>
-                    <p class="text-xs text-[#8b949e] mt-1">Registering <code>g0ogle.com</code> or <code>faceboook.com</code>. Relying on users missing the typo.</p>
+                <li class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <strong class="text-[color:var(--text)]">Typosquatting (URL Hijacking)</strong>
+                    <p class="text-xs text-[color:var(--muted)] mt-1">Registering <code>g0ogle.com</code> or <code>faceboook.com</code>. Relying on users missing the typo.</p>
                 </li>
-                <li class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <strong class="text-[#c9d1d9]">Homoglyphs (IDN Homograph Attack)</strong>
-                    <p class="text-xs text-[#8b949e] mt-1">Using characters from different scripts that look identical. E.g., Cyrillic 'a' vs Latin 'a'. <code>apple.com</code> vs <code>аpple.com</code>.</p>
+                <li class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <strong class="text-[color:var(--text)]">Homoglyphs (IDN Homograph Attack)</strong>
+                    <p class="text-xs text-[color:var(--muted)] mt-1">Using characters from different scripts that look identical. E.g., Cyrillic 'a' vs Latin 'a'. <code>apple.com</code> vs <code>аpple.com</code>.</p>
                 </li>
-                <li class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <strong class="text-[#c9d1d9]">Subdomain Abuse</strong>
-                    <p class="text-xs text-[#8b949e] mt-1"><code>microsoft-login.attacker-site.com</code>. The domain is <code>attacker-site.com</code>, but the subdomain looks legitimate.</p>
+                <li class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <strong class="text-[color:var(--text)]">Subdomain Abuse</strong>
+                    <p class="text-xs text-[color:var(--muted)] mt-1"><code>microsoft-login.attacker-site.com</code>. The domain is <code>attacker-site.com</code>, but the subdomain looks legitimate.</p>
                 </li>
             </ul>
         `
@@ -165,7 +165,7 @@ export const SECURITY_CONCEPTS = [
         id: 'c2-infrastructure',
         title: 'C2 Infrastructure',
         icon: 'fas fa-server',
-        iconColor: 'text-[#8b949e]',
+        iconColor: 'text-[color:var(--muted)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Advanced',
         summary: 'How attackers control botnets using HTTP, DNS Tunneling, and Fast Flux networks.',
@@ -174,7 +174,7 @@ export const SECURITY_CONCEPTS = [
             <p>C2 infrastructure is the set of servers and protocols attackers use to communicate with compromised systems (botnets) inside a target network.</p>
 
             <h4>Communication Methods</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>HTTP/HTTPS:</strong> Blending in with normal web traffic.</li>
                 <li><strong>DNS Tunneling:</strong> Encoding data in DNS queries (e.g., <code>secret-data.attacker.com</code>).</li>
                 <li><strong>Social Media:</strong> Bots checking a specific Twitter account or Reddit thread for instructions.</li>
@@ -198,21 +198,21 @@ export const SECURITY_CONCEPTS = [
             <p>Using publicly available information to gather intelligence on targets.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">VirusTotal</h5>
-                    <p class="text-xs text-[#8b949e]">Aggregates 70+ antivirus scanners and URL/domain blocklists. The "Google" of malware.</p>
+                <div class="panel p-3 border border-[var(--border)]">
+                    <h5 class="font-bold text-[color:var(--accent)]">VirusTotal</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Aggregates 70+ antivirus scanners and URL/domain blocklists. The "Google" of malware.</p>
                 </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Shodan</h5>
-                    <p class="text-xs text-[#8b949e]">Search engine for connected devices. Finds webcams, servers, routers, and industrial control systems.</p>
+                <div class="panel p-3 border border-[var(--border)]">
+                    <h5 class="font-bold text-[color:var(--accent)]">Shodan</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Search engine for connected devices. Finds webcams, servers, routers, and industrial control systems.</p>
                 </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">AbuseIPDB</h5>
-                    <p class="text-xs text-[#8b949e]">Crowdsourced IP reputation. Great for checking if an IP has been reported for SSH brute-forcing.</p>
+                <div class="panel p-3 border border-[var(--border)]">
+                    <h5 class="font-bold text-[color:var(--accent)]">AbuseIPDB</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Crowdsourced IP reputation. Great for checking if an IP has been reported for SSH brute-forcing.</p>
                 </div>
-                <div class="panel p-3 border border-[#30363d]">
-                    <h5 class="font-bold text-[#58a6ff]">Urlscan.io</h5>
-                    <p class="text-xs text-[#8b949e]">Sandboxes a URL, takes a screenshot, and records all network requests (DOM, JS, cookies).</p>
+                <div class="panel p-3 border border-[var(--border)]">
+                    <h5 class="font-bold text-[color:var(--accent)]">Urlscan.io</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Sandboxes a URL, takes a screenshot, and records all network requests (DOM, JS, cookies).</p>
                 </div>
             </div>
         `
@@ -230,7 +230,7 @@ export const SECURITY_CONCEPTS = [
             <p>YARA is the "Swiss army knife" of pattern matching for malware researchers. It allows you to create descriptions (rules) of malware families based on text or binary patterns.</p>
 
             <h4>Example Rule</h4>
-            <pre class="bg-[#0d1117] p-3 rounded border border-[#30363d] text-xs font-mono text-[#c9d1d9]">
+            <pre class="bg-[var(--canvas)] p-3 rounded border border-[var(--border)] text-xs font-mono text-[color:var(--text)]">
 rule SilentBanker_Trojan {
     meta:
         description = "Detects SilentBanker"
@@ -249,7 +249,7 @@ rule SilentBanker_Trojan {
         id: 'ddos-attacks',
         title: 'DDoS Attacks',
         icon: 'fas fa-radiation',
-        iconColor: 'text-[#f85149]',
+        iconColor: 'text-[color:var(--danger)]',
         tags: ['Network Security', 'Threat Intel'],
         complexity: 'Intermediate',
         summary: 'Distributed Denial of Service: Overwhelming targets with a flood of internet traffic.',
@@ -259,21 +259,21 @@ rule SilentBanker_Trojan {
             
             <h4>Common Attack Types</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Volumetric</h5>
-                    <p class="text-xs text-[#8b949e]">Flooding the network with massive amounts of data (e.g., UDP floods, ICMP floods).</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Volumetric</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Flooding the network with massive amounts of data (e.g., UDP floods, ICMP floods).</p>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Protocol</h5>
-                    <p class="text-xs text-[#8b949e]">Exploiting weaknesses in Layer 3 and 4 (e.g., SYN floods, Ping of Death).</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Protocol</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Exploiting weaknesses in Layer 3 and 4 (e.g., SYN floods, Ping of Death).</p>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Application Layer</h5>
-                    <p class="text-xs text-[#8b949e]">Targeting specific web server functions (e.g., HTTP GET/POST floods, Slowloris).</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Application Layer</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Targeting specific web server functions (e.g., HTTP GET/POST floods, Slowloris).</p>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Amplification</h5>
-                    <p class="text-xs text-[#8b949e]">Using small queries to generate large responses (e.g., DNS Amplification, NTP Reflection).</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Amplification</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Using small queries to generate large responses (e.g., DNS Amplification, NTP Reflection).</p>
                 </div>
             </div>
         `
@@ -282,7 +282,7 @@ rule SilentBanker_Trojan {
         id: 'domain-generation-algorithms',
         title: 'Domain Generation Algorithms (DGA)',
         icon: 'fas fa-random',
-        iconColor: 'text-[#d29922]',
+        iconColor: 'text-[color:var(--warning)]',
         tags: ['Threat Intel', 'Malware'],
         complexity: 'Advanced',
         summary: 'How malware generates thousands of domains to evade blacklisting and maintain C2 communication.',
@@ -294,7 +294,7 @@ rule SilentBanker_Trojan {
             <p>If malware uses a single hardcoded domain (e.g., <code>evil-c2.com</code>), defenders can easily block it. With DGA, the malware might try 1,000 random domains a day (e.g., <code>xkqz-123.com</code>, <code>abxy-999.net</code>). The attacker only needs to register <strong>one</strong> of them to regain control.</p>
 
             <h4>Detection</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>High Entropy:</strong> Domains look like random gibberish (e.g., <code>agbdfhjk.com</code>).</li>
                 <li><strong>NXDOMAIN Responses:</strong> A sudden spike in "Domain Not Found" errors as the malware tries non-existent domains.</li>
                 <li><strong>Machine Learning:</strong> Classifiers trained to distinguish English words from random strings.</li>
@@ -305,7 +305,7 @@ rule SilentBanker_Trojan {
         id: 'fast-flux',
         title: 'Fast Flux',
         icon: 'fas fa-sync-alt',
-        iconColor: 'text-[#f85149]',
+        iconColor: 'text-[color:var(--danger)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Advanced',
         summary: 'A DNS technique used by botnets to hide phishing and malware delivery sites behind an ever-changing network of compromised hosts.',
@@ -318,13 +318,13 @@ rule SilentBanker_Trojan {
 
             <h4>Types of Fast Flux</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Single Flux</h5>
-                    <p class="text-xs text-[#8b949e]">The IP addresses of the web server change rapidly.</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Single Flux</h5>
+                    <p class="text-xs text-[color:var(--muted)]">The IP addresses of the web server change rapidly.</p>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#f85149] font-semibold mb-1">Double Flux</h5>
-                    <p class="text-xs text-[#8b949e]">Both the web server IPs AND the authoritative Name Server IPs change rapidly. Extremely hard to take down.</p>
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--danger)] font-semibold mb-1">Double Flux</h5>
+                    <p class="text-xs text-[color:var(--muted)]">Both the web server IPs AND the authoritative Name Server IPs change rapidly. Extremely hard to take down.</p>
                 </div>
             </div>
         `
@@ -342,7 +342,7 @@ rule SilentBanker_Trojan {
             <p>A hash is a unique alphanumeric string generated by a mathematical algorithm (like MD5, SHA-1, or SHA-256) based on the contents of a file. If you change a single bit in the file, the hash changes completely.</p>
 
             <h4>Why use Hashes?</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>Identification:</strong> Quickly check if a file is known malware by searching its hash in databases like VirusTotal.</li>
                 <li><strong>Integrity:</strong> Verify that a downloaded file hasn't been tampered with.</li>
                 <li><strong>Safety:</strong> You can share a hash with other analysts without sharing the dangerous malware file itself.</li>
@@ -356,7 +356,7 @@ rule SilentBanker_Trojan {
         id: 'dns-sinkhole',
         title: 'DNS Sinkhole',
         icon: 'fas fa-filter',
-        iconColor: 'text-[#3fb950]',
+        iconColor: 'text-[color:var(--success)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Intermediate',
         summary: 'A defense mechanism that intercepts DNS queries for malicious domains and redirects them to a safe IP.',
@@ -365,7 +365,7 @@ rule SilentBanker_Trojan {
             <p>A DNS sinkhole is a mechanism used by defenders to intercept DNS queries attempting to resolve known malicious domains (e.g., C2 servers, botnet controllers) and return a false IP address.</p>
 
             <h4>How it Works</h4>
-            <ol class="list-decimal list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ol class="list-decimal list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li>A compromised device inside the network tries to contact <code>malware-c2.com</code>.</li>
                 <li>The internal DNS server checks its blocklist.</li>
                 <li>Instead of returning the real IP of the C2 server, it returns the IP of the Sinkhole Server (e.g., <code>10.10.10.10</code>).</li>
@@ -373,7 +373,7 @@ rule SilentBanker_Trojan {
             </ol>
 
             <h4>Benefits</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>Containment:</strong> Prevents malware from receiving commands or exfiltrating data.</li>
                 <li><strong>Identification:</strong> Defenders can monitor logs on the Sinkhole Server to identify exactly which internal machines are infected.</li>
             </ul>
@@ -402,7 +402,7 @@ rule SilentBanker_Trojan {
         id: 'ja3-fingerprinting',
         title: 'JA3 Fingerprinting',
         icon: 'fas fa-handshake',
-        iconColor: 'text-[#f85149]',
+        iconColor: 'text-[color:var(--danger)]',
         tags: ['Threat Intel', 'Network Security'],
         complexity: 'Advanced',
         summary: 'A method to fingerprint SSL/TLS client applications based on the unique way they initiate a connection.',
@@ -412,7 +412,7 @@ rule SilentBanker_Trojan {
 
             <h4>How it Works</h4>
             <p>When a client initiates a TLS connection, it sends a Hello packet containing:</p>
-            <ul class="list-disc list-inside text-sm text-[#8b949e] my-2">
+            <ul class="list-disc list-inside text-sm text-[color:var(--muted)] my-2">
                 <li>SSL/TLS Version</li>
                 <li>Accepted Cipher Suites</li>
                 <li>List of Extensions</li>

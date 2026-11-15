@@ -6,8 +6,9 @@ Thanks for your interest in contributing! Here's how to get started.
 
 1. **Fork** the repository
 2. **Clone** your fork: `git clone https://github.com/<your-username>/dns-tools.git`
-3. **Install dependencies**: `pip install -r requirements.txt`
-4. **Run locally**: `python app.py` then open `http://localhost:5000`
+3. **Install dependencies**: `pip install -r requirements.txt` and `npm ci`
+4. **Build the browser bundle**: `npm run build`
+5. **Run locally**: `python app.py` then open `http://localhost:5000`
 
 ## Development
 
@@ -29,7 +30,7 @@ dns-tools/
 
 - **Client-side first**: DNS, RDAP, and analysis happen in the browser, no server proxying of user queries
 - **Privacy by design**: no telemetry, no server-side logging of lookups, `localStorage` only
-- **Minimal dependencies**: keep the stack lean (Flask + Alpine.js + Tailwind CSS)
+- **Minimal dependencies**: keep the stack lean (Flask, Alpine.js, Tailwind CSS and UI SDK)
 
 ### Running tests
 

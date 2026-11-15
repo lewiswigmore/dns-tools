@@ -14,16 +14,16 @@ export const CLOUD_CONCEPTS = [
             <h4>Principle of Least Privilege (PoLP)</h4>
             <p>A user or service should have only the minimum permissions necessary to perform their function.</p>
             
-            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
-                <h5 class="text-[#c9d1d9] font-semibold mb-2">Example: Azure Storage Access</h5>
+            <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)] my-4">
+                <h5 class="text-[color:var(--text)] font-semibold mb-2">Example: Azure Storage Access</h5>
                 <div class="space-y-2">
                     <div class="flex items-center gap-2 text-xs">
-                        <i class="fas fa-times-circle text-[#f85149]"></i>
-                        <span class="text-[#8b949e]"><strong>Bad:</strong> Assigning "Owner" role to a developer.</span>
+                        <i class="fas fa-times-circle text-[color:var(--danger)]"></i>
+                        <span class="text-[color:var(--muted)]"><strong>Bad:</strong> Assigning "Owner" role to a developer.</span>
                     </div>
                     <div class="flex items-center gap-2 text-xs">
-                        <i class="fas fa-check-circle text-[#3fb950]"></i>
-                        <span class="text-[#8b949e]"><strong>Good:</strong> Assigning "Storage Blob Data Reader" role.</span>
+                        <i class="fas fa-check-circle text-[color:var(--success)]"></i>
+                        <span class="text-[color:var(--muted)]"><strong>Good:</strong> Assigning "Storage Blob Data Reader" role.</span>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@ export const CLOUD_CONCEPTS = [
 
             <h4>Network Security Groups (NSG)</h4>
             <p>An NSG contains security rules that allow or deny inbound network traffic to, or outbound network traffic from, several types of Azure resources.</p>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>Inbound Rules:</strong> Control traffic coming into the subnet/VM (e.g., Allow HTTPS on port 443).</li>
                 <li><strong>Outbound Rules:</strong> Control traffic leaving the subnet/VM.</li>
             </ul>
@@ -67,10 +67,10 @@ export const CLOUD_CONCEPTS = [
             <h4>Verification Process</h4>
             <p>Azure needs to verify you own the domain before allowing the mapping. This is often done via a TXT record if you want to map the domain without downtime (pre-verification).</p>
             
-            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
-                <h5 class="text-[#c9d1d9] font-semibold mb-2">The "asuid" Record</h5>
-                <p class="text-sm text-[#8b949e] mb-2">To verify ownership without pointing traffic yet, create a TXT record:</p>
-                <code class="block bg-[#0d1117] p-2 rounded text-xs text-[#58a6ff]">asuid.www.contoso.com TXT "verification-hash-from-azure"</code>
+            <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)] my-4">
+                <h5 class="text-[color:var(--text)] font-semibold mb-2">The "asuid" Record</h5>
+                <p class="text-sm text-[color:var(--muted)] mb-2">To verify ownership without pointing traffic yet, create a TXT record:</p>
+                <code class="block bg-[var(--canvas)] p-2 rounded text-xs text-[color:var(--accent)]">asuid.www.contoso.com TXT "verification-hash-from-azure"</code>
             </div>
 
             <h4>Root Domains (Apex)</h4>
@@ -90,7 +90,7 @@ export const CLOUD_CONCEPTS = [
             <p>Azure Traffic Manager is a DNS-based traffic load balancer. It allows you to distribute traffic to your public facing applications across the global Azure regions.</p>
 
             <h4>How it Works</h4>
-            <ol class="list-decimal list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ol class="list-decimal list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li>User queries <code>myapp.contoso.com</code>.</li>
                 <li>DNS resolves to Traffic Manager profile (<code>myapp.trafficmanager.net</code>).</li>
                 <li>Traffic Manager checks the <strong>Routing Method</strong> (Priority, Weighted, Performance, Geographic).</li>
@@ -98,7 +98,7 @@ export const CLOUD_CONCEPTS = [
                 <li>User connects directly to that endpoint.</li>
             </ol>
             
-            <p class="text-sm text-[#8b949e]">Note: Traffic Manager does not see the actual HTTP traffic; it only directs the DNS query.</p>
+            <p class="text-sm text-[color:var(--muted)]">Note: Traffic Manager does not see the actual HTTP traffic; it only directs the DNS query.</p>
         `
     },
     {
@@ -124,7 +124,7 @@ export const CLOUD_CONCEPTS = [
         id: 'azure-private-dns',
         title: 'Azure Private DNS',
         icon: 'fas fa-lock',
-        iconColor: 'text-[#3fb950]',
+        iconColor: 'text-[color:var(--success)]',
         tags: ['Azure', 'Networking'],
         complexity: 'Intermediate',
         summary: 'Resolving domain names in a private virtual network without adding custom DNS servers.',
@@ -133,7 +133,7 @@ export const CLOUD_CONCEPTS = [
             <p>Azure Private DNS allows you to use your own domain names (e.g., <code>db.internal.contoso.com</code>) within your Virtual Networks (VNet).</p>
 
             <h4>Key Features</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>No Infrastructure:</strong> You don't need to manage VM-based DNS servers.</li>
                 <li><strong>Automatic Registration:</strong> VMs in the VNet can automatically register their A records.</li>
                 <li><strong>Split-Horizon:</strong> You can have a public zone <code>contoso.com</code> and a private zone <code>contoso.com</code>. Internal users see internal IPs; external users see public IPs.</li>
@@ -144,7 +144,7 @@ export const CLOUD_CONCEPTS = [
         id: 'azure-public-ip',
         title: 'Azure Public IP Addresses',
         icon: 'fas fa-globe-americas',
-        iconColor: 'text-[#58a6ff]',
+        iconColor: 'text-[color:var(--accent)]',
         tags: ['Azure', 'Networking'],
         complexity: 'Beginner',
         summary: 'Understanding Public IP SKUs (Basic vs Standard) and allocation methods.',
@@ -154,17 +154,17 @@ export const CLOUD_CONCEPTS = [
 
             <h4>SKUs: Basic vs. Standard</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#58a6ff] font-semibold mb-1">Standard SKU</h5>
-                    <ul class="list-disc list-inside text-xs text-[#8b949e]">
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--accent)] font-semibold mb-1">Standard SKU</h5>
+                    <ul class="list-disc list-inside text-xs text-[color:var(--muted)]">
                         <li><strong>Static only:</strong> IP address doesn't change.</li>
                         <li><strong>Secure by default:</strong> Closed to inbound traffic unless allowed by NSG.</li>
                         <li><strong>Zone Redundant:</strong> Can span availability zones.</li>
                     </ul>
                 </div>
-                <div class="bg-[#161b22] p-3 rounded border border-[#30363d]">
-                    <h5 class="text-[#d29922] font-semibold mb-1">Basic SKU</h5>
-                    <ul class="list-disc list-inside text-xs text-[#8b949e]">
+                <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)]">
+                    <h5 class="text-[color:var(--warning)] font-semibold mb-1">Basic SKU</h5>
+                    <ul class="list-disc list-inside text-xs text-[color:var(--muted)]">
                         <li><strong>Dynamic or Static:</strong> Dynamic IPs change on stop/start.</li>
                         <li><strong>Open by default:</strong> NSG is optional (but recommended).</li>
                         <li><strong>No Zone Redundancy.</strong></li>
@@ -186,7 +186,7 @@ export const CLOUD_CONCEPTS = [
             <p>Azure DNS allows you to host your DNS domain in Azure and manage your DNS records using the same credentials, APIs, tools, and billing as your other Azure services.</p>
 
             <h4>Key Benefits</h4>
-            <ul class="list-disc list-inside space-y-2 my-4 text-[#c9d1d9]">
+            <ul class="list-disc list-inside space-y-2 my-4 text-[color:var(--text)]">
                 <li><strong>Global Network:</strong> Uses Microsoft's global network of Anycast name servers for ultra-fast query responses.</li>
                 <li><strong>Reliability:</strong> 100% availability SLA.</li>
                 <li><strong>Security:</strong> Supports Role-Based Access Control (RBAC) to restrict who can modify records.</li>
@@ -198,7 +198,7 @@ export const CLOUD_CONCEPTS = [
         id: 'private-endpoints',
         title: 'Private Endpoints (Private Link)',
         icon: 'fas fa-network-wired',
-        iconColor: 'text-[#3fb950]',
+        iconColor: 'text-[color:var(--success)]',
         tags: ['Azure', 'Networking', 'Security'],
         complexity: 'Advanced',
         summary: 'Accessing PaaS services (SQL, Storage) privately from your VNet.',
@@ -211,7 +211,7 @@ export const CLOUD_CONCEPTS = [
 
             <h4>DNS Integration</h4>
             <p>To make this work seamlessly, you need to override DNS resolution. Azure creates a CNAME to a private link zone:</p>
-            <pre class="bg-[#0d1117] p-3 rounded border border-[#30363d] text-xs font-mono text-[#c9d1d9] mt-2">
+            <pre class="bg-[var(--canvas)] p-3 rounded border border-[var(--border)] text-xs font-mono text-[color:var(--text)] mt-2">
 myserver.database.windows.net 
   -> myserver.privatelink.database.windows.net 
     -> 10.0.1.5</pre>
@@ -232,8 +232,8 @@ myserver.database.windows.net
             <h4>Use Cases</h4>
             <p>Instead of manually maintaining a list of IPs for Azure SQL or Azure Storage in your firewall rules, you can simply allow traffic to the tag:</p>
             
-            <div class="bg-[#161b22] p-3 rounded border border-[#30363d] my-4">
-                <ul class="space-y-2 text-sm text-[#c9d1d9]">
+            <div class="bg-[var(--surface)] p-3 rounded border border-[var(--border)] my-4">
+                <ul class="space-y-2 text-sm text-[color:var(--text)]">
                     <li><strong>Internet:</strong> All public IP addresses outside the VNet.</li>
                     <li><strong>AzureCloud:</strong> All public IP addresses for Azure cloud services.</li>
                     <li><strong>Sql:</strong> Azure SQL Database, MySQL, PostgreSQL, etc.</li>

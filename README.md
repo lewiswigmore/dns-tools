@@ -36,6 +36,8 @@ A privacy-focused, client-side web toolkit for DNS lookups, WHOIS/RDAP domain re
 git clone https://github.com/lewiswigmore/dns-tools.git
 cd dns-tools
 pip install -r requirements.txt
+npm ci
+npm run build
 python app.py
 # Open http://localhost:5000
 ```
@@ -50,6 +52,7 @@ The site is automatically deployed on every push to `main` via GitHub Actions:
 To deploy manually:
 
 ```bash
+npm ci && npm run build
 python generate_static.py   # outputs to dist/
 ```
 
@@ -58,7 +61,7 @@ python generate_static.py   # outputs to dist/
 | Layer     | Stack                                      |
 | --------- | ------------------------------------------ |
 | Backend   | Python / Flask (template rendering only)   |
-| Frontend  | Alpine.js, Tailwind CSS                    |
+| Frontend  | Alpine.js, Tailwind CSS, UI SDK (beta)      |
 | DNS       | DNS-over-HTTPS (Google, Cloudflare, Quad9) |
 | WHOIS     | IANA RDAP Bootstrap (client-side)          |
 | Hosting   | GitHub Pages (static)                      |

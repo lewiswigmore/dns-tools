@@ -1,9 +1,9 @@
 {% macro section_header(icon_class, title) %}
 <div class="flex items-center mb-4" role="heading" aria-level="2">
-  <div class="w-8 h-8 flex items-center justify-center mr-3 rounded-md bg-[#21262d] border border-[#30363d] text-[#58a6ff]" aria-hidden="true">
+  <div class="w-8 h-8 flex items-center justify-center mr-3 rounded-md bg-[var(--surface-raised)] border border-[var(--border)] text-[color:var(--accent)]" aria-hidden="true">
     <i class="fas {{icon_class}}"></i>
   </div>
-  <h2 class="text-xl font-semibold text-[#c9d1d9]">{{ title }}</h2>
+  <h2 class="text-xl font-semibold text-[color:var(--text)]">{{ title }}</h2>
 </div>
 {% endmacro %}
 
@@ -14,33 +14,33 @@
 {% macro info_banner(icon='fa-info-circle', title='Information', body='') %}
 <div class="panel p-4 mb-4" role="note" aria-label="{{ title }}">
   <div class="flex items-start gap-3">
-    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-[#21262d] border border-[#30363d] text-[#58a6ff]" aria-hidden="true">
+    <div class="w-8 h-8 flex items-center justify-center rounded-md bg-[var(--surface-raised)] border border-[var(--border)] text-[color:var(--accent)]" aria-hidden="true">
       <i class="fas {{icon}}"></i>
     </div>
     <div class="text-sm">
-      <h3 class="font-semibold text-[#c9d1d9] mb-1">{{ title }}</h3>
-      <p class="text-[#8b949e]">{{ body }}</p>
+      <h3 class="font-semibold text-[color:var(--text)] mb-1">{{ title }}</h3>
+      <p class="text-[color:var(--muted)]">{{ body }}</p>
     </div>
   </div>
 </div>
 {% endmacro %}
 
 {% macro help_card(title, icon, items) %}
-<div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] h-full">
-  <h3 class="text-sm font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-    <i class="fas {{ icon }} text-[#58a6ff]"></i>
+<div class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] h-full">
+  <h3 class="text-sm font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
+    <i class="fas {{ icon }} text-[color:var(--accent)]"></i>
     {{ title }}
   </h3>
   <ul class="space-y-2">
     {% for item in items %}
-    <li class="flex items-start gap-2 text-[11px] text-[#8b949e]">
-      <i class="fas fa-check text-[#3fb950] mt-0.5 flex-shrink-0"></i>
+    <li class="flex items-start gap-2 text-[11px] text-[color:var(--muted)]">
+      <i class="fas fa-check text-[color:var(--success)] mt-0.5 flex-shrink-0"></i>
       <span>{{ item }}</span>
     </li>
     {% endfor %}
   </ul>
-  <div class="mt-4 pt-3 border-t border-[#30363d]">
-    <a href="{{ url_for('resources_page') }}" class="text-[10px] text-[#58a6ff] hover:underline flex items-center gap-1">
+  <div class="mt-4 pt-3 border-t border-[var(--border)]">
+    <a href="{{ url_for('resources_page') }}" class="text-[10px] text-[color:var(--accent)] hover:underline flex items-center gap-1">
       <i class="fas fa-book"></i>
       Learn more in Resources
     </a>
@@ -51,56 +51,56 @@
 {% macro concept_modal() %}
 <!-- Concept Detail Modal -->
 <div x-show="conceptModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50" @click="closeConcept" style="display: none;">
-  <div class="bg-[#0d1117] border-0 sm:border border-[#30363d] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] concept-modal-content flex flex-col" @click.stop>
+  <div class="bg-[var(--canvas)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] concept-modal-content flex flex-col" @click.stop>
     <div class="p-4 sm:p-6 flex-1 overflow-y-auto">
       <!-- Modal Header -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-[#21262d] border border-[#30363d] rounded-lg flex items-center justify-center shrink-0">
-            <i class="fas fa-lightbulb text-[#58a6ff]"></i>
+          <div class="w-10 h-10 bg-[var(--surface-raised)] border border-[var(--border)] rounded-lg flex items-center justify-center shrink-0">
+            <i class="fas fa-lightbulb text-[color:var(--accent)]"></i>
           </div>
           <div>
-            <h3 class="text-lg sm:text-xl font-semibold text-[#c9d1d9]" x-text="currentConcept"></h3>
-            <p class="text-xs sm:text-sm text-[#8b949e]">Deep Research Explanation</p>
+            <h3 class="text-lg sm:text-xl font-semibold text-[color:var(--text)]" x-text="currentConcept"></h3>
+            <p class="text-xs sm:text-sm text-[color:var(--muted)]">Deep Research Explanation</p>
           </div>
         </div>
-        <button @click="closeConcept" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors p-1">
+        <button @click="closeConcept" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors p-1">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
 
       <!-- Loading State -->
       <div x-show="loadingConcept" class="text-center py-12">
-        <div class="inline-flex flex-col items-center space-y-3 text-[#8b949e]">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#58a6ff]"></div>
+        <div class="inline-flex flex-col items-center space-y-3 text-[color:var(--muted)]">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)]"></div>
           <span class="text-sm">Loading detailed explanation...</span>
         </div>
       </div>
 
       <!-- Content -->
       <div x-show="!loadingConcept && conceptContent" class="prose prose-invert max-w-none">
-        <div x-html="conceptContent" class="text-[#c9d1d9] space-y-4 text-sm sm:text-base"></div>
+        <div x-html="conceptContent" class="text-[color:var(--text)] space-y-4 text-sm sm:text-base"></div>
       </div>
 
       <!-- Error State -->
       <div x-show="!loadingConcept && conceptError" class="text-center py-12">
-        <div class="text-[#f85149] mb-2">
+        <div class="text-[color:var(--danger)] mb-2">
           <i class="fas fa-exclamation-triangle text-3xl"></i>
         </div>
-        <p class="text-[#f85149] mb-4 text-sm" x-text="conceptError"></p>
-        <button @click="loadConcept(currentConcept)" class="px-4 py-2 bg-[#30363d] hover:bg-[#484f58] text-white rounded-lg text-xs font-medium transition-colors">
+        <p class="text-[color:var(--danger)] mb-4 text-sm" x-text="conceptError"></p>
+        <button @click="loadConcept(currentConcept)" class="px-4 py-2 bg-[var(--border)] hover:bg-[var(--border-strong)] text-white rounded-lg text-xs font-medium transition-colors">
           <i class="fas fa-redo mr-2"></i>Try Again
         </button>
       </div>
     </div>
 
     <!-- Footer -->
-    <div x-show="!loadingConcept && conceptContent" class="p-4 sm:p-6 border-t border-[#30363d] flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#161b22] shrink-0">
-      <div class="flex items-center space-x-2 text-xs text-[#8b949e]">
-        <i class="fas fa-brain text-[#58a6ff]"></i>
+    <div x-show="!loadingConcept && conceptContent" class="p-4 sm:p-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4 bg-[var(--surface)] shrink-0">
+      <div class="flex items-center space-x-2 text-xs text-[color:var(--muted)]">
+        <i class="fas fa-brain text-[color:var(--accent)]"></i>
         <span>Generated by Gemini</span>
       </div>
-      <button @click="closeConcept" class="w-full sm:w-auto px-4 py-2 bg-[#30363d] hover:bg-[#484f58] text-white rounded-lg text-xs font-medium transition-colors">Close</button>
+      <button @click="closeConcept" class="w-full sm:w-auto px-4 py-2 bg-[var(--border)] hover:bg-[var(--border-strong)] text-white rounded-lg text-xs font-medium transition-colors">Close</button>
     </div>
   </div>
 </div>

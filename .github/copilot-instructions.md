@@ -21,9 +21,9 @@ This file is a **living document**. You (the AI agent) are expected to keep it a
 ## Project stack
 
 - **Backend:** Python / Flask (`app.py`), serves API endpoints and renders Jinja2 templates
-- **Frontend:** Vanilla JavaScript (ES modules) in `static/js/modules/`
+- **Frontend:** Alpine.js and vanilla JavaScript (ES modules) in `static/js/modules/`, with UI SDK web components
 - **Styling:** Tailwind CSS (CDN) across all templates in `templates/`
-- **Static build:** `generate_static.py` converts Flask templates to a `dist/` folder
+- **Static build:** `npm ci && npm run build` bundles the UI SDK; `generate_static.py` converts Flask templates and assets to `dist/`
 - **Deployment:** GitHub Pages via `.github/workflows/deploy.yml` (pushes `dist/` on every merge to `main`)
 
 ## Agent skills
@@ -82,6 +82,8 @@ tests/                        Pytest security checks and Node.js regression test
 
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
+- The UI SDK is the exception: `static/js/ui-sdk.js` is bundled with esbuild into the ignored `static/js/ui-sdk.bundle.js` before running Flask or generating Pages. Keep the Pages build step in sync.
+- Shared theme colors are CSS custom properties in `templates/base.html`; use the semantic tokens instead of repeating their hex values in templates. Preserve semantic status colors.
 - `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on lookup/MX/DMARC pages, and load command-palette knowledge-base data only when the palette is opened
 - Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
 - MX and DMARC pages share the `commonDomainPresets()` and `initializeDomainLookup()` helpers in `utils.js` for consistent presets and URL-driven auto-lookups

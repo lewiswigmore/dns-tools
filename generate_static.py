@@ -19,6 +19,9 @@ def create_static_site():
     templates_dir = base_dir / 'templates'
     static_dir = base_dir / 'static'
     dist_dir = base_dir / 'dist'
+
+    if not (static_dir / 'js' / 'ui-sdk.bundle.js').is_file():
+        raise FileNotFoundError("UI SDK bundle missing; run npm ci and npm run build first")
     
     # Clean and create dist directory (with error handling for Windows)
     if dist_dir.exists():
@@ -173,3 +176,4 @@ if __name__ == '__main__':
         print(f"\\nError during static site generation: {e}")
         import traceback
         traceback.print_exc()
+        raise SystemExit(1)
