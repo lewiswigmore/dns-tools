@@ -168,23 +168,20 @@
   </div>
 
   <!-- Preview Modal -->
-  <div x-show="previewModal"
-       x-cloak
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50"
-       @click="closePreview">
-    <div @click.stop
-         class="bg-[var(--surface)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col">
+  <ui-dialog x-effect="$el.open = previewModal" @openchange="if (!$event.detail.value && previewModal) closePreview()">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
+    <ui-dialog-content class="large-dialog bg-[var(--surface)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl sm:max-h-[80vh] overflow-hidden flex flex-col">
 
       <!-- Modal Header -->
       <div class="flex items-center justify-between p-4 border-b border-[var(--border)] shrink-0">
         <div class="flex items-center gap-3">
-          <h3 class="text-base sm:text-lg font-semibold text-[color:var(--text)]">Query Results</h3>
+          <ui-dialog-title class="text-base sm:text-lg font-semibold text-[color:var(--text)]">Query Results</ui-dialog-title>
           <span x-show="previewData"
                 :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'"
                 x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'"
                 class="text-[10px] font-medium"></span>
         </div>
-        <button @click="closePreview"
+        <button @click="closePreview" aria-label="Close query results"
                 class="text-[color:var(--muted)] hover:text-[color:var(--text)] text-lg p-1">
           <i class="fas fa-times"></i>
         </button>
@@ -394,17 +391,7 @@
           </button>
         </div>
       </div>
-    </div>
-  </div>
+    </ui-dialog-content>
+  </ui-dialog>
 </div>
-{% endblock %}
-{% block scripts %}
-<script>
-// Close modal on ESC key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && window.historyPageInstance?.previewModal) {
-    window.historyPageInstance.closePreview();
-  }
-});
-</script>
 {% endblock %}

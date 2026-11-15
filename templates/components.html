@@ -50,8 +50,9 @@
 
 {% macro concept_modal() %}
 <!-- Concept Detail Modal -->
-<div x-show="conceptModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50" @click="closeConcept" style="display: none;">
-  <div class="bg-[var(--canvas)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] concept-modal-content flex flex-col" @click.stop>
+<ui-dialog x-effect="$el.open = conceptModal" @openchange="if (!$event.detail.value && conceptModal) closeConcept()">
+  <ui-dialog-backdrop></ui-dialog-backdrop>
+  <ui-dialog-content class="large-dialog bg-[var(--canvas)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl sm:max-h-[90vh] concept-modal-content flex flex-col">
     <div class="p-4 sm:p-6 flex-1 overflow-y-auto">
       <!-- Modal Header -->
       <div class="flex items-center justify-between mb-6">
@@ -60,11 +61,11 @@
             <i class="fas fa-lightbulb text-[color:var(--accent)]"></i>
           </div>
           <div>
-            <h3 class="text-lg sm:text-xl font-semibold text-[color:var(--text)]" x-text="currentConcept"></h3>
+            <ui-dialog-title class="text-lg sm:text-xl font-semibold text-[color:var(--text)]" x-text="currentConcept"></ui-dialog-title>
             <p class="text-xs sm:text-sm text-[color:var(--muted)]">Deep Research Explanation</p>
           </div>
         </div>
-        <button @click="closeConcept" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors p-1">
+        <button @click="closeConcept" aria-label="Close concept details" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors p-1">
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
@@ -102,8 +103,8 @@
       </div>
       <button @click="closeConcept" class="w-full sm:w-auto px-4 py-2 bg-[var(--border)] hover:bg-[var(--border-strong)] text-white rounded-lg text-xs font-medium transition-colors">Close</button>
     </div>
-  </div>
-</div>
+  </ui-dialog-content>
+</ui-dialog>
 {% endmacro %}
 
 <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>

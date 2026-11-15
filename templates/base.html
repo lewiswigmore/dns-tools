@@ -38,6 +38,7 @@
             --action-hover: #484f58;
         }
         [x-cloak]{display:none!important}
+        ui-dialog:not(:defined){display:none}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--canvas);color:var(--text);font-size:0.875rem}
         .logo-font{font-weight:750;letter-spacing:.04em}
 
@@ -156,6 +157,12 @@
         .loader-hidden { opacity: 0; visibility: hidden; }
         ui-dialog-backdrop { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,.7) }
         ui-dialog-content { position:fixed; z-index:101; top:50%; left:50%; transform:translate(-50%,-50%); width:calc(100% - 2rem); max-height:calc(100dvh - 2rem); overflow:auto }
+        ui-dialog-content.settings-dialog { top:0; right:0; left:auto; transform:none; width:min(100%, 20rem); height:100dvh; max-height:none }
+        ui-dialog-content.command-dialog { top:5rem; transform:translateX(-50%) }
+        @media (max-width:639px) {
+            ui-dialog-content.command-dialog { inset:0; transform:none; width:100%; height:100dvh; max-height:none }
+            ui-dialog-content.large-dialog { inset:0; transform:none; width:100%; height:100dvh; max-height:none }
+        }
     </style>
 </head>
 <body data-page="{{ active_page|default('dashboard') }}">
@@ -214,11 +221,12 @@
                             aria-label="Search tools" title="Search (Cmd+K)">
                         <i class="fas fa-search text-xs"></i>
                     </button>
-                    <button @click="mobileMenuOpen = false; $store.settings.toggle(); $nextTick(() => document.getElementById('settings-close').focus())"
+                    <ui-dialog-trigger for="settings-dialog"><button
+                            @click="document.getElementById('settings-dialog').dataset.returnToMobileMenu = mobileMenuOpen; mobileMenuOpen = false; $nextTick(() => document.getElementById('settings-close').focus())"
                             class="p-1.5 text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors"
                             aria-label="Settings" title="Settings">
                         <i class="fas fa-cog text-xs"></i>
-                    </button>
+                    </button></ui-dialog-trigger>
                     <button x-ref="menuClose" @click="mobileMenuOpen = false; $nextTick(() => $refs.menuToggle.focus())" aria-label="Close navigation" class="p-1.5 text-[color:var(--muted)] md:hidden">
                         <i class="fas fa-times text-sm"></i>
                     </button>
@@ -277,7 +285,7 @@
             <h1 class="text-[10px] font-bold text-white logo-font">DNSTools</h1>
             <div class="flex items-center gap-2">
                 <button @click="$dispatch('open-command-palette')" aria-label="Search tools" title="Search tools" class="text-[color:var(--text)] p-2"><i class="fas fa-search" aria-hidden="true"></i></button>
-                <button x-ref="menuToggle" @click="mobileMenuOpen = true; $nextTick(() => $refs.menuClose.focus())" :aria-expanded="mobileMenuOpen" aria-controls="app-navigation" aria-label="Open navigation" class="text-[color:var(--text)] p-2">
+                <button id="mobile-menu-toggle" x-ref="menuToggle" @click="mobileMenuOpen = true; $nextTick(() => $refs.menuClose.focus())" :aria-expanded="mobileMenuOpen" aria-controls="app-navigation" aria-label="Open navigation" class="text-[color:var(--text)] p-2">
                     <i class="fas fa-bars text-lg" aria-hidden="true"></i>
                 </button>
             </div>
@@ -290,35 +298,12 @@
 </div>
 
 <!-- Command Palette -->
-<div x-data="CommandPalette"
-     class="relative z-[100]"
-     role="dialog"
-     aria-modal="true"
-     x-show="open"
-     x-cloak>
-
-    <!-- Backdrop -->
-    <div x-show="open"
-         x-transition:enter="ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-         @click="close()"></div>
-
-    <!-- Modal -->
-    <div class="fixed inset-0 z-10 overflow-y-auto p-0 sm:p-6 md:p-20">
-        <div x-show="open"
-             @click.stop
-             x-transition:enter="ease-out duration-300"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             x-transition:leave="ease-in duration-200"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-95"
-             class="mx-auto max-w-xl h-full sm:h-auto transform divide-y divide-[var(--border)] overflow-hidden rounded-none sm:rounded-xl bg-[var(--surface)] shadow-2xl ring-1 ring-black ring-opacity-5 transition-all border-0 sm:border border-[var(--border)]">
+<ui-dialog id="command-dialog" x-data="CommandPalette"
+           x-effect="$el.open = open"
+           @openchange="if (!$event.detail.value && open) close()">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
+    <ui-dialog-content class="command-dialog max-w-xl divide-y divide-[var(--border)] overflow-hidden rounded-none sm:rounded-xl bg-[var(--surface)] shadow-2xl border-0 sm:border border-[var(--border)]">
+            <ui-dialog-title class="sr-only">Search tools, concepts, and history</ui-dialog-title>
 
             <div class="relative flex items-center">
                 <i class="fas fa-search absolute top-3.5 left-4 h-5 w-5 text-[color:var(--muted)]"></i>
@@ -372,42 +357,23 @@
                 <span class="mx-1 flex h-5 w-10 items-center justify-center rounded border border-[var(--border)] bg-[var(--surface)] font-sans font-medium text-[color:var(--text)]">esc</span>
                 <span class="mx-1">to close</span>
             </div>
-        </div>
-    </div>
-</div>
+    </ui-dialog-content>
+</ui-dialog>
 
 <!-- Settings Panel -->
-<div x-data x-show="$store.settings.open"
-     class="fixed inset-0 z-50 flex justify-end"
-     role="dialog" aria-modal="true" x-cloak>
-
-    <!-- Backdrop -->
-    <div x-show="$store.settings.open"
-         x-transition:enter="transition-opacity ease-linear duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-linear duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         @click="$store.settings.close()"
-         class="fixed inset-0 bg-black/60"></div>
+<ui-dialog id="settings-dialog" x-data
+           @openchange="if (!$event.detail.value && $el.dataset.returnToMobileMenu === 'true') { $el.dataset.returnToMobileMenu = 'false'; $nextTick(() => document.getElementById('mobile-menu-toggle').focus()) }">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
 
     <!-- Panel -->
-    <div x-show="$store.settings.open"
-         x-transition:enter="transition ease-in-out duration-300 transform"
-         x-transition:enter-start="translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in-out duration-300 transform"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="translate-x-full"
-         class="relative w-full sm:max-w-xs bg-[var(--surface)] border-l border-[var(--border)] shadow-xl flex flex-col h-full">
+    <ui-dialog-content class="settings-dialog bg-[var(--surface)] border-l border-[var(--border)] shadow-xl flex flex-col">
 
         <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-[var(--border)]">
-            <h2 class="text-sm font-bold text-[color:var(--text)] uppercase tracking-wider"><i class="fas fa-cog mr-2 text-[color:var(--accent)]"></i>Settings</h2>
-            <button id="settings-close" @click="$store.settings.close()" aria-label="Close settings" class="text-[color:var(--muted)] hover:text-[color:var(--text)]">
+            <ui-dialog-title class="text-sm font-bold text-[color:var(--text)] uppercase tracking-wider"><i class="fas fa-cog mr-2 text-[color:var(--accent)]"></i>Settings</ui-dialog-title>
+            <ui-dialog-close><button id="settings-close" aria-label="Close settings" class="text-[color:var(--muted)] hover:text-[color:var(--text)]">
                 <i class="fas fa-times"></i>
-            </button>
+            </button></ui-dialog-close>
         </div>
 
         <!-- Content -->
@@ -481,12 +447,12 @@
 
         <!-- Footer -->
         <div class="p-4 border-t border-[var(--border)] bg-[var(--canvas)]">
-            <button @click="$store.settings.close()" class="w-full py-2 px-4 rounded-md font-semibold bg-[var(--border)] hover:bg-[var(--border-strong)] text-white text-xs transition-colors">
+            <ui-dialog-close><button class="w-full py-2 px-4 rounded-md font-semibold bg-[var(--border)] hover:bg-[var(--border-strong)] text-white text-xs transition-colors">
                 Close Settings
-            </button>
+            </button></ui-dialog-close>
         </div>
-    </div>
-</div>
+    </ui-dialog-content>
+</ui-dialog>
 
 <!-- Info Modal -->
 <ui-dialog id="infoModal">
@@ -560,7 +526,7 @@
 </script>
 
 <!-- Onboarding Modal -->
-<div x-data="{
+<ui-dialog x-data="{
     open: false,
     step: 1,
     init() {
@@ -577,14 +543,11 @@
         localStorage.setItem('dnstools_onboarding_seen', 'true');
     }
 }"
-x-show="open"
-class="fixed inset-0 z-[150] flex items-center justify-center p-4"
-x-cloak>
-    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="finish()"></div>
-    <div class="relative bg-[var(--surface)] border border-[var(--border)] rounded-xl max-w-lg w-full p-6 shadow-2xl"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 scale-90"
-         x-transition:enter-end="opacity-100 scale-100">
+x-effect="$el.open = open"
+@openchange="if (!$event.detail.value && open) finish()">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
+    <ui-dialog-content class="bg-[var(--surface)] border border-[var(--border)] rounded-xl max-w-lg p-6 shadow-2xl">
+        <ui-dialog-title class="sr-only">Welcome to DNSTools</ui-dialog-title>
 
         <!-- Step 1: Welcome -->
         <div x-show="step === 1" x-transition:enter="transition ease-out duration-300 delay-100">
@@ -679,8 +642,8 @@ x-cloak>
                 </button>
             </div>
         </div>
-    </div>
-</div>
+    </ui-dialog-content>
+</ui-dialog>
 
 {% block scripts %}{% endblock %}
 </body>
