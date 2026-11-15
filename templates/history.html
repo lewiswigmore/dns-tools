@@ -8,7 +8,6 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">Search History</h2>
-      <p class="text-xs text-[color:var(--muted)]">Review previous lookup queries with detailed analytics</p>
     </div>
   </div>
 
@@ -37,7 +36,7 @@
       <div class="flex bg-[var(--surface)] rounded-lg p-1 border border-[var(--border)] overflow-x-auto no-scrollbar w-full lg:w-auto">
         <div class="flex min-w-max gap-1">
           <button @click="toggleTypeFilter('all')"
-                  :class="typeFilter === 'all' ? 'bg-[#1f6feb] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'all' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             All (<span x-text="history.length"></span>)
           </button>
@@ -47,27 +46,27 @@
             DNS (<span x-text="getTypeCount('DNS')"></span>)
           </button>
           <button @click="toggleTypeFilter('MX')"
-                  :class="typeFilter === 'MX' ? 'bg-[var(--warning)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'MX' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             MX (<span x-text="getTypeCount('MX')"></span>)
           </button>
           <button @click="toggleTypeFilter('DMARC')"
-                  :class="typeFilter === 'DMARC' ? 'bg-[#a855f7] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'DMARC' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             DMARC (<span x-text="getTypeCount('DMARC')"></span>)
           </button>
           <button @click="toggleTypeFilter('Headers')"
-                  :class="typeFilter === 'Headers' ? 'bg-[#e3b341] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'Headers' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             Headers (<span x-text="getTypeCount('Headers')"></span>)
           </button>
           <button @click="toggleTypeFilter('WHOIS')"
-                  :class="typeFilter === 'WHOIS' ? 'bg-[var(--warning)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'WHOIS' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS (<span x-text="getTypeCount('WHOIS')"></span>)
           </button>
           <button @click="toggleTypeFilter('WHOIS-IP')"
-                  :class="typeFilter === 'WHOIS-IP' ? 'bg-[#1f6feb] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                  :class="typeFilter === 'WHOIS-IP' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS IP (<span x-text="getTypeCount('WHOIS-IP')"></span>)
           </button>

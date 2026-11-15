@@ -311,7 +311,7 @@ export function DashboardPage() {
                 labels: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
                 datasets: [{
                   data: hourlyData,
-                  borderColor: '#58a6ff',
+                  borderColor: '#c9d1d9',
                   borderWidth: 2,
                   tension: 0.3,
                   pointRadius: 0,
@@ -415,7 +415,7 @@ export function DashboardPage() {
                   typeChartInstance.data.datasets[0].data = [
                       types['DNS'], types['MX'], types['DMARC'], types['Headers'], types['Intel'], types['WHOIS'], types['WHOIS-IP']
                   ];
-                    typeChartInstance.data.datasets[0].backgroundColor = ['#3fb950', '#58a6ff', '#d29922', '#a855f7', '#f85149', '#bc8cff', '#79c0ff'];
+                    typeChartInstance.data.datasets[0].backgroundColor = ['#c9d1d9', '#a8b1ba', '#8b949e', '#707983', '#59636e', '#484f58', '#343b44'];
                     typeChartInstance.data.labels = ['DNS', 'MX', 'DMARC', 'Headers', 'Intel', 'WHOIS', 'WHOIS-IP'];
                   typeChartInstance.options.plugins.tooltip = { enabled: true };
               }
@@ -516,7 +516,7 @@ export function DashboardPage() {
                     datasets: [{
                       label: 'Lookups per Hour',
                       data: [...data],
-                      borderColor: '#58a6ff',
+                      borderColor: '#c9d1d9',
                       backgroundColor: 'rgba(88, 166, 255, 0.1)',
                       borderWidth: 2,
                       fill: true

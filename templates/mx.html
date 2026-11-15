@@ -8,14 +8,11 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">MX Lookup</h2>
-      <p class="text-xs text-[color:var(--muted)]">Check mail exchange records and priority</p>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.info_banner('fa-info-circle','MX Record Information','MX records define the mail servers responsible for accepting email on behalf of a domain. Lower priority = higher preference.') }}
-
       <div class="mb-4">
         <label class="block text-xs font-semibold text-[color:var(--text)] mb-2"><i class="fas fa-globe mr-2 text-[color:var(--accent)]"></i>Domain for MX lookup:</label>
         <input x-model="domain" @keyup.enter="performLookup" type="text" class="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--canvas)] text-[color:var(--text)] text-sm" placeholder="example.com" />
@@ -42,8 +39,8 @@
           </div>
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" x-model="compareMode" class="sr-only peer">
-          <div class="w-11 h-6 bg-[var(--border)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
+          <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
+          <div class="relative w-11 h-6 bg-[var(--border)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--accent)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
         </label>
       </div>
 
@@ -68,7 +65,8 @@
     </div>
   </div>
 
-  <div x-show="(results && results.length>0) || (comparisonResult)" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
+  {{ ui.table_skeleton() }}
+  <div x-show="!loading && ((results && results.length>0) || (comparisonResult))" x-transition style="display: none;" class="panel rounded-xl p-4 space-y-4">
     <div class="result-toolbar">
       <h3 class="text-base font-semibold text-[color:var(--text)]"><i class="fas fa-envelope mr-2"></i>MX Records for <span x-text="domain"></span></h3>
       <div class="result-actions">

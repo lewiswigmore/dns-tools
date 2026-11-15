@@ -5,8 +5,9 @@ export function ResourcesPage() {
       conceptContent: '',
       loadingConcept: false,
       conceptError: '',
-      conceptAnimations: {},
       knowledgeBase: [],
+      loadingLibrary: true,
+      libraryError: '',
       complexityFilter: 'All',
       categoryFilter: 'All',
       searchQuery: '',
@@ -141,12 +142,10 @@ export function ResourcesPage() {
           })
           .catch(error => {
             console.error('Failed to load resource knowledge base:', error);
-            this.conceptError = 'Failed to load the knowledge base.';
+            this.libraryError = 'Could not load the library. Reload the page to try again.';
             return [];
-          });
-
-        // Initialize random pulse animations for DNS concepts
-        this.initRandomPulseAnimations();
+          })
+          .finally(() => { this.loadingLibrary = false; });
 
         // Check for params in URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -185,36 +184,6 @@ export function ResourcesPage() {
         }
 
         this.updateUrlState();
-      },
-      
-      initRandomPulseAnimations() {
-        const concepts = [
-          'A Record', 'AAAA Record', 'CNAME Record', 'MX Record', 
-          'TXT Record', 'NS Record', 'PTR Record', 'SRV Record', 'CAA Record',
-          'SPF', 'DKIM', 'DMARC'
-        ];
-        
-        // Randomly select 3-4 concepts to pulse
-        const numToPulse = Math.floor(Math.random() * 2) + 3; // 3 or 4 concepts
-        const shuffled = concepts.sort(() => 0.5 - Math.random());
-        const selectedConcepts = shuffled.slice(0, numToPulse);
-        
-        // Initialize all concepts as not pulsing
-        concepts.forEach(concept => {
-          this.conceptAnimations[concept] = false;
-        });
-        
-        // Add staggered pulse animations
-        selectedConcepts.forEach((concept, index) => {
-          setTimeout(() => {
-            this.conceptAnimations[concept] = true;
-            
-            // Stop pulsing after user has been on page for a while (15 seconds)
-            setTimeout(() => {
-              this.conceptAnimations[concept] = false;
-            }, 15000);
-          }, index * 800); // Stagger the start times by 800ms
-        });
       },
       
       showConcept(conceptName) {

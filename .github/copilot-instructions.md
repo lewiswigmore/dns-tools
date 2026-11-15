@@ -86,6 +86,7 @@ docs/research/                Sourced research notes
 - The UI SDK is the exception: `static/js/ui-sdk.js` is bundled with esbuild into the ignored `static/js/ui-sdk.bundle.js` before running Flask or generating Pages. Keep the Pages build step in sync.
 - SDK dialogs driven by Alpine state synchronize the element's `open` property with `x-effect` and clear that state on `openchange` so Escape and outside dismissal remain in sync.
 - Shared theme colors are CSS custom properties in `templates/base.html`; use the semantic tokens instead of repeating their hex values in templates. Preserve semantic status colors.
+- Keep operational UI flat and restrained: use spacing rather than nested borders, neutral selection colors, concise labels, and accessible names for icon-only controls. Use the shared `table_skeleton` macro for table-shaped loading states; placeholders must not imply actual results.
 - `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on lookup/MX/DMARC pages, and load command-palette knowledge-base data only when the palette is opened
 - Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
 - MX and DMARC pages share the `commonDomainPresets()` and `initializeDomainLookup()` helpers in `utils.js` for consistent presets and URL-driven auto-lookups
@@ -105,6 +106,8 @@ docs/research/                Sourced research notes
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
+- **2026-11-15**: The Content Library initially showed “no matching concepts” while its lazy import was pending, and import errors looked like empty results. Keep loading, error, and empty states distinct.
+- **2026-11-15**: Mobile's 44px label height displaced provider-toggle thumbs. Position the thumb relative to the track, not the label, and retain a visible keyboard focus indicator.
 - **2026-11-13**: Bulk DNS lookup paths could issue unbounded requests and repeatedly scan accumulated domains for deduplication/original input; static knowledge-base imports also delayed page-component initialization. Keep DoH fan-out at six concurrent requests, use sets/maps for batch indexing, and import the data after page initialization or when opening the command palette.
 - **2026-11-13**: Shared startup imported the DNS client on every page and the dashboard checked DNS providers sequentially. Dynamically import the shared client only on pages that use it and run independent provider health checks concurrently.
 - **2026-11-10**: Lookup result actions overflowed phone viewports after queries. Allow flex/grid children to shrink, wrap shared result toolbars, and use compact secondary action icons with accessible text. Mobile navigation must be inert while closed and return focus to its toggle when dismissed.

@@ -8,7 +8,6 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">Content Library</h2>
-      <p class="text-xs text-[color:var(--muted)]">Reference guide and educational materials</p>
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center gap-3">
@@ -17,6 +16,7 @@
             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--muted)] text-xs"></i>
             <input type="text"
                    x-model="searchQuery"
+                   aria-label="Search library"
                    @input="resetPage()"
                    placeholder="Search library..."
                    class="bg-[var(--canvas)] border border-[var(--border)] text-[color:var(--text)] text-xs rounded-md py-1.5 pl-8 pr-3 focus:ring-1 focus:ring-[var(--accent)] focus:border-[var(--accent)] placeholder-[color:var(--muted)] w-full md:w-48">
@@ -29,13 +29,13 @@
                         :class="complexityFilter === 'All' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">All</button>
                 <button @click="complexityFilter = 'Beginner'; resetPage()"
-                        :class="complexityFilter === 'Beginner' ? 'bg-[#1f6feb] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                        :class="complexityFilter === 'Beginner' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Beginner</button>
                 <button @click="complexityFilter = 'Intermediate'; resetPage()"
-                        :class="complexityFilter === 'Intermediate' ? 'bg-[var(--warning)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                        :class="complexityFilter === 'Intermediate' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Intermediate</button>
                 <button @click="complexityFilter = 'Advanced'; resetPage()"
-                        :class="complexityFilter === 'Advanced' ? 'bg-[var(--danger)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
+                        :class="complexityFilter === 'Advanced' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                         class="px-3 py-1 rounded text-xs font-medium transition-colors">Advanced</button>
             </div>
         </div>
@@ -43,29 +43,32 @@
   </div>
 
   <!-- Concepts Grid -->
-  <div class="panel p-4 rounded-xl space-y-3" x-show="filteredKnowledgeBase.length > 0">
+  <div x-show="loadingLibrary" x-cloak class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="status" aria-label="Loading library">
+    {% for item in range(3) %}
+    <div class="panel p-4 space-y-3" aria-hidden="true">
+      <div class="skeleton h-4 w-1/2"></div>
+      <div class="skeleton h-3 w-full"></div>
+      <div class="skeleton h-3 w-2/3"></div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="panel p-4 rounded-xl space-y-3" x-show="!loadingLibrary && !libraryError && filteredKnowledgeBase.length > 0" x-cloak>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
       <template x-for="item in paginatedKnowledgeBase" :key="item.id">
-        <div @click="showConcept(item.title)"
-             class="panel p-3 rounded-lg concept-container cursor-pointer hover:border-[var(--accent)] transition-colors border border-[var(--border)]"
-             :class="conceptAnimations[item.title] ? 'concept-pulse' : ''">
+        <div role="button" tabindex="0" @click="showConcept(item.title)" @keydown.enter.prevent="showConcept(item.title)" @keydown.space.prevent="showConcept(item.title)"
+             class="p-3 rounded-lg concept-container w-full text-left">
             <div class="flex justify-between items-start mb-2">
                 <h4 class="font-semibold text-[color:var(--text)] flex items-center text-sm">
-                    <i :class="item.icon + ' ' + item.iconColor" class="mr-2"></i>
                     <span x-text="item.title"></span>
                 </h4>
-                <span class="text-[10px] px-1.5 py-0.5 rounded border"
-                      :class="{
-                        'border-blue-500/30 text-blue-400 bg-blue-500/10': item.complexity === 'Beginner',
-                        'border-yellow-500/30 text-yellow-400 bg-yellow-500/10': item.complexity === 'Intermediate',
-                        'border-red-500/30 text-red-400 bg-red-500/10': item.complexity === 'Advanced'
-                      }"
+                <span class="text-[10px] px-1.5 py-0.5 rounded text-[color:var(--muted)] shrink-0 whitespace-nowrap"
                       x-text="item.complexity"></span>
             </div>
             <p class="text-[color:var(--muted)] mb-2 text-xs line-clamp-2" x-text="item.summary"></p>
             <div class="flex flex-wrap gap-1 mt-2">
                 <template x-for="tag in item.tags" :key="tag">
-                    <span class="text-[10px] bg-[var(--surface-raised)] text-[color:var(--muted)] px-1.5 py-0.5 rounded border border-[var(--border)]" x-text="tag"></span>
+                    <span class="text-[10px] bg-[var(--surface-raised)] text-[color:var(--muted)] px-1.5 py-0.5 rounded" x-text="tag"></span>
                 </template>
             </div>
         </div>
@@ -117,8 +120,11 @@
     </div>
   </div>
 
-  <div class="panel p-4 rounded-xl" x-show="filteredKnowledgeBase.length === 0" style="display: none;">
-    <p class="text-xs text-[color:var(--muted)]"><i class="fas fa-info-circle mr-2"></i>No matching concepts found. Try a broader search or change filters.</p>
+  <div class="panel p-4 rounded-xl" x-show="!loadingLibrary && libraryError" x-cloak role="alert">
+    <p class="text-xs text-[color:var(--danger)]" x-text="libraryError"></p>
+  </div>
+  <div class="panel p-4 rounded-xl" x-show="!loadingLibrary && !libraryError && filteredKnowledgeBase.length === 0" x-cloak>
+    <p class="text-xs text-[color:var(--muted)]">No matching concepts. Try a broader search or change filters.</p>
   </div>
 
   <!-- Use the concept modal component -->

@@ -8,17 +8,13 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">Tools & Resources</h2>
-      <p class="text-xs text-[color:var(--muted)]">External utilities and project information</p>
     </div>
   </div>
 
   <!-- Tools & Resources -->
   <div class="panel p-4 rounded-xl space-y-3">
-    {{ ui.section_header('fa-tools','Useful Tools & Resources') }}
-    <p class="text-[color:var(--muted)] mb-4 text-xs">External tools and documentation for DNS management and troubleshooting.</p>
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="panel p-3 rounded-lg border border-[var(--border)]">
+      <div class="p-3">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] flex items-center text-sm">
           <i class="fas fa-terminal text-[color:var(--accent)] mr-2"></i>Command Line Tools
         </h4>
@@ -38,7 +34,7 @@
         </div>
       </div>
 
-      <div class="panel p-3 rounded-lg border border-[var(--border)]">
+      <div class="p-3">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] flex items-center text-sm">
           <i class="fas fa-globe text-[color:var(--accent)] mr-2"></i>Online DNS Tools
         </h4>
@@ -49,7 +45,7 @@
         </div>
       </div>
 
-      <div class="panel p-3 rounded-lg border border-[var(--border)]">
+      <div class="p-3">
         <h4 class="font-semibold mb-2 text-[color:var(--text)] flex items-center text-sm">
           <i class="fas fa-book-open text-[color:var(--accent)] mr-2"></i>Documentation
         </h4>
@@ -62,36 +58,8 @@
     </div>
   </div>
 
-  <!-- About DNSTools -->
-  <div class="panel p-4 rounded-xl space-y-3">
-    <div class="flex items-center mb-3">
-      <div class="w-8 h-8 flex items-center justify-center mr-3 rounded-md bg-[var(--surface-raised)] border border-[var(--border)] text-[color:var(--accent)]">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <h2 class="text-[10px] font-bold text-white uppercase tracking-wider">About <span class="logo-font tracking-[0.1em]">DNSTools</span></h2>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div>
-        <h4 class="font-semibold mb-2 text-[color:var(--text)] text-sm">Features</h4>
-        <ul class="space-y-1 text-xs text-[color:var(--muted)]">
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>Multi-domain DNS lookups</li>
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>MX record analysis</li>
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>DMARC policy validation</li>
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>Email header analysis</li>
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>Session-based analytics</li>
-          <li class="flex items-center"><i class="fas fa-check text-[color:var(--action)] mr-2"></i>Search history with preview</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="font-semibold mb-2 text-[color:var(--text)] text-sm">Open Source</h4>
-        <p class="text-[color:var(--muted)] text-xs mb-3"><span class="logo-font tracking-[0.05em] text-white">DNSTools</span> is open source and available on GitHub. Contributions, bug reports, and feature requests are welcome.</p>
-        <a href="https://github.com/lewiswigmore/dns-tools" target="_blank" rel="noopener noreferrer"
-           class="inline-flex items-center px-3 py-1.5 bg-[var(--surface-raised)] border border-[var(--border)] rounded-lg text-[color:var(--text)] hover:bg-[var(--border)] transition-colors text-xs">
-          <i class="fab fa-github mr-2"></i>View on GitHub
-        </a>
-      </div>
-    </div>
-  </div>
+  <a href="https://github.com/lewiswigmore/dns-tools" target="_blank" rel="noopener noreferrer"
+     class="inline-block text-xs text-[color:var(--muted)] hover:text-[color:var(--text)]">View on GitHub</a>
 
 </div>
 {% endblock %}

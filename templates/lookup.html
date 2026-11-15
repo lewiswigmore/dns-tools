@@ -8,14 +8,11 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-lg font-semibold text-[color:var(--text)]">DNS Lookup</h2>
-      <p class="text-xs text-[color:var(--muted)]">Query DNS records for multiple domains</p>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.info_banner('fa-shield-alt','Security & Obfuscation Support','This tool handles obfuscated domains (google[.]com, hxxp://example[.]com) used in security research.') }}
-
       <div class="mb-4">
         <label class="block text-xs font-semibold text-[color:var(--text)] mb-2"><i class="fas fa-globe mr-2 text-[color:var(--accent)]"></i>Enter domains:</label>
     <textarea id="lookup-domains" aria-label="Domains to look up" autocapitalize="none" spellcheck="false" x-model="domains" x-ref="domainsBox" @input="autoGrow && autoGrow($refs.domainsBox)" @keydown.ctrl.enter="performLookup" x-init="autoGrow && autoGrow($refs.domainsBox)" placeholder="example.com
@@ -64,7 +61,7 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
         </div>
         <label class="relative inline-flex items-center cursor-pointer">
           <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
-          <div class="w-11 h-6 bg-[var(--border)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
+          <div class="relative w-11 h-6 bg-[var(--border)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--accent)] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent-fill)]"></div>
         </label>
       </div>
 
@@ -89,7 +86,8 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     </div>
   </div>
 
-  <div x-show="(results && results.length>0) || (comparisonResults && comparisonResults.length>0)" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[var(--border)] space-y-4">
+  {{ ui.table_skeleton() }}
+  <div x-show="!loading && ((results && results.length>0) || (comparisonResults && comparisonResults.length>0))" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[var(--border)] space-y-4">
     <div class="result-toolbar">
       <h2 class="text-base font-semibold text-[color:var(--text)]">DNS Analysis Results</h2>
       <div class="result-actions">

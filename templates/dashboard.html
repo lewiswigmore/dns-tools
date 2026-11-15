@@ -15,7 +15,7 @@
       <p class="text-[10px] font-bold text-[color:var(--accent)] uppercase tracking-wider mb-0.5">DNS Tip</p>
       <p class="text-xs text-[color:var(--text)]" x-text="currentTip"></p>
     </div>
-    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
+    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" aria-label="Show another DNS tip" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
       <i class="fas fa-sync-alt text-xs"></i>
     </button>
   </div>
@@ -44,7 +44,7 @@
         <!-- Intel -->
         <div>
             <h3 class="text-sm font-semibold text-[color:var(--text)] mb-2 flex items-center gap-2">
-                <i class="fas fa-shield-alt text-[color:var(--danger)]"></i> Threat Intel
+                Threat Intel
             </h3>
             <div class="flex flex-col sm:flex-row gap-2">
                 <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()"
@@ -208,12 +208,12 @@
           Provider Health
           <div class="relative group">
             <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help"></i>
-            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-[10px] text-[color:var(--muted)] hidden group-hover:block z-10 shadow-xl">
+            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-[10px] text-[color:var(--muted)] hidden group-hover:block z-10">
               Checks connectivity to DoH providers. "Blocked" usually means your browser, extension (e.g. uBlock), or network is preventing access to 3rd party DNS APIs.
             </div>
           </div>
         </h3>
-        <button @click="checkProviderHealth()" class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-colors" title="Refresh Health Status">
+        <button @click="checkProviderHealth()" aria-label="Refresh provider health" class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-colors" title="Refresh Health Status">
           <i class="fas fa-sync-alt text-xs" :class="{'fa-spin': providerStatus.some(p => p.status === 'checking')}"></i>
         </button>
       </div>
@@ -222,13 +222,12 @@
           <div class="p-3 rounded-lg border border-[var(--border)] bg-[var(--canvas)] flex flex-col gap-2 relative group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <i class="text-xs" :class="provider.name.includes('Google') ? 'fab fa-google text-[color:var(--text)]' : (provider.name.includes('Cloudflare') ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[color:var(--muted)]')"></i>
                 <span class="text-xs font-medium text-[color:var(--text)]" x-text="provider.name"></span>
               </div>
               <span class="w-2 h-2 rounded-full bg-[var(--muted)]"
                     :class="{
-                      'bg-[var(--success)] shadow-[0_0_8px_var(--success)]': provider.status === 'online',
-                      'bg-[var(--danger)] shadow-[0_0_8px_var(--danger)]': provider.status === 'offline' || provider.status === 'error',
+                      'bg-[var(--success)]': provider.status === 'online',
+                      'bg-[var(--danger)]': provider.status === 'offline' || provider.status === 'error',
                       'bg-[var(--muted)] animate-pulse': provider.status === 'checking'
                     }"></span>
             </div>
@@ -240,7 +239,7 @@
             </div>
             <!-- Status Tooltip -->
             <div x-show="provider.status !== 'online' && provider.status !== 'checking'"
-                 class="absolute top-full left-0 right-0 mt-1 p-2 bg-[var(--surface-raised)] border border-[var(--border)] rounded text-[10px] text-[color:var(--text)] z-20 hidden group-hover:block shadow-lg">
+                 class="absolute top-full left-0 right-0 mt-1 p-2 bg-[var(--surface-raised)] border border-[var(--border)] rounded text-[10px] text-[color:var(--text)] z-20 hidden group-hover:block">
               <p x-text="provider.message"></p>
               <p class="text-[color:var(--muted)] mt-1">Check browser console for CSP/CORS errors.</p>
             </div>
@@ -364,7 +363,7 @@
   <!-- Session Info Modal -->
   <ui-dialog x-effect="$el.open = showSessionModal" @openchange="if (!$event.detail.value) showSessionModal = false">
     <ui-dialog-backdrop></ui-dialog-backdrop>
-    <ui-dialog-content class="bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-2xl max-w-md overflow-hidden">
+    <ui-dialog-content class="bg-[var(--surface)] border border-[var(--border)] rounded-xl max-w-md overflow-hidden">
       <div class="p-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--canvas)]">
         <ui-dialog-title class="text-sm font-bold text-[color:var(--text)] flex items-center gap-2">
           <i class="fas fa-clock text-[color:var(--accent)]"></i> Session Information
