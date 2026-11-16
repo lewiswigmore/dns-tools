@@ -4,27 +4,24 @@
 {% block title %}DNS Lookup - DNSTools{% endblock %}
 {% block content %}
 <div x-data="LookupPage()" x-init="init()" class="space-y-4">
-  
+
   <div class="flex items-center justify-between">
     <div>
-      <h2 class="text-lg font-semibold text-[#c9d1d9]">DNS Lookup</h2>
-      <p class="text-xs text-[#8b949e]">Query DNS records for multiple domains</p>
+      <h2 class="text-lg font-semibold text-[color:var(--text)]">DNS Lookup</h2>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.info_banner('fa-shield-alt','Security & Obfuscation Support','This tool handles obfuscated domains (google[.]com, hxxp://example[.]com) used in security research.') }}
-
       <div class="mb-4">
-        <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Enter domains:</label>
+        <label class="block text-xs font-semibold text-[color:var(--text)] mb-2"><i class="fas fa-globe mr-2 text-[color:var(--accent)]"></i>Enter domains:</label>
     <textarea id="lookup-domains" aria-label="Domains to look up" autocapitalize="none" spellcheck="false" x-model="domains" x-ref="domainsBox" @input="autoGrow && autoGrow($refs.domainsBox)" @keydown.ctrl.enter="performLookup" x-init="autoGrow && autoGrow($refs.domainsBox)" placeholder="example.com
 microsoft.com
 google.com
-contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-xs leading-relaxed text-[#c9d1d9]"></textarea>
-        <p class="mt-2 text-[10px] text-[#8b949e]">Supports standard & obfuscated formats (e.g. google[.]com, hxxp://example[.]org), and accepts commas, spaces, or newlines. Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Ctrl</kbd> + <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run.</p>
+contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--canvas)] text-xs leading-relaxed text-[color:var(--text)]"></textarea>
+        <p class="mt-2 text-[10px] text-[color:var(--muted)]">Supports standard & obfuscated formats (e.g. google[.]com, hxxp://example[.]org), and accepts commas, spaces, or newlines. Press <kbd class="bg-[var(--surface-raised)] px-1 rounded border border-[var(--border)]">Ctrl</kbd> + <kbd class="bg-[var(--surface-raised)] px-1 rounded border border-[var(--border)]">Enter</kbd> to run.</p>
         <div class="mt-2 flex flex-wrap items-center gap-2">
-          <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
+          <span class="text-[10px] text-[color:var(--muted)]">Quick tests:</span>
           <template x-for="preset in presets" :key="preset.label">
             <button @click="applyPresetDomains(preset.value)" type="button" class="pill pill-outline pill-blue text-[10px]">
               <span x-text="preset.label"></span>
@@ -35,44 +32,29 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
 
       <div class="mb-4">
         <div class="flex items-center justify-between mb-2">
-          <label class="block text-xs font-semibold text-[#c9d1d9]"><i class="fas fa-list-check mr-2 text-[#58a6ff]"></i>Record Types:</label>
+          <label class="block text-xs font-semibold text-[color:var(--text)]"><i class="fas fa-list-check mr-2 text-[color:var(--accent)]"></i>Record Types:</label>
           <div class="flex gap-2">
-            <button @click="selectAllRecordTypes" type="button" class="text-[10px] text-[#58a6ff] hover:text-[#79c0ff] underline">Select All</button>
-            <button @click="clearAllRecordTypes" type="button" class="text-[10px] text-[#8b949e] hover:text-[#c9d1d9] underline">Clear</button>
+            <button @click="selectAllRecordTypes" type="button" class="text-[10px] text-[color:var(--accent)] hover:text-white underline">Select All</button>
+            <button @click="clearAllRecordTypes" type="button" class="text-[10px] text-[color:var(--muted)] hover:text-[color:var(--text)] underline">Clear</button>
           </div>
         </div>
         <div class="flex flex-wrap gap-2" >
           <template x-for="type in availableRecordTypes" :key="type">
-            <label class="flex items-center p-1.5 rounded-lg border border-[#30363d] cursor-pointer bg-[#0d1117] hover:border-[#58a6ff]">
+            <label class="flex items-center p-1.5 rounded-lg border border-[var(--border)] cursor-pointer bg-[var(--canvas)] hover:border-[var(--accent)]">
               <input type="checkbox" :value="type" x-model="selectedRecordTypes" class="mr-1.5">
-              <span class="text-xs text-[#c9d1d9]" x-text="type"></span>
+              <span class="text-xs text-[color:var(--text)]" x-text="type"></span>
             </label>
           </template>
         </div>
       </div>
 
-      <!-- Compare Providers Toggle -->
-      <div x-show="$store.settings.config.providers.length > 1" class="flex items-center justify-between mb-4 p-3 bg-[#161b22] rounded-lg border border-[#30363d]">
-        <div class="flex items-center gap-3">
-          <div class="p-2 bg-[#30363d] rounded-full">
-            <i class="fas fa-balance-scale text-[#58a6ff]"></i>
-          </div>
-          <div>
-            <h3 class="text-sm font-semibold text-[#c9d1d9]">Compare Providers</h3>
-            <p class="text-xs text-[#8b949e]">Query selected providers simultaneously</p>
-          </div>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" x-model="compareMode" aria-label="Compare DNS providers" class="sr-only peer">
-          <div class="w-11 h-6 bg-[#30363d] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#58a6ff]"></div>
-        </label>
-      </div>
+      {{ ui.compare_toggle() }}
 
-      <button @click="performLookup" 
-              :disabled="loading || !domains.trim() || selectedRecordTypes.length===0" 
+      <button @click="performLookup"
+              :disabled="loading || !domains.trim() || selectedRecordTypes.length===0"
               disabled
-              class="w-full py-2 px-4 rounded-md font-semibold bg-[#30363d] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition text-sm"
-              :class="!(loading || !domains.trim() || selectedRecordTypes.length===0) ? 'bg-[#238636]' : 'bg-[#30363d]'">
+              class="w-full py-2 px-4 rounded-md font-semibold bg-[var(--border)] hover:bg-[var(--action-hover)] disabled:bg-[var(--border)] text-white transition text-sm"
+              :class="!(loading || !domains.trim() || selectedRecordTypes.length===0) ? 'bg-[var(--action)]' : 'bg-[var(--border)]'">
         <span x-show="!loading"><i class="fas fa-search mr-2"></i>Analyze DNS Records</span>
         <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Processing...</span>
       </button>
@@ -89,23 +71,24 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     </div>
   </div>
 
-  <div x-show="(results && results.length>0) || (comparisonResults && comparisonResults.length>0)" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[#30363d] space-y-4">
+  {{ ui.table_skeleton() }}
+  <div x-show="!loading && ((results && results.length>0) || (comparisonResults && comparisonResults.length>0))" x-transition style="display: none;" class="panel rounded-xl p-4 border border-[var(--border)] space-y-4">
     <div class="result-toolbar">
-      <h2 class="text-base font-semibold text-[#c9d1d9]">DNS Analysis Results</h2>
+      <h2 class="text-base font-semibold text-[color:var(--text)]">DNS Analysis Results</h2>
       <div class="result-actions">
         <button x-data="{ copied: false }"
                 @click="copyShareUrl(); copied = true; setTimeout(() => copied = false, 1500)"
                 title="Share results URL"
                 class="pill pill-outline pill-blue transition-all duration-200"
-                :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+                :class="copied ? 'bg-[var(--accent-fill)] text-white border-[var(--accent)]' : ''">
           <i class="fas" :class="copied ? 'fa-check' : 'fa-link'"></i>
           <span class="action-label" aria-live="polite" x-text="copied ? 'Link Copied!' : 'Share URL'"></span>
         </button>
-        <button x-data="{ copied: false }" 
-                @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
+        <button x-data="{ copied: false }"
+                @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)"
                 title="Copy results as Markdown"
                 class="pill pill-outline pill-blue transition-all duration-200"
-                :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+                :class="copied ? 'bg-[var(--accent-fill)] text-white border-[var(--accent)]' : ''">
           <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
           <span class="action-label" aria-live="polite" x-text="copied ? 'Copied!' : 'Copy as Markdown'"></span>
         </button>
@@ -121,11 +104,11 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
         </button>
       </div>
     </div>
-    
+
     <!-- Standard Results -->
-    <div x-show="!compareMode" class="overflow-x-auto rounded-md border border-[#30363d]">
+    <div x-show="!compareMode" class="overflow-x-auto rounded-md">
       <table class="min-w-full text-xs responsive-table">
-        <thead class="bg-[#161b22]">
+        <thead class="bg-[var(--surface)]">
           <tr>
             <th class="px-3 py-2 text-left">Domain</th>
             <th class="px-3 py-2 text-left">Status</th>
@@ -134,9 +117,9 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
             <th class="px-3 py-2 text-left">Fraud Risk</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#30363d]">
+        <tbody class="divide-y divide-[var(--border)]">
           <template x-for="(row, index) in results" :key="row.domain + '_' + index">
-            <tr class="hover:bg-[#161b22] animate-fade-in-up" :style="'animation-delay: ' + (index * 0.05) + 's'">
+            <tr class="hover:bg-[var(--surface)] animate-fade-in-up" :style="'animation-delay: ' + (index * 0.05) + 's'">
               <td class="px-3 py-2" data-label="Domain" x-text="row.domain"></td>
               <td class="px-3 py-2" data-label="Status">
                 <span x-show="row.status==='success'" class="pill pill-outline pill-green">Success</span>
@@ -147,14 +130,14 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                   <template x-if="row.records[rt] && row.records[rt].length">
                     <div class="space-y-1 w-full">
                       <template x-for="(rec, recIndex) in getVisibleRecords(row, rt)" :key="rt + '_' + index + '_' + recIndex">
-                        <div class="flex items-center justify-between bg-[#0d1117] rounded px-2 py-1 border border-[#30363d] group">
+                        <div class="flex items-center justify-between bg-[var(--canvas)] rounded px-2 py-1 group">
                           <span class="font-mono text-[10px] truncate max-w-[150px] sm:max-w-[200px]" :title="rec.value" x-text="formatRecordValue(rec.value)"></span>
                           <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-[#8b949e]" x-text="'TTL '+rec.ttl"></span>
-                            <button x-data="{ copied: false }" 
-                                    @click="copyToClipboard(rec.value); copied = true; setTimeout(() => copied = false, 1000)" 
-                                    class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200"
-                                    :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                            <span class="text-[10px] text-[color:var(--muted)]" x-text="'TTL '+rec.ttl"></span>
+                            <button x-data="{ copied: false }"
+                                    @click="copyToClipboard(rec.value); copied = true; setTimeout(() => copied = false, 1000)"
+                                    class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-all duration-200"
+                                    :class="copied ? 'text-[color:var(--success)]! opacity-100' : 'opacity-0 group-hover:opacity-100'"
                                     :title="copied ? 'Copied!' : 'Copy value'">
                               <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                             </button>
@@ -163,30 +146,30 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                       </template>
                       <button x-show="hasHiddenRecords(row, rt)"
                               @click="toggleRecordSet(row, rt)"
-                              class="text-[10px] text-[#58a6ff] hover:text-[#79c0ff] underline mt-1">
+                              class="text-[10px] text-[color:var(--accent)] hover:text-white underline mt-1">
                         Show <span x-text="getHiddenRecordCount(row, rt)"></span> more
                       </button>
                       <button x-show="isRecordSetExpanded(row, rt) && row.records[rt].length > maxInlineRecords"
                               @click="toggleRecordSet(row, rt)"
-                              class="text-[10px] text-[#8b949e] hover:text-[#c9d1d9] underline mt-1">
+                              class="text-[10px] text-[color:var(--muted)] hover:text-[color:var(--text)] underline mt-1">
                         Show less
                       </button>
                     </div>
                   </template>
-                  <span x-show="!row.records[rt] || !row.records[rt].length" class="text-[10px] text-[#8b949e]">—</span>
+                  <span x-show="!row.records[rt] || !row.records[rt].length" class="text-[10px] text-[color:var(--muted)]">—</span>
                 </td>
               </template>
               <td class="px-3 py-2" data-label="Issues">
                 <template x-if="row.errors && row.errors.length">
                   <div class="space-y-1">
-                    <template x-for="err in row.errors" :key="err"><div class="text-[11px] text-[#f85149]" x-text="err"></div></template>
+                    <template x-for="err in row.errors" :key="err"><div class="text-[11px] text-[color:var(--danger)]" x-text="err"></div></template>
                   </div>
                 </template>
-                <span x-show="!row.errors || !row.errors.length" class="text-[10px] text-[#8b949e]">None</span>
+                <span x-show="!row.errors || !row.errors.length" class="text-[10px] text-[color:var(--muted)]">None</span>
               </td>
               <td class="px-3 py-2" data-label="Fraud Risk">
                 <template x-if="row.status !== 'success'">
-                  <span class="text-[10px] text-[#8b949e]">—</span>
+                  <span class="text-[10px] text-[color:var(--muted)]">—</span>
                 </template>
                 <template x-if="row.status === 'success'">
                   <div>
@@ -196,10 +179,10 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
                       </button>
                     </template>
                     <template x-if="fraudState(row.domain)?.loading">
-                      <span class="text-[10px] text-[#8b949e]"><i class="fas fa-spinner fa-spin"></i> Checking...</span>
+                      <span class="text-[10px] text-[color:var(--muted)]"><i class="fas fa-spinner fa-spin"></i> Checking...</span>
                     </template>
                     <template x-if="fraudState(row.domain) && !fraudState(row.domain).loading && fraudState(row.domain).error">
-                      <span class="text-[10px] text-[#f85149]" x-text="fraudState(row.domain).error"></span>
+                      <span class="text-[10px] text-[color:var(--danger)]" x-text="fraudState(row.domain).error"></span>
                     </template>
                     <template x-if="fraudState(row.domain) && !fraudState(row.domain).loading && fraudState(row.domain).data">
                       <span class="inline-flex items-center gap-1 text-[11px] cursor-help"
@@ -221,11 +204,11 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
     <!-- Comparison Results -->
     <div x-show="compareMode" class="space-y-6">
       <!-- Comparison Explanation -->
-      <div class="panel p-3 rounded-lg border border-[#30363d] bg-[#0d1117]">
+      <div class="panel p-3 rounded-lg border border-[var(--border)] bg-[var(--canvas)]">
         <div class="flex items-start gap-3">
-          <i class="fas fa-info-circle text-[#58a6ff] mt-1"></i>
-          <div class="text-xs text-[#8b949e] space-y-1">
-            <p class="font-semibold text-[#c9d1d9]">Why do results differ?</p>
+          <i class="fas fa-info-circle text-[color:var(--accent)] mt-1"></i>
+          <div class="text-xs text-[color:var(--muted)] space-y-1">
+            <p class="font-semibold text-[color:var(--text)]">Why do results differ?</p>
             <ul class="list-disc list-inside space-y-1 ml-1">
               <li><strong>Propagation:</strong> Recent changes may not have reached all providers yet.</li>
               <li><strong>Geo-Location:</strong> Providers may return different IPs based on your location (CDN).</li>
@@ -237,32 +220,32 @@ contoso.com" class="w-full resize-none overflow-hidden min-h-[80px] px-3 py-2 bo
 
       <template x-for="(row, index) in comparisonResults" :key="'comp_' + index">
         <div class="space-y-3">
-          <h3 class="text-sm font-semibold text-[#c9d1d9] border-b border-[#30363d] pb-2" x-text="row.domain"></h3>
-          
+          <h3 class="text-sm font-semibold text-[color:var(--text)] border-b border-[var(--border)] pb-2" x-text="row.domain"></h3>
+
           <template x-for="rt in selectedRecordTypes" :key="'comp_rt_' + rt + '_' + index">
-            <div class="bg-[#0d1117] rounded-lg border border-[#30363d] overflow-hidden">
-              <div class="bg-[#161b22] px-3 py-2 border-b border-[#30363d] flex justify-between items-center">
-                <span class="text-xs font-semibold text-[#58a6ff]" x-text="rt + ' Records'"></span>
+            <div class="bg-[var(--canvas)] rounded-lg overflow-hidden">
+              <div class="bg-[var(--surface)] px-3 py-2 border-b border-[var(--border)] flex justify-between items-center">
+                <span class="text-xs font-semibold text-[color:var(--accent)]" x-text="rt + ' Records'"></span>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[#30363d]">
+              <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-[var(--border)]">
                 <template x-for="provider in Object.keys(row.comparisons[rt]).sort()" :key="provider">
                   <div class="p-3 space-y-2">
                     <div class="flex items-center justify-between mb-2">
                       <div class="flex items-center gap-2">
-                        <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[#c9d1d9]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[#8b949e]')"></i>
-                        <span class="text-[10px] font-semibold text-[#8b949e]" x-text="provider"></span>
+                        <i class="text-[10px]" :class="provider === 'Google' ? 'fab fa-google text-[color:var(--text)]' : (provider === 'Cloudflare' ? 'fas fa-cloud text-[color:var(--text)]' : 'fas fa-server text-[color:var(--muted)]')"></i>
+                        <span class="text-[10px] font-semibold text-[color:var(--muted)]" x-text="provider"></span>
                       </div>
-                      <span class="text-[10px]" :class="row.comparisons[rt][provider].status === 'success' ? 'text-[#3fb950]' : 'text-[#f85149]'" x-text="row.comparisons[rt][provider].latency + 'ms'"></span>
+                      <span class="text-[10px]" :class="row.comparisons[rt][provider].status === 'success' ? 'text-[color:var(--success)]' : 'text-[color:var(--danger)]'" x-text="row.comparisons[rt][provider].latency + 'ms'"></span>
                     </div>
                     <template x-if="row.comparisons[rt][provider].records.length > 0">
                       <div class="space-y-1">
                         <template x-for="rec in row.comparisons[rt][provider].records">
-                          <div class="text-[10px] font-mono bg-[#161b22] p-1.5 rounded border border-[#30363d] truncate" :title="rec.value" x-text="rec.value"></div>
+                          <div class="text-[10px] font-mono bg-[var(--surface)] p-1.5 rounded truncate" :title="rec.value" x-text="rec.value"></div>
                         </template>
                       </div>
                     </template>
                     <template x-if="!row.comparisons[rt][provider].records.length">
-                      <div class="text-[10px] text-[#8b949e] italic">No records found</div>
+                      <div class="text-[10px] text-[color:var(--muted)] italic">No records found</div>
                     </template>
                   </div>
                 </template>

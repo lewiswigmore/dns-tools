@@ -113,7 +113,7 @@ export function MXPage() {
             const res = this.comparisonResult[provider];
             if (res) {
               const records = res.records.map(r => `${r.priority} ${r.exchange}`).join(', ') || 'No records';
-              text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+              text += `| ${provider} | ${res.status === 'success' ? 'Success' : 'Error'} | ${res.latency}ms | \`${records}\` |\n`;
             }
           });
           

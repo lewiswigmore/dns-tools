@@ -290,7 +290,7 @@ export function LookupPage() {
                   if (res) {
                     const limitedRecords = this.getLimitedRecords(res.records);
                     const records = limitedRecords.map(r => r.value).join(', ') || 'No records';
-                    text += `| ${provider} | ${res.status === 'success' ? '✅' : '❌'} | ${res.latency}ms | \`${records}\` |\n`;
+                    text += `| ${provider} | ${res.status === 'success' ? 'Success' : 'Error'} | ${res.latency}ms | \`${records}\` |\n`;
                     if (Array.isArray(res.records) && res.records.length > this.maxCopyRecordsPerType) {
                       text += `| ${provider} | ℹ️ | — | _Truncated ${res.records.length - this.maxCopyRecordsPerType} additional records in copy output_ |\n`;
                     }
@@ -303,7 +303,7 @@ export function LookupPage() {
         } else {
           data.forEach(row => {
             text += `## ${row.domain}\n\n`;
-            text += `**Status:** ${row.status === 'success' ? '✅ Success' : '❌ Error'}\n\n`;
+            text += `**Status:** ${row.status === 'success' ? 'Success' : 'Error'}\n\n`;
             
             this.selectedRecordTypes.forEach(type => {
               if (row.records && row.records[type] && row.records[type].length > 0) {

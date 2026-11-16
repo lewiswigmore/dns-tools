@@ -21,9 +21,9 @@ This file is a **living document**. You (the AI agent) are expected to keep it a
 ## Project stack
 
 - **Backend:** Python / Flask (`app.py`), serves API endpoints and renders Jinja2 templates
-- **Frontend:** Vanilla JavaScript (ES modules) in `static/js/modules/`
+- **Frontend:** Alpine.js and vanilla JavaScript (ES modules) in `static/js/modules/`, with UI SDK web components
 - **Styling:** Tailwind CSS (CDN) across all templates in `templates/`
-- **Static build:** `generate_static.py` converts Flask templates to a `dist/` folder
+- **Static build:** `npm ci && npm run build` bundles the UI SDK; `generate_static.py` converts Flask templates and assets to `dist/`
 - **Deployment:** GitHub Pages via `.github/workflows/deploy.yml` (pushes `dist/` on every merge to `main`)
 
 ## Agent skills
@@ -75,6 +75,7 @@ static/js/modules/            Vanilla JS ES module frontend
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
 tests/                        Pytest security checks and Node.js regression tests
+docs/research/                Sourced research notes
 .github/workflows/deploy.yml  GitHub Actions: build + deploy to Pages
 ```
 
@@ -82,6 +83,10 @@ tests/                        Pytest security checks and Node.js regression test
 
 - Templates use `url_for()` which is remapped in `generate_static.py` for static output
 - JS modules use native ES module imports (no bundler)
+- The UI SDK is the exception: `static/js/ui-sdk.js` is bundled with esbuild into the ignored `static/js/ui-sdk.bundle.js` before running Flask or generating Pages. Keep the Pages build step in sync.
+- SDK dialogs driven by Alpine state synchronize the element's `open` property with `x-effect` and clear that state on `openchange` so Escape and outside dismissal remain in sync.
+- Shared theme colors are CSS custom properties in `templates/base.html`; use the neutral palette for surfaces and decoration, and reserve semantic colors for status and risk. Keep chart colors aligned with the palette.
+- Keep operational UI flat and restrained: separate sections with spacing and surfaces, not nested borders or framed decorative icons; distinguish the sidebar and mobile result rows with surface shading. Retain input outlines and visible keyboard focus. Reuse the loading, pagination and provider-toggle macros in `components.html`; skeletons must match the content shape without implying actual results.
 - `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on lookup/MX/DMARC pages, and load command-palette knowledge-base data only when the palette is opened
 - Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
 - MX and DMARC pages share the `commonDomainPresets()` and `initializeDomainLookup()` helpers in `utils.js` for consistent presets and URL-driven auto-lookups
@@ -101,6 +106,9 @@ tests/                        Pytest security checks and Node.js regression test
 > Add entries here when a non-obvious bug or edge case is discovered and resolved.
 > Format: `- **YYYY-MM-DD**: <symptom>: <root cause>, <fix/workaround>`
 
+- **2026-11-15**: The Content Library initially showed “no matching concepts” while its lazy import was pending, and import errors looked like empty results. Keep loading, error, and empty states distinct.
+- **2026-11-15**: Mobile's 44px label height displaced provider-toggle thumbs. Position the thumb relative to the track, not the label, and retain a visible keyboard focus indicator.
+- **2026-11-15**: The global splash displayed fabricated progress and delayed an already-loaded page. Keep loading indicators tied to actual pending content rather than timed startup animations.
 - **2026-11-13**: Bulk DNS lookup paths could issue unbounded requests and repeatedly scan accumulated domains for deduplication/original input; static knowledge-base imports also delayed page-component initialization. Keep DoH fan-out at six concurrent requests, use sets/maps for batch indexing, and import the data after page initialization or when opening the command palette.
 - **2026-11-13**: Shared startup imported the DNS client on every page and the dashboard checked DNS providers sequentially. Dynamically import the shared client only on pages that use it and run independent provider health checks concurrently.
 - **2026-11-10**: Lookup result actions overflowed phone viewports after queries. Allow flex/grid children to shrink, wrap shared result toolbars, and use compact secondary action icons with accessible text. Mobile navigation must be inert while closed and return focus to its toggle when dismissed.

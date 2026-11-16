@@ -7,51 +7,48 @@
 {% block content %}
 <div x-data="DashboardPage()" x-init="init()" class="space-y-4">
   <!-- DNS Tip Banner -->
-  <div class="bg-[#58a6ff1a] border border-[#58a6ff33] rounded-xl p-3 flex items-center gap-3 animate-fade-in">
-    <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-[#58a6ff] text-white">
-      <i class="fas fa-lightbulb"></i>
-    </div>
+  <div class="bg-[var(--accent-subtle)] rounded-xl p-3 flex items-center gap-3 animate-fade-in">
     <div class="flex-1">
-      <p class="text-[10px] font-bold text-[#58a6ff] uppercase tracking-wider mb-0.5">DNS Tip</p>
-      <p class="text-xs text-[#c9d1d9]" x-text="currentTip"></p>
+      <p class="text-[10px] font-bold text-[color:var(--accent)] uppercase tracking-wider mb-0.5">DNS Tip</p>
+      <p class="text-xs text-[color:var(--text)]" x-text="currentTip"></p>
     </div>
-    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+    <button @click="currentTip = dnsTips[Math.floor(Math.random() * dnsTips.length)]" aria-label="Show another DNS tip" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
       <i class="fas fa-sync-alt text-xs"></i>
     </button>
   </div>
 
   <!-- Quick Lookups & Knowledge -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    
+
     <!-- Quick Lookups -->
-    <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] space-y-4">
+    <div class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] space-y-4">
         <!-- DNS -->
         <div>
-            <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
-                <i class="fas fa-globe text-[#58a6ff]"></i> DNS Lookup
+            <h3 class="text-sm font-semibold text-[color:var(--text)] mb-2 flex items-center gap-2">
+                <i class="fas fa-globe text-[color:var(--accent)]"></i> DNS Lookup
             </h3>
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()" 
-                       placeholder="Enter domain (e.g. google.com)..." 
-                       class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#58a6ff] focus:ring-1 focus:ring-[#58a6ff] transition-all placeholder-[#484f58]">
-                <button @click="performQuickLookup()" :disabled="!quickLookupDomain.trim()" 
-                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
+                <input type="text" x-model="quickLookupDomain" @keyup.enter="performQuickLookup()"
+                       placeholder="Enter domain (e.g. google.com)..."
+                       class="flex-1 bg-[var(--canvas)] border border-[var(--border)] text-[color:var(--text)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)] transition-all placeholder-[color:var(--muted)]">
+                <button @click="performQuickLookup()" :disabled="!quickLookupDomain.trim()"
+                        class="bg-[var(--action)] hover:bg-[var(--action-hover)] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
                     Lookup
                 </button>
             </div>
         </div>
-        
+
         <!-- Intel -->
         <div>
-            <h3 class="text-sm font-semibold text-[#c9d1d9] mb-2 flex items-center gap-2">
-                <i class="fas fa-shield-alt text-[#f85149]"></i> Threat Intel
+            <h3 class="text-sm font-semibold text-[color:var(--text)] mb-2 flex items-center gap-2">
+                Threat Intel
             </h3>
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()" 
-                       placeholder="Enter IP, Domain, or Hash..." 
-                       class="flex-1 bg-[#0d1117] border border-[#30363d] text-[#c9d1d9] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#f85149] focus:ring-1 focus:ring-[#f85149] transition-all placeholder-[#484f58]">
-                <button @click="performIntelLookup()" :disabled="!quickIntelQuery.trim()" 
-                        class="bg-[#238636] hover:bg-[#2ea043] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
+                <input type="text" x-model="quickIntelQuery" @keyup.enter="performIntelLookup()"
+                       placeholder="Enter IP, Domain, or Hash..."
+                       class="flex-1 bg-[var(--canvas)] border border-[var(--border)] text-[color:var(--text)] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[var(--danger)] focus:ring-1 focus:ring-[var(--danger)] transition-all placeholder-[color:var(--muted)]">
+                <button @click="performIntelLookup()" :disabled="!quickIntelQuery.trim()"
+                        class="bg-[var(--action)] hover:bg-[var(--action-hover)] text-white px-4 py-2 rounded-lg text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap">
                     Analyze
                 </button>
             </div>
@@ -59,26 +56,23 @@
     </div>
 
     <!-- Featured Concept -->
-    <div class="panel p-4 rounded-xl border border-[#30363d] bg-[#161b22] flex flex-col" x-show="featuredConcept">
+    <div class="panel p-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] flex flex-col" x-show="featuredConcept">
         <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-semibold text-[#c9d1d9] flex items-center gap-2">
-                <i class="fas fa-lightbulb text-[#d29922]"></i> Featured Concept
+            <h3 class="text-sm font-semibold text-[color:var(--text)] flex items-center gap-2">
+                <i class="fas fa-lightbulb text-[color:var(--muted)]"></i> Featured Concept
             </h3>
-            <span class="text-[10px] text-[#8b949e] border border-[#30363d] rounded px-1.5 py-0.5" x-text="featuredConcept?.tags[0]"></span>
+            <span class="text-[10px] text-[color:var(--muted)]" x-text="featuredConcept?.tags[0]"></span>
         </div>
-        
+
         <div class="flex items-start gap-3 flex-1">
-            <div class="h-10 w-10 rounded-lg bg-[#0d1117] border border-[#30363d] flex items-center justify-center shrink-0">
-                <i :class="featuredConcept?.icon + ' ' + featuredConcept?.iconColor" class="text-lg"></i>
-            </div>
             <div>
-                <h4 class="text-sm font-bold text-[#c9d1d9] mb-1" x-text="featuredConcept?.title"></h4>
-                <p class="text-xs text-[#8b949e] line-clamp-2" x-text="featuredConcept?.summary"></p>
+                <h4 class="text-sm font-bold text-[color:var(--text)] mb-1" x-text="featuredConcept?.title"></h4>
+                <p class="text-xs text-[color:var(--muted)] line-clamp-2" x-text="featuredConcept?.summary"></p>
             </div>
         </div>
-        
-        <a :href="'intel.html?concept=' + featuredConcept?.id" 
-           class="mt-3 text-center w-full py-1.5 rounded border border-[#30363d] bg-[#0d1117] text-[#58a6ff] text-xs hover:bg-[#30363d] transition-colors font-medium">
+
+        <a :href="'intel.html?concept=' + featuredConcept?.id"
+           class="mt-3 self-start py-1.5 text-[color:var(--accent)] text-xs hover:underline font-medium">
             Learn More <i class="fas fa-arrow-right ml-1 text-[10px]"></i>
         </a>
     </div>
@@ -90,59 +84,47 @@
     <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+          <p class="text-[color:var(--muted)] text-xs flex items-center gap-1">
             Total Lookups Today
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Total number of DNS, MX, DMARC, and Header queries performed in the last 24 hours"></i>
           </p>
-          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.totalLookups"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-search text-[#c9d1d9] text-xs"></i>
+          <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.totalLookups"></p>
         </div>
       </div>
     </div>
-    
+
     <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+          <p class="text-[color:var(--muted)] text-xs flex items-center gap-1">
             Success Rate
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Percentage of queries that returned a successful response from the DoH provider"></i>
           </p>
-          <p class="text-xl font-bold" :class="stats.successRate >= 90 ? 'text-[#3fb950]' : stats.successRate >= 70 ? 'text-[#d29922]' : 'text-[#f85149]'" x-text="stats.successRate + '%'"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-chart-line text-[#c9d1d9] text-xs"></i>
+          <p class="text-xl font-bold" :class="stats.successRate >= 90 ? 'text-[color:var(--success)]' : stats.successRate >= 70 ? 'text-[color:var(--warning)]' : 'text-[color:var(--danger)]'" x-text="stats.successRate + '%'"></p>
         </div>
       </div>
     </div>
-    
-    <div class="panel p-4 rounded-xl cursor-pointer hover:border-[#58a6ff] transition-colors group" @click="showSessionModal = true">
+
+    <button type="button" class="panel p-4 rounded-xl text-left cursor-pointer hover:border-[var(--accent)] transition-colors group" @click="showSessionModal = true">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+          <p class="text-[color:var(--muted)] text-xs flex items-center gap-1">
             Session Time
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Time elapsed since you opened the dashboard in this browser session"></i>
           </p>
-          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.sessionTime"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center group-hover:border-[#58a6ff] transition-colors">
-          <i class="fas fa-clock text-[#c9d1d9] text-xs group-hover:text-[#58a6ff] transition-colors"></i>
+          <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.sessionTime"></p>
         </div>
       </div>
-    </div>
-    
+    </button>
+
     <div class="panel p-4 rounded-xl">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-[#8b949e] text-xs flex items-center gap-1">
+          <p class="text-[color:var(--muted)] text-xs flex items-center gap-1">
             Avg Response Time
             <i class="fas fa-info-circle text-[10px] cursor-help" title="Average time taken for the DoH provider to respond to your queries"></i>
           </p>
-          <p class="text-xl font-bold text-[#c9d1d9]" x-text="stats.avgResponseTime"></p>
-        </div>
-        <div class="w-8 h-8 rounded-md border border-[#30363d] bg-[#161b22] flex items-center justify-center">
-          <i class="fas fa-tachometer-alt text-[#c9d1d9] text-xs"></i>
+          <p class="text-xl font-bold text-[color:var(--text)]" x-text="stats.avgResponseTime"></p>
         </div>
       </div>
     </div>
@@ -152,22 +134,22 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <!-- Hourly Activity Chart -->
     <div class="panel p-4 rounded-xl">
-      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-        <i class="fas fa-chart-bar text-[#58a6ff]"></i>
+      <h3 class="text-base font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
+        <i class="fas fa-chart-bar text-[color:var(--accent)]"></i>
         Activity Last 24 Hours
-        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Visual representation of your query volume over the past 24 hours"></i>
+        <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help" title="Visual representation of your query volume over the past 24 hours"></i>
       </h3>
       <div class="h-48 w-full relative">
         <canvas id="hourlyChart" class="w-full h-full"></canvas>
       </div>
     </div>
-    
+
     <!-- Lookup Types Distribution -->
     <div class="panel p-4 rounded-xl">
-      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-        <i class="fas fa-chart-pie text-[#58a6ff]"></i>
+      <h3 class="text-base font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
+        <i class="fas fa-chart-pie text-[color:var(--accent)]"></i>
         Lookup Types
-        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Distribution of different query types performed in this session"></i>
+        <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help" title="Distribution of different query types performed in this session"></i>
       </h3>
       <div class="h-48 relative">
         <canvas id="typeChart"></canvas>
@@ -179,22 +161,22 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
     <!-- Top Searches -->
     <div class="panel p-4 rounded-xl lg:col-span-1">
-      <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-        <i class="fas fa-list-ol text-[#58a6ff]"></i>
+      <h3 class="text-base font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
+        <i class="fas fa-list-ol text-[color:var(--accent)]"></i>
         Top Searches
-        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most frequently queried items across all sessions"></i>
+        <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help" title="Your most frequently queried items across all sessions"></i>
       </h3>
       <div class="space-y-2">
         <template x-for="(item, index) in topSearches" :key="item.query">
-          <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
+          <div class="flex items-center justify-between py-2">
             <div class="flex items-center gap-2 overflow-hidden">
-              <span class="text-[10px] font-bold text-[#8b949e] w-4" x-text="(index + 1) + '.'"></span>
-              <span class="text-[#c9d1d9] text-xs truncate" x-text="item.query"></span>
+              <span class="text-[10px] font-bold text-[color:var(--muted)] w-4" x-text="(index + 1) + '.'"></span>
+              <span class="text-[color:var(--text)] text-xs truncate" x-text="item.query"></span>
             </div>
-            <span class="text-[10px] font-mono text-[#58a6ff] bg-[#58a6ff1a] px-1.5 py-0.5 rounded" x-text="item.count + 'x'"></span>
+            <span class="text-[10px] font-mono text-[color:var(--accent)] bg-[var(--accent-subtle)] px-1.5 py-0.5 rounded" x-text="item.count + 'x'"></span>
           </div>
         </template>
-        <div x-show="topSearches.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
+        <div x-show="topSearches.length === 0" class="text-center text-[color:var(--muted)] py-4 text-xs">
           No data yet
         </div>
       </div>
@@ -203,124 +185,120 @@
     <!-- Provider Health -->
     <div class="panel p-4 rounded-xl lg:col-span-2">
       <div class="flex items-center justify-between mb-3">
-        <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
-          <i class="fas fa-heartbeat text-[#f85149]"></i>
+        <h3 class="text-base font-semibold text-[color:var(--text)] flex items-center gap-2">
+          <i class="fas fa-heartbeat text-[color:var(--muted)]"></i>
           Provider Health
           <div class="relative group">
-            <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help"></i>
-            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-[#161b22] border border-[#30363d] rounded-lg text-[10px] text-[#8b949e] hidden group-hover:block z-10 shadow-xl">
+            <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help"></i>
+            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-[10px] text-[color:var(--muted)] hidden group-hover:block z-10">
               Checks connectivity to DoH providers. "Blocked" usually means your browser, extension (e.g. uBlock), or network is preventing access to 3rd party DNS APIs.
             </div>
           </div>
         </h3>
-        <button @click="checkProviderHealth()" class="text-[#8b949e] hover:text-[#58a6ff] transition-colors" title="Refresh Health Status">
+        <button @click="checkProviderHealth()" aria-label="Refresh provider health" class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-colors" title="Refresh Health Status">
           <i class="fas fa-sync-alt text-xs" :class="{'fa-spin': providerStatus.some(p => p.status === 'checking')}"></i>
         </button>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <template x-for="provider in providerStatus" :key="provider.name">
-          <div class="p-3 rounded-lg border border-[#30363d] bg-[#0d1117] flex flex-col gap-2 relative group">
+          <div class="p-3 rounded-lg bg-[var(--canvas)] flex flex-col gap-2 relative group">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <i class="text-xs" :class="provider.name.includes('Google') ? 'fab fa-google text-[#c9d1d9]' : (provider.name.includes('Cloudflare') ? 'fas fa-cloud text-[#f38020]' : 'fas fa-server text-[#8b949e]')"></i>
-                <span class="text-xs font-medium text-[#c9d1d9]" x-text="provider.name"></span>
+                <span class="text-xs font-medium text-[color:var(--text)]" x-text="provider.name"></span>
               </div>
-              <span class="w-2 h-2 rounded-full bg-[#8b949e]" 
+              <span class="w-2 h-2 rounded-full bg-[var(--muted)]"
                     :class="{
-                      'bg-[#3fb950] shadow-[0_0_8px_#3fb950]': provider.status === 'online',
-                      'bg-[#f85149] shadow-[0_0_8px_#f85149]': provider.status === 'offline' || provider.status === 'error',
-                      'bg-[#8b949e] animate-pulse': provider.status === 'checking'
+                      'bg-[var(--success)]': provider.status === 'online',
+                      'bg-[var(--danger)]': provider.status === 'offline' || provider.status === 'error',
+                      'bg-[var(--muted)] animate-pulse': provider.status === 'checking'
                     }"></span>
             </div>
             <div class="flex items-end justify-between">
-              <span class="text-[10px] text-[#8b949e]" x-text="provider.status === 'online' ? 'Latency' : 'Status'"></span>
-              <span class="text-xs font-mono" 
-                    :class="provider.status === 'online' ? 'text-[#3fb950]' : 'text-[#f85149]'"
+              <span class="text-[10px] text-[color:var(--muted)]" x-text="provider.status === 'online' ? 'Latency' : 'Status'"></span>
+              <span class="text-xs font-mono"
+                    :class="provider.status === 'online' ? 'text-[color:var(--success)]' : 'text-[color:var(--danger)]'"
                     x-text="provider.status === 'online' ? provider.latency + 'ms' : (provider.message || provider.status)"></span>
             </div>
             <!-- Status Tooltip -->
-            <div x-show="provider.status !== 'online' && provider.status !== 'checking'" 
-                 class="absolute top-full left-0 right-0 mt-1 p-2 bg-[#21262d] border border-[#30363d] rounded text-[10px] text-[#c9d1d9] z-20 hidden group-hover:block shadow-lg">
+            <div x-show="provider.status !== 'online' && provider.status !== 'checking'"
+                 class="absolute top-full left-0 right-0 mt-1 p-2 bg-[var(--surface-raised)] border border-[var(--border)] rounded text-[10px] text-[color:var(--text)] z-20 hidden group-hover:block">
               <p x-text="provider.message"></p>
-              <p class="text-[#8b949e] mt-1">Check browser console for CSP/CORS errors.</p>
+              <p class="text-[color:var(--muted)] mt-1">Check browser console for CSP/CORS errors.</p>
             </div>
           </div>
         </template>
-        
+
         <!-- Configure Card -->
-        <button @click="$store.settings.toggle()" class="p-3 rounded-lg border border-dashed border-[#30363d] bg-[#0d1117]/50 hover:bg-[#161b22] hover:border-[#58a6ff] transition-all group flex flex-col items-center justify-center gap-2 h-full min-h-[80px]">
-            <div class="w-8 h-8 rounded-full bg-[#30363d] group-hover:bg-[#58a6ff] flex items-center justify-center transition-colors">
-                <i class="fas fa-cog text-[#8b949e] group-hover:text-white transition-colors"></i>
-            </div>
-            <span class="text-xs font-medium text-[#8b949e] group-hover:text-[#c9d1d9]">Configure Providers</span>
-        </button>
+        <ui-dialog-trigger for="settings-dialog"><button class="p-3 rounded-lg bg-[var(--canvas)] hover:bg-[var(--surface-raised)] transition-colors group flex flex-col items-center justify-center gap-2 h-full min-h-[80px]">
+            <span class="text-xs font-medium text-[color:var(--muted)] group-hover:text-[color:var(--text)]">Configure Providers</span>
+        </button></ui-dialog-trigger>
       </div>
     </div>
   </div>
 
   <!-- Quick Actions -->
   <div class="panel p-4 rounded-xl">
-    <h3 class="text-base font-semibold text-[#c9d1d9] mb-3 flex items-center gap-2">
-      <i class="fas fa-tools text-[#58a6ff]"></i>
+    <h3 class="text-base font-semibold text-[color:var(--text)] mb-3 flex items-center gap-2">
+      <i class="fas fa-tools text-[color:var(--accent)]"></i>
       Quick Actions
     </h3>
     <div class="flex flex-wrap gap-3">
-      <button @click="if(confirm('Clear all search history?')) { localStorage.removeItem('dns_history'); refreshStats(); }" 
-              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#f85149] hover:bg-[#f851491a] transition-colors text-xs font-medium">
+      <button @click="if(confirm('Clear all search history?')) { localStorage.removeItem('dns_history'); refreshStats(); }"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)] text-[color:var(--danger)] hover:bg-[var(--danger-subtle)] transition-colors text-xs font-medium">
         <i class="fas fa-trash-alt"></i>
         Clear History
       </button>
       <button @click="const blob = new Blob([localStorage.getItem('dns_history')], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'dnstools_history.json'; a.click();"
-              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#58a6ff] hover:bg-[#58a6ff1a] transition-colors text-xs font-medium">
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)] text-[color:var(--accent)] hover:bg-[var(--accent-subtle)] transition-colors text-xs font-medium">
         <i class="fas fa-download"></i>
         Export Data
       </button>
-      <button onclick="toggleInfoModal()"
-              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#30363d] bg-[#0d1117] text-[#c9d1d9] hover:bg-[#30363d] transition-colors text-xs font-medium">
+      <ui-dialog-trigger for="infoModal"><button
+              class="flex items-center gap-2 px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--canvas)] text-[color:var(--text)] hover:bg-[var(--border)] transition-colors text-xs font-medium">
         <i class="fas fa-info-circle"></i>
         About <span class="logo-font">DNSTools</span>
-      </button>
+      </button></ui-dialog-trigger>
     </div>
   </div>
 
   <!-- Recent Activity -->
   <div class="panel p-4 rounded-xl">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
-        <i class="fas fa-history text-[#58a6ff]"></i>
+      <h3 class="text-base font-semibold text-[color:var(--text)] flex items-center gap-2">
+        <i class="fas fa-history text-[color:var(--accent)]"></i>
         Recent Activity
-        <i class="fas fa-info-circle text-[10px] text-[#8b949e] cursor-help" title="Your most recent queries from this session. Click the redo icon to run them again."></i>
+        <i class="fas fa-info-circle text-[10px] text-[color:var(--muted)] cursor-help" title="Your most recent queries from this session. Click the redo icon to run them again."></i>
       </h3>
-      <a href="{{ url_for('history_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs font-medium">
+      <a href="{{ url_for('history_page') }}" class="text-[color:var(--accent)] hover:text-white text-xs font-medium">
         <i class="fas fa-external-link-alt mr-1"></i>View Full History
       </a>
     </div>
     <div class="space-y-2">
       <template x-for="activity in recentActivity" :key="activity.timestamp">
-        <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
+        <div class="flex items-center justify-between py-2">
           <div class="flex items-center space-x-3">
             <div class="flex-1">
-              <p class="text-[#c9d1d9] font-medium text-sm" x-text="activity.query"></p>
-              <p class="text-[#8b949e] text-[10px]" x-text="activity.timeAgo"></p>
+              <p class="text-[color:var(--text)] font-medium text-sm" x-text="activity.query"></p>
+              <p class="text-[color:var(--muted)] text-[10px]" x-text="activity.timeAgo"></p>
             </div>
           </div>
           <div class="flex items-center space-x-2">
             <span class="pill pill-outline text-[10px]"
                  :class="{
                    'pill-green': activity.type === 'DNS',
-                   'pill-blue': activity.type === 'MX', 
+                   'pill-blue': activity.type === 'MX',
                    'pill-orange': activity.type === 'DMARC',
                    'pill-purple': activity.type === 'Headers',
                    'pill-orange': activity.type === 'WHOIS',
                    'pill-blue': activity.type === 'WHOIS-IP'
                  }" x-text="activity.type"></span>
-            <button @click="rerunQuery(activity)" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs">
+            <button @click="rerunQuery(activity)" class="text-[color:var(--accent)] hover:text-white text-xs">
               <i class="fas fa-redo"></i>
             </button>
           </div>
         </div>
       </template>
-      <div x-show="recentActivity.length === 0" class="text-center text-[#8b949e] py-6">
+      <div x-show="recentActivity.length === 0" class="text-center text-[color:var(--muted)] py-6">
         <i class="fas fa-chart-line text-2xl mb-2"></i>
         <p class="text-xs">No activity yet. Start by running some DNS lookups!</p>
       </div>
@@ -330,96 +308,88 @@
   <!-- Recent WHOIS/IP Activity -->
   <div class="panel p-4 rounded-xl">
     <div class="flex items-center justify-between mb-3">
-      <h3 class="text-base font-semibold text-[#c9d1d9] flex items-center gap-2">
-        <i class="fas fa-id-card text-[#bc8cff]"></i>
+      <h3 class="text-base font-semibold text-[color:var(--text)] flex items-center gap-2">
+        <i class="fas fa-id-card text-[color:var(--muted)]"></i>
         Recent WHOIS / IP RDAP
       </h3>
-      <a href="{{ url_for('whois_page') }}" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs font-medium">
+      <a href="{{ url_for('whois_page') }}" class="text-[color:var(--accent)] hover:text-white text-xs font-medium">
         Open WHOIS
       </a>
     </div>
     <div class="space-y-2">
       <template x-for="entry in recentWhoisActivity" :key="entry.timestamp">
-        <div class="flex items-center justify-between p-2 rounded-lg border border-[#30363d] bg-[#0d1117]">
+        <div class="flex items-center justify-between py-2">
           <div class="min-w-0">
-            <p class="text-[#c9d1d9] text-xs truncate" x-text="entry.query"></p>
-            <p class="text-[#8b949e] text-[10px]" x-text="entry.timeAgo"></p>
+            <p class="text-[color:var(--text)] text-xs truncate" x-text="entry.query"></p>
+            <p class="text-[color:var(--muted)] text-[10px]" x-text="entry.timeAgo"></p>
           </div>
           <div class="flex items-center gap-2">
             <span class="pill pill-outline text-[10px]"
                   :class="entry.type === 'WHOIS-IP' ? 'pill-blue' : 'pill-orange'"
                   x-text="entry.type"></span>
-            <button @click="rerunQuery(entry)" class="text-[#58a6ff] hover:text-[#79c0ff] text-xs">
+            <button @click="rerunQuery(entry)" class="text-[color:var(--accent)] hover:text-white text-xs">
               <i class="fas fa-redo"></i>
             </button>
           </div>
         </div>
       </template>
-      <div x-show="recentWhoisActivity.length === 0" class="text-center text-[#8b949e] py-4 text-xs">
+      <div x-show="recentWhoisActivity.length === 0" class="text-center text-[color:var(--muted)] py-4 text-xs">
         No WHOIS/IP lookups yet.
       </div>
     </div>
   </div>
 
   <!-- Session Info Modal -->
-  <div x-show="showSessionModal" 
-       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#010409]/80 backdrop-blur-sm"
-       x-transition:enter="transition ease-out duration-200"
-       x-transition:enter-start="opacity-0 scale-95"
-       x-transition:enter-end="opacity-100 scale-100"
-       x-transition:leave="transition ease-in duration-100"
-       x-transition:leave-start="opacity-100 scale-100"
-       x-transition:leave-end="opacity-0 scale-95"
-       @keydown.escape.window="showSessionModal = false"
-       style="display: none;">
-    <div class="bg-[#161b22] border border-[#30363d] rounded-xl shadow-2xl max-w-md w-full overflow-hidden" @click.away="showSessionModal = false">
-      <div class="p-4 border-b border-[#30363d] flex items-center justify-between bg-[#0d1117]">
-        <h3 class="text-sm font-bold text-[#c9d1d9] flex items-center gap-2">
-          <i class="fas fa-clock text-[#58a6ff]"></i> Session Information
-        </h3>
-        <button @click="showSessionModal = false" class="text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+  <ui-dialog x-effect="$el.open = showSessionModal" @openchange="if (!$event.detail.value) showSessionModal = false">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
+    <ui-dialog-content class="bg-[var(--surface)] border border-[var(--border)] rounded-xl max-w-md overflow-hidden">
+      <div class="p-4 border-b border-[var(--border)] flex items-center justify-between bg-[var(--canvas)]">
+        <ui-dialog-title class="text-sm font-bold text-[color:var(--text)] flex items-center gap-2">
+          <i class="fas fa-clock text-[color:var(--accent)]"></i> Session Information
+        </ui-dialog-title>
+        <button @click="showSessionModal = false" aria-label="Close session information" class="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="p-6 space-y-4">
         <div class="space-y-2">
-          <h4 class="text-xs font-bold text-[#8b949e] uppercase tracking-wider">What is a Session?</h4>
-          <p class="text-sm text-[#c9d1d9] leading-relaxed">
+          <h4 class="text-xs font-bold text-[color:var(--muted)] uppercase tracking-wider">What is a Session?</h4>
+          <p class="text-sm text-[color:var(--text)] leading-relaxed">
             A session represents your current active period using <span class="logo-font">DNSTools</span>. It starts when you first open the dashboard and persists as long as you remain active.
           </p>
         </div>
-        
+
         <div class="space-y-2">
-          <h4 class="text-xs font-bold text-[#8b949e] uppercase tracking-wider">What is it used for?</h4>
+          <h4 class="text-xs font-bold text-[color:var(--muted)] uppercase tracking-wider">What is it used for?</h4>
           <ul class="space-y-2">
-            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
-              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+            <li class="flex items-start gap-2 text-sm text-[color:var(--text)]">
+              <i class="fas fa-check-circle text-[color:var(--success)] mt-1 text-xs"></i>
               <span>Tracks your query volume and success rates for the current day.</span>
             </li>
-            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
-              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+            <li class="flex items-start gap-2 text-sm text-[color:var(--text)]">
+              <i class="fas fa-check-circle text-[color:var(--success)] mt-1 text-xs"></i>
               <span>Calculates average response times from DNS providers.</span>
             </li>
-            <li class="flex items-start gap-2 text-sm text-[#c9d1d9]">
-              <i class="fas fa-check-circle text-[#3fb950] mt-1 text-xs"></i>
+            <li class="flex items-start gap-2 text-sm text-[color:var(--text)]">
+              <i class="fas fa-check-circle text-[color:var(--success)] mt-1 text-xs"></i>
               <span>Persists indefinitely until you clear your browser data.</span>
             </li>
           </ul>
         </div>
 
-        <div class="p-3 rounded-lg bg-[#58a6ff1a] border border-[#58a6ff33]">
-          <p class="text-[10px] text-[#58a6ff] font-medium">
+        <div class="p-3 rounded-lg bg-[var(--accent-subtle)] border border-[var(--accent-border)]">
+          <p class="text-[10px] text-[color:var(--accent)] font-medium">
             <i class="fas fa-shield-alt mr-1"></i> Your session data is stored locally in your browser and is never sent to our servers.
           </p>
         </div>
       </div>
-      <div class="p-4 bg-[#0d1117] border-t border-[#30363d] flex justify-end">
-        <button @click="showSessionModal = false" class="px-4 py-2 bg-[#30363d] hover:bg-[#3fb950] text-white rounded-lg text-xs font-medium transition-colors">
+      <div class="p-4 bg-[var(--canvas)] border-t border-[var(--border)] flex justify-end">
+        <button @click="showSessionModal = false" class="px-4 py-2 bg-[var(--border)] hover:bg-[var(--success)] text-white rounded-lg text-xs font-medium transition-colors">
           Got it
         </button>
       </div>
-    </div>
-  </div>
+    </ui-dialog-content>
+  </ui-dialog>
 </div>
 {% endblock %}
 {% block scripts %}

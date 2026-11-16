@@ -84,7 +84,11 @@ logs/
 # Results
 results/
 *.json
+!package.json
+!package-lock.json
 *.csv
+node_modules/
+static/js/ui-sdk.bundle.js
 
 # Temporary files
 temp/

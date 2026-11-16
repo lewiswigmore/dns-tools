@@ -4,156 +4,154 @@
 {% block title %}Search History - DNSTools{% endblock %}
 {% block content %}
 <div x-data="HistoryPage()" class="space-y-4">
-  
+
   <div class="flex items-center justify-between">
     <div>
-      <h2 class="text-lg font-semibold text-[#c9d1d9]">Search History</h2>
-      <p class="text-xs text-[#8b949e]">Review previous lookup queries with detailed analytics</p>
+      <h2 class="text-lg font-semibold text-[color:var(--text)]">Search History</h2>
     </div>
   </div>
 
   <div class="panel p-4 rounded-xl space-y-4">
-    
+
     <!-- Filter and Stats Bar -->
-    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between border-b border-[#30363d] pb-4">
+    <div x-show="history.length > 0" class="flex flex-col lg:flex-row gap-3 items-start lg:items-center justify-between pb-4">
       <!-- Search Filter -->
       <div class="w-full flex-1 max-w-md">
         <div class="relative">
-          <input type="text" 
+          <input type="text"
                  x-model="searchFilter" aria-label="Filter search history"
                  @input="applyFilters"
                  placeholder="Filter by domain, type, or status..."
-                 class="w-full px-3 py-1.5 pl-9 bg-[#0d1117] border border-[#30363d] rounded-lg text-[#c9d1d9] placeholder-[#8b949e] focus:border-[#58a6ff] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] text-xs">
-          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] text-xs"></i>
-          <button x-show="searchFilter.length > 0" 
-                  @click="searchFilter = ''; applyFilters()" 
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#8b949e] hover:text-[#c9d1d9]">
+                 class="w-full px-3 py-1.5 pl-9 bg-[var(--canvas)] border border-[var(--border)] rounded-lg text-[color:var(--text)] placeholder-[color:var(--muted)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] text-xs">
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[color:var(--muted)] text-xs"></i>
+          <button x-show="searchFilter.length > 0"
+                  @click="searchFilter = ''; applyFilters()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-[color:var(--muted)] hover:text-[color:var(--text)]">
             <i class="fas fa-times text-xs"></i>
           </button>
         </div>
       </div>
-      
+
       <!-- Type Filter Pills -->
-      <div class="flex bg-[#161b22] rounded-lg p-1 border border-[#30363d] overflow-x-auto no-scrollbar w-full lg:w-auto">
+      <div class="flex bg-[var(--surface)] rounded-lg p-1 border border-[var(--border)] overflow-x-auto no-scrollbar w-full lg:w-auto">
         <div class="flex min-w-max gap-1">
-          <button @click="toggleTypeFilter('all')" 
-                  :class="typeFilter === 'all' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+          <button @click="toggleTypeFilter('all')"
+                  :class="typeFilter === 'all' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             All (<span x-text="history.length"></span>)
           </button>
-          <button @click="toggleTypeFilter('DNS')" 
-                  :class="typeFilter === 'DNS' ? 'bg-[#238636] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+          <button @click="toggleTypeFilter('DNS')"
+                  :class="typeFilter === 'DNS' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             DNS (<span x-text="getTypeCount('DNS')"></span>)
           </button>
-          <button @click="toggleTypeFilter('MX')" 
-                  :class="typeFilter === 'MX' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+          <button @click="toggleTypeFilter('MX')"
+                  :class="typeFilter === 'MX' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             MX (<span x-text="getTypeCount('MX')"></span>)
           </button>
-          <button @click="toggleTypeFilter('DMARC')" 
-                  :class="typeFilter === 'DMARC' ? 'bg-[#a855f7] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+          <button @click="toggleTypeFilter('DMARC')"
+                  :class="typeFilter === 'DMARC' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             DMARC (<span x-text="getTypeCount('DMARC')"></span>)
           </button>
-          <button @click="toggleTypeFilter('Headers')" 
-                  :class="typeFilter === 'Headers' ? 'bg-[#e3b341] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+          <button @click="toggleTypeFilter('Headers')"
+                  :class="typeFilter === 'Headers' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             Headers (<span x-text="getTypeCount('Headers')"></span>)
           </button>
           <button @click="toggleTypeFilter('WHOIS')"
-                  :class="typeFilter === 'WHOIS' ? 'bg-[#d29922] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  :class="typeFilter === 'WHOIS' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS (<span x-text="getTypeCount('WHOIS')"></span>)
           </button>
           <button @click="toggleTypeFilter('WHOIS-IP')"
-                  :class="typeFilter === 'WHOIS-IP' ? 'bg-[#1f6feb] text-white' : 'text-[#8b949e] hover:text-[#c9d1d9]'"
+                  :class="typeFilter === 'WHOIS-IP' ? 'bg-[var(--action)] text-white' : 'text-[color:var(--muted)] hover:text-[color:var(--text)]'"
                   class="px-3 py-1 rounded text-[10px] font-medium transition-colors">
             WHOIS IP (<span x-text="getTypeCount('WHOIS-IP')"></span>)
           </button>
         </div>
       </div>
-      
+
       <!-- Clear All Button -->
-      <button @click="clearAll" class="w-full lg:w-auto px-3 py-1.5 rounded-lg border border-[#f85149] text-[#f85149] hover:bg-[#f851491a] transition-colors text-[10px] font-medium">
+      <button @click="clearAll" class="w-full lg:w-auto px-3 py-1.5 rounded-lg border border-[var(--danger)] text-[color:var(--danger)] hover:bg-[var(--danger-subtle)] transition-colors text-[10px] font-medium">
         <i class="fas fa-trash mr-2"></i>Clear All
       </button>
     </div>
-    
+
     <!-- Results Summary -->
-    <div x-show="history.length > 0" class="text-xs text-[#8b949e]">
-      Showing <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
-      <span x-show="searchFilter.length > 0">matching "<span x-text="searchFilter" class="text-[#c9d1d9]"></span>"</span>
+    <div x-show="history.length > 0" class="text-xs text-[color:var(--muted)]">
+      <span x-text="filteredHistory.length"></span> of <span x-text="history.length"></span> entries
+      <span x-show="searchFilter.length > 0">matching "<span x-text="searchFilter" class="text-[color:var(--text)]"></span>"</span>
     </div>
-    
+
     <!-- Empty State -->
     <div x-cloak x-show="history.length===0" class="text-center py-8">
-      <i class="fas fa-history text-4xl text-[#30363d] mb-3"></i>
-      <p class="text-xs text-[#8b949e] mb-3">No history yet. Perform a lookup to populate this list.</p>
+      <i class="fas fa-history text-4xl text-[color:var(--border)] mb-3"></i>
+      <p class="text-xs text-[color:var(--muted)] mb-3">No history yet. Perform a lookup to populate this list.</p>
       <a href="{{ url_for('lookup_page') }}" class="pill pill-outline pill-blue text-xs"><i class="fas fa-search mr-2"></i>Start Lookup</a>
     </div>
-    
+
     <!-- No Filtered Results -->
     <div x-cloak x-show="history.length > 0 && filteredHistory.length === 0" class="text-center py-6">
-      <i class="fas fa-filter text-3xl text-[#30363d] mb-3"></i>
-      <p class="text-xs text-[#8b949e] mb-3">No entries match your current filter.</p>
+      <i class="fas fa-filter text-3xl text-[color:var(--border)] mb-3"></i>
+      <p class="text-xs text-[color:var(--muted)] mb-3">No entries match your current filter.</p>
       <button @click="clearFilters" class="pill pill-outline pill-blue text-xs">
         <i class="fas fa-times mr-2"></i>Clear Filters
       </button>
     </div>
-    
+
     <!-- History Items -->
     <div x-cloak x-show="filteredHistory.length > 0" class="space-y-3">
-      <template x-for="(item,i) in filteredHistory" :key="i">
-        <div @click="showPreview(item)" 
-             class="panel p-3 rounded-lg border border-[#30363d] hover:border-[#58a6ff] transition-colors cursor-pointer">
+      <template x-for="(item,i) in paginatedHistory" :key="i">
+        <div class="p-3 rounded-lg bg-[var(--canvas)]">
           <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3">
             <!-- Main Info -->
             <div class="flex-1">
               <div class="flex items-center gap-3 mb-2">
-                <h4 class="font-semibold text-[#c9d1d9] text-base" x-text="getDisplayTitle(item)"></h4>
+                <h4 class="font-semibold text-[color:var(--text)] text-base"><button @click="showPreview(item)" class="text-left hover:underline" x-text="getDisplayTitle(item)"></button></h4>
                 <span :class="getTypePillClass(item)" x-text="getQueryType(item.recordTypes)" class="text-[10px] font-medium"></span>
               </div>
-              
+
               <!-- Enhanced Metadata -->
-              <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-[10px] text-[#8b949e]">
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-[10px] text-[color:var(--muted)]">
                 <div class="flex items-center">
-                  <i class="fas fa-globe w-3 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-globe w-3 mr-2 text-[color:var(--accent)]"></i>
                   <span><span x-text="item.domains"></span> domain<span x-show="item.domains !== 1">s</span></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-clock w-3 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-clock w-3 mr-2 text-[color:var(--accent)]"></i>
                   <span x-text="formatDuration(item.duration)"></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-calendar w-3 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-calendar w-3 mr-2 text-[color:var(--accent)]"></i>
                   <span x-text="formatDate(item.timestamp)"></span>
                 </div>
                 <div class="flex items-center">
-                  <i class="fas fa-stopwatch w-3 mr-2 text-[#58a6ff]"></i>
+                  <i class="fas fa-stopwatch w-3 mr-2 text-[color:var(--accent)]"></i>
                   <span x-text="getTimeAgo(item.timestamp)"></span>
                 </div>
               </div>
-              
+
               <!-- Record Types Detail -->
               <div x-show="item.recordTypes && item.recordTypes.length > 0" class="mt-2">
                 <div class="flex items-center gap-2 text-[10px]">
-                  <i class="fas fa-list w-3 text-[#8b949e]"></i>
-                  <span class="text-[#8b949e]">Record Types:</span>
+                  <i class="fas fa-list w-3 text-[color:var(--muted)]"></i>
+                  <span class="text-[color:var(--muted)]">Record Types:</span>
                   <div class="flex flex-wrap gap-1">
                     <template x-for="(type, typeIndex) in item.recordTypes" :key="'type-' + i + '-' + typeIndex">
-                      <span class="px-1.5 py-0.5 bg-[#0d1117] border border-[#30363d] rounded text-[#c9d1d9]" x-text="type"></span>
+                      <span class="px-1.5 py-0.5 bg-[var(--canvas)] border border-[var(--border)] rounded text-[color:var(--text)]" x-text="type"></span>
                     </template>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <!-- Status and Actions -->
             <div class="flex items-center gap-3">
               <div class="flex flex-col items-end gap-2">
                 <div class="flex items-center gap-2">
-                  <button @click.stop="rerun(item)" 
+                  <button @click.stop="rerun(item)"
                           class="pill pill-outline pill-blue text-[10px] flex items-center"
                           title="Rerun this query">
                     <i class="fas fa-redo mr-1"></i>Rerun
@@ -164,60 +162,60 @@
           </div>
         </div>
       </template>
+      <div x-show="totalPages > 1" class="flex justify-end pt-3">
+        {{ ui.pagination('goToPage(1)', 'goToPage(currentPage - 1)', 'goToPage(currentPage + 1)', 'goToPage(totalPages)') }}
+      </div>
     </div>
   </div>
-  
+
   <!-- Preview Modal -->
-  <div x-show="previewModal" 
-       x-cloak
-       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-0 sm:p-4 z-50"
-       @click="closePreview">
-    <div @click.stop 
-         class="bg-[#161b22] border-0 sm:border border-[#30363d] rounded-none sm:rounded-xl max-w-4xl w-full h-full sm:h-auto sm:max-h-[80vh] overflow-hidden flex flex-col">
-      
+  <ui-dialog x-effect="$el.open = previewModal" @openchange="if (!$event.detail.value && previewModal) closePreview()">
+    <ui-dialog-backdrop></ui-dialog-backdrop>
+    <ui-dialog-content class="large-dialog bg-[var(--surface)] border-0 sm:border border-[var(--border)] rounded-none sm:rounded-xl max-w-4xl sm:max-h-[80vh] overflow-hidden flex flex-col">
+
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-4 border-b border-[#30363d] shrink-0">
+      <div class="flex items-center justify-between p-4 border-b border-[var(--border)] shrink-0">
         <div class="flex items-center gap-3">
-          <h3 class="text-base sm:text-lg font-semibold text-[#c9d1d9]">Query Results</h3>
-          <span x-show="previewData" 
-                :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'" 
-                x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'" 
+          <ui-dialog-title class="text-base sm:text-lg font-semibold text-[color:var(--text)]">Query Results</ui-dialog-title>
+          <span x-show="previewData"
+                :class="previewData ? getTypePillClass(previewData) : 'pill pill-outline pill-blue'"
+                x-text="previewData ? getQueryType(previewData.recordTypes) : 'Loading...'"
                 class="text-[10px] font-medium"></span>
         </div>
-        <button @click="closePreview" 
-                class="text-[#8b949e] hover:text-[#c9d1d9] text-lg p-1">
+        <button @click="closePreview" aria-label="Close query results"
+                class="text-[color:var(--muted)] hover:text-[color:var(--text)] text-lg p-1">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
+
       <!-- Modal Content -->
       <div class="p-4 overflow-y-auto flex-1 concept-modal-content">
         <div class="space-y-4">
           <!-- Query Info -->
-          <div class="flex flex-wrap gap-x-4 gap-y-2 text-[10px] sm:text-xs text-[#8b949e] mb-4">
+          <div class="flex flex-wrap gap-x-4 gap-y-2 text-[10px] sm:text-xs text-[color:var(--muted)] mb-4">
             <span class="flex items-center"><i class="fas fa-search mr-2 w-3"></i><span x-text="previewData ? getDisplayTitle(previewData) : ''"></span></span>
             <span class="flex items-center"><i class="fas fa-calendar mr-2 w-3"></i><span x-text="formatDate(previewData?.timestamp)"></span></span>
             <span class="flex items-center"><i class="fas fa-clock mr-2 w-3"></i><span x-text="formatDuration(previewData?.duration)"></span></span>
           </div>
-          
+
           <!-- DNS Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'DNS' && previewData?.results && Array.isArray(previewData.results)" class="space-y-4">
             <template x-for="(result, resultIndex) in (previewData?.results || [])" :key="'dns-result-' + resultIndex">
-              <div class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
-                <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm" x-text="result.domain"></h4>
+              <div class="panel p-3 sm:p-4 rounded-lg border border-[var(--border)]">
+                <h4 class="font-semibold text-[color:var(--text)] mb-3 text-sm" x-text="result.domain"></h4>
                 <div class="space-y-3">
                   <template x-for="(records, recordType) in result.records" :key="'dns-' + resultIndex + '-' + recordType">
                     <div x-show="records && records.length > 0">
-                      <h5 class="text-xs font-medium text-[#58a6ff] mb-2" x-text="recordType + ' Records'"></h5>
+                      <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2" x-text="recordType + ' Records'"></h5>
                       <div class="space-y-1">
                         <template x-for="(record, recordIndex) in records" :key="'dns-record-' + resultIndex + '-' + recordType + '-' + recordIndex">
-                          <div class="flex items-center justify-between bg-[#0d1117] p-2 rounded border border-[#30363d] group">
-                            <div class="text-[11px] font-mono text-[#c9d1d9] truncate max-w-[200px] sm:max-w-[400px]" 
+                          <div class="flex items-center justify-between bg-[var(--canvas)] p-2 rounded group">
+                            <div class="text-[11px] font-mono text-[color:var(--text)] truncate max-w-[200px] sm:max-w-[400px]"
                                  x-text="typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record"></div>
-                            <button x-data="{ copied: false }" 
-                                    @click="copyToClipboard(typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
-                                    class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
-                                    :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
+                            <button x-data="{ copied: false }"
+                                    @click="copyToClipboard(typeof record === 'object' ? (record.data || record.value || record.target || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)"
+                                    class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-all duration-200 ml-2"
+                                    :class="copied ? 'text-[color:var(--success)]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
                                     :title="copied ? 'Copied!' : 'Copy value'">
                               <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                             </button>
@@ -230,100 +228,100 @@
               </div>
             </template>
           </div>
-          
+
           <!-- MX Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'MX' && previewData?.results && Array.isArray(previewData.results)" class="space-y-2">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">MX Records</h4>
+            <h4 class="font-semibold text-[color:var(--text)] mb-3 text-sm">MX Records</h4>
             <template x-for="(record, mxIndex) in (previewData?.results || [])" :key="'mx-record-' + mxIndex">
-              <div class="flex items-center justify-between bg-[#0d1117] p-3 rounded border border-[#30363d] group">
-                <div class="text-[11px] font-mono text-[#c9d1d9]" 
+              <div class="flex items-center justify-between bg-[var(--canvas)] p-3 rounded group">
+                <div class="text-[11px] font-mono text-[color:var(--text)]"
                      x-text="typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record"></div>
-                <button x-data="{ copied: false }" 
-                        @click="copyToClipboard(typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)" 
-                        class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
-                        :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
+                <button x-data="{ copied: false }"
+                        @click="copyToClipboard(typeof record === 'object' ? (record.exchange || record.priority + ' ' + record.exchange || JSON.stringify(record)) : record); copied = true; setTimeout(() => copied = false, 1000)"
+                        class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-all duration-200 ml-2"
+                        :class="copied ? 'text-[color:var(--success)]! opacity-100' : 'opacity-0 sm:group-hover:opacity-100'"
                         :title="copied ? 'Copied!' : 'Copy value'">
                   <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                 </button>
               </div>
             </template>
           </div>
-          
+
           <!-- DMARC Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'DMARC'">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">DMARC Policy</h4>
-            
+            <h4 class="font-semibold text-[color:var(--text)] mb-3 text-sm">DMARC Policy</h4>
+
             <div class="space-y-3">
               <!-- Raw DMARC Record -->
               <div>
-                <h5 class="text-xs font-medium text-[#58a6ff] mb-2">Raw DMARC Record</h5>
-                <div class="text-[11px] font-mono bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] break-all">
+                <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2">Raw DMARC Record</h5>
+                <div class="text-[11px] font-mono bg-[var(--canvas)] p-3 rounded text-[color:var(--text)] break-all">
                   <span x-text="previewData?.results?.result?.raw || 'No DMARC record found'"></span>
                 </div>
               </div>
-              
+
               <!-- Parsed Policy Details -->
               <div x-show="previewData?.results?.result?.policy">
-                <h5 class="text-xs font-medium text-[#58a6ff] mb-2">Policy Details</h5>
-                <div class="text-[11px] bg-[#0d1117] p-3 rounded border border-[#30363d] text-[#c9d1d9] space-y-1">
+                <h5 class="text-xs font-medium text-[color:var(--accent)] mb-2">Policy Details</h5>
+                <div class="text-[11px] bg-[var(--canvas)] p-3 rounded text-[color:var(--text)] space-y-1">
                   <div class="flex justify-between">
-                    <span class="text-[#8b949e]">Policy:</span>
+                    <span class="text-[color:var(--muted)]">Policy:</span>
                     <span class="font-mono" x-text="previewData?.results?.result?.policy"></span>
                   </div>
                   <div x-show="previewData?.results?.result?.adkim" class="flex justify-between">
-                    <span class="text-[#8b949e]">DKIM Alignment:</span>
+                    <span class="text-[color:var(--muted)]">DKIM Alignment:</span>
                     <span class="font-mono" x-text="previewData?.results?.result?.adkim"></span>
                   </div>
                   <div x-show="previewData?.results?.result?.aspf" class="flex justify-between">
-                    <span class="text-[#8b949e]">SPF Alignment:</span>
+                    <span class="text-[color:var(--muted)]">SPF Alignment:</span>
                     <span class="font-mono" x-text="previewData?.results?.result?.aspf"></span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <!-- Headers Results -->
           <div x-show="getQueryType(previewData?.recordTypes) === 'Headers'" class="space-y-4">
-            <h4 class="font-semibold text-[#c9d1d9] mb-3 text-sm">Email Header Analysis</h4>
-            
+            <h4 class="font-semibold text-[color:var(--text)] mb-3 text-sm">Email Header Analysis</h4>
+
             <!-- Authentication Status -->
-            <div x-show="previewData?.results?.spf || previewData?.results?.dkim || previewData?.results?.dmarc" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Authentication Status</h5>
+            <div x-show="previewData?.results?.spf || previewData?.results?.dkim || previewData?.results?.dmarc" class="panel p-3 sm:p-4 rounded-lg border border-[var(--border)]">
+              <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Authentication Status</h5>
               <div class="space-y-2 text-[11px]">
                 <div class="flex justify-between">
-                  <span class="text-[#8b949e]">SPF:</span>
-                  <span class="pill pill-outline" 
+                  <span class="text-[color:var(--muted)]">SPF:</span>
+                  <span class="pill pill-outline"
                         :class="{'pill-green': previewData?.results?.spf?.status === 'pass', 'pill-red': previewData?.results?.spf?.status === 'fail', 'pill-orange': previewData?.results?.spf?.status === 'neutral'}"
                         x-text="previewData?.results?.spf?.status || 'unknown'"></span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-[#8b949e]">DKIM:</span>
-                  <span class="pill pill-outline" 
+                  <span class="text-[color:var(--muted)]">DKIM:</span>
+                  <span class="pill pill-outline"
                         :class="{'pill-green': previewData?.results?.dkim?.status === 'pass', 'pill-red': previewData?.results?.dkim?.status === 'fail'}"
                         x-text="previewData?.results?.dkim?.status || 'unknown'"></span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-[#8b949e]">DMARC:</span>
-                  <span class="pill pill-outline" 
+                  <span class="text-[color:var(--muted)]">DMARC:</span>
+                  <span class="pill pill-outline"
                         :class="{'pill-green': previewData?.results?.dmarc?.status === 'pass', 'pill-red': previewData?.results?.dmarc?.status === 'fail'}"
                         x-text="previewData?.results?.dmarc?.status || 'unknown'"></span>
                 </div>
               </div>
             </div>
-            
+
             <!-- Security Indicators -->
-            <div x-show="previewData?.results?.security" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Security Indicators</h5>
+            <div x-show="previewData?.results?.security" class="panel p-3 sm:p-4 rounded-lg border border-[var(--border)]">
+              <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Security Indicators</h5>
               <div class="space-y-2 text-[11px]">
                 <div class="flex items-center gap-2">
-                  <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-green-500' : 'fa-unlock text-red-500'"></i>
+                  <i class="fas" :class="previewData?.results?.security?.tls ? 'fa-lock text-[color:var(--success)]' : 'fa-unlock text-[color:var(--danger)]'"></i>
                   <span x-text="previewData?.results?.security?.tls ? 'TLS Encrypted' : 'No TLS Encryption'"></span>
                 </div>
                 <div x-show="previewData?.results?.security?.warnings?.length > 0">
-                  <h6 class="font-medium text-red-400 mb-1">Security Warnings:</h6>
+                  <h6 class="font-medium text-[color:var(--danger)] mb-1">Security Warnings:</h6>
                   <template x-for="(warning, warningIndex) in (previewData?.results?.security?.warnings || [])" :key="'warning-' + warningIndex">
-                    <div class="bg-red-900/20 border border-red-700 rounded p-2 text-red-300 text-[10px]">
+                    <div class="bg-[var(--danger-subtle)] rounded p-2 text-[color:var(--danger)] text-[10px]">
                       <i class="fas fa-exclamation-triangle mr-1"></i>
                       <span x-text="warning"></span>
                     </div>
@@ -331,80 +329,70 @@
                 </div>
               </div>
             </div>
-            
+
             <!-- Delivery Path -->
-            <div x-show="previewData?.results?.delivery_path?.length > 0" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Delivery Path</h5>
+            <div x-show="previewData?.results?.delivery_path?.length > 0" class="panel p-3 sm:p-4 rounded-lg border border-[var(--border)]">
+              <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Delivery Path</h5>
               <div class="space-y-1">
                 <template x-for="(hop, hopIndex) in (previewData?.results?.delivery_path || [])" :key="'hop-' + hopIndex">
-                  <div class="bg-[#0d1117] rounded p-2 border border-[#30363d]">
-                    <div class="font-mono text-[11px] text-[#c9d1d9] break-all" x-text="hop.server"></div>
-                    <div class="text-[10px] text-[#8b949e]" x-text="hop.timestamp"></div>
+                  <div class="bg-[var(--canvas)] rounded p-2">
+                    <div class="font-mono text-[11px] text-[color:var(--text)] break-all" x-text="hop.server"></div>
+                    <div class="text-[10px] text-[color:var(--muted)]" x-text="hop.timestamp"></div>
                   </div>
                 </template>
               </div>
             </div>
-            
+
             <!-- Routing Information -->
-            <div x-show="previewData?.results?.routing" class="panel p-3 sm:p-4 rounded-lg border border-[#30363d]">
-              <h5 class="font-medium text-[#58a6ff] mb-3 text-xs">Email Headers</h5>
+            <div x-show="previewData?.results?.routing" class="panel p-3 sm:p-4 rounded-lg border border-[var(--border)]">
+              <h5 class="font-medium text-[color:var(--accent)] mb-3 text-xs">Email Headers</h5>
               <div class="space-y-2 text-[11px]">
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-[#8b949e]">From:</span>
-                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.from"></span>
+                  <span class="text-[color:var(--muted)]">From:</span>
+                  <span class="text-[color:var(--text)] font-mono break-all" x-text="previewData?.results?.routing?.from"></span>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-[#8b949e]">To:</span>
-                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.to"></span>
+                  <span class="text-[color:var(--muted)]">To:</span>
+                  <span class="text-[color:var(--text)] font-mono break-all" x-text="previewData?.results?.routing?.to"></span>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-[#8b949e]">Subject:</span>
-                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.subject"></span>
+                  <span class="text-[color:var(--muted)]">Subject:</span>
+                  <span class="text-[color:var(--text)] font-mono break-all" x-text="previewData?.results?.routing?.subject"></span>
                 </div>
                 <div class="flex flex-col sm:flex-row sm:justify-between gap-1">
-                  <span class="text-[#8b949e]">Date:</span>
-                  <span class="text-[#c9d1d9] font-mono break-all" x-text="previewData?.results?.routing?.date"></span>
+                  <span class="text-[color:var(--muted)]">Date:</span>
+                  <span class="text-[color:var(--text)] font-mono break-all" x-text="previewData?.results?.routing?.date"></span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <!-- Modal Footer -->
-      <div class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-[#30363d] gap-4 shrink-0">
+      <div class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-[var(--border)] gap-4 shrink-0">
         <div class="flex gap-2 w-full sm:w-auto">
-          <button x-data="{ copied: false }" 
-                  @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)" 
+          <button x-data="{ copied: false }"
+                  @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)"
                   class="flex-1 sm:flex-none pill pill-outline pill-blue transition-all duration-200 text-[10px] sm:text-xs"
-                  :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+                  :class="copied ? 'bg-[var(--accent-fill)] text-white border-[var(--accent)]' : ''">
             <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
             <span x-text="copied ? 'Copied!' : 'Copy Markdown'"></span>
           </button>
           <button @click="exportResults" class="flex-1 sm:flex-none pill pill-outline pill-green text-[10px] sm:text-xs"><i class="fas fa-download"></i><span>Export</span></button>
         </div>
         <div class="flex gap-2 w-full sm:w-auto">
-          <button @click="rerun(previewData)" 
+          <button @click="rerun(previewData)"
                   class="flex-1 sm:flex-none pill pill-outline pill-blue text-[10px] sm:text-xs">
             <i class="fas fa-redo mr-2"></i>Rerun
           </button>
-          <button @click="closePreview" 
+          <button @click="closePreview"
                   class="flex-1 sm:flex-none pill pill-outline pill-gray text-[10px] sm:text-xs">
             Close
           </button>
         </div>
       </div>
-    </div>
-  </div>
+    </ui-dialog-content>
+  </ui-dialog>
 </div>
-{% endblock %}
-{% block scripts %}
-<script>
-// Close modal on ESC key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape' && window.historyPageInstance?.previewModal) {
-    window.historyPageInstance.closePreview();
-  }
-});
-</script>
 {% endblock %}

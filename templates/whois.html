@@ -7,24 +7,21 @@
 
   <div class="flex items-center justify-between">
     <div>
-      <h2 class="text-lg font-semibold text-[#c9d1d9]">WHOIS Lookup</h2>
-      <p class="text-xs text-[#8b949e]">Query domain and IP registration/allocation data via RDAP, ICANN's modern WHOIS replacement</p>
+      <h2 class="text-lg font-semibold text-[color:var(--text)]">WHOIS Lookup</h2>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
     <!-- Input Panel -->
     <div class="lg:col-span-3 panel p-4 rounded-xl space-y-4">
-      {{ ui.info_banner('fa-info-circle','About RDAP','Registration Data Access Protocol (RDAP) is the IETF-standard replacement for WHOIS. It returns structured JSON directly from the authoritative registry, no third-party proxy required.') }}
-
       <div class="mb-4">
-         <label class="block text-xs font-semibold text-[#c9d1d9] mb-2"><i class="fas fa-globe mr-2 text-[#58a6ff]"></i>Domain or IP to look up:</label>
+         <label class="block text-xs font-semibold text-[color:var(--text)] mb-2"><i class="fas fa-globe mr-2 text-[color:var(--accent)]"></i>Domain or IP to look up:</label>
         <input x-model="domain" @keyup.enter="performLookup" type="text" aria-label="Domain or IP address" autocapitalize="none" spellcheck="false"
-               class="w-full px-3 py-2 border border-[#30363d] rounded-md focus:outline-none focus:ring-2 focus:ring-[#58a6ff] bg-[#0d1117] text-[#c9d1d9] text-sm"
+               class="w-full px-3 py-2 border border-[var(--border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-[var(--canvas)] text-[color:var(--text)] text-sm"
            placeholder="example.com or 8.8.8.8" />
-        <p class="mt-2 text-[10px] text-[#8b949e]">Press <kbd class="bg-[#21262d] px-1 rounded border border-[#30363d]">Enter</kbd> to run. Domains, IPv4/IPv6, and full URLs are accepted (host is extracted automatically).</p>
+        <p class="mt-2 text-[10px] text-[color:var(--muted)]">Press <kbd class="bg-[var(--surface-raised)] px-1 rounded border border-[var(--border)]">Enter</kbd> to run. Domains, IPv4/IPv6, and full URLs are accepted (host is extracted automatically).</p>
         <div class="mt-2 flex flex-wrap items-center gap-2">
-          <span class="text-[10px] text-[#8b949e]">Quick tests:</span>
+          <span class="text-[10px] text-[color:var(--muted)]">Quick tests:</span>
           <template x-for="preset in presets" :key="preset.value">
             <button @click="applyPreset(preset.value)" type="button" class="pill pill-outline pill-blue text-[10px]">
               <span x-text="preset.label"></span>
@@ -36,8 +33,8 @@
       <button @click="performLookup"
               :disabled="loading || !domain.trim()"
               disabled
-              class="w-full py-2 px-4 rounded-md font-semibold bg-[#30363d] hover:bg-[#2ea043] disabled:bg-[#30363d] text-white transition text-sm"
-              :class="!(loading || !domain.trim()) ? 'bg-[#238636]' : 'bg-[#30363d]'">
+              class="w-full py-2 px-4 rounded-md font-semibold bg-[var(--border)] hover:bg-[var(--action-hover)] disabled:bg-[var(--border)] text-white transition text-sm"
+              :class="!(loading || !domain.trim()) ? 'bg-[var(--action)]' : 'bg-[var(--border)]'">
         <span x-show="!loading"><i class="fas fa-search mr-2"></i>WHOIS Lookup</span>
         <span x-show="loading" style="display: none;"><i class="fas fa-spinner fa-spin mr-2"></i>Querying registry...</span>
       </button>
@@ -57,15 +54,16 @@
   </div>
 
   <!-- Results -->
-  <div x-show="result" x-transition style="display: none;" class="space-y-4">
+  {{ ui.detail_skeleton() }}
+  <div x-show="!loading && result" x-transition style="display: none;" class="space-y-4">
     <!-- Header -->
     <div class="panel rounded-xl p-4">
       <div class="result-toolbar mb-4">
         <div class="space-y-2">
-          <h3 class="text-base font-semibold text-[#c9d1d9]"><i class="fas fa-id-card mr-2"></i>Registration Data for <span class="text-[#58a6ff]" x-text="result?.ldhName || result?.startAddress || domain"></span></h3>
+          <h3 class="text-base font-semibold text-[color:var(--text)]"><i class="fas fa-id-card mr-2"></i>Registration Data for <span class="text-[color:var(--accent)]" x-text="result?.ldhName || result?.startAddress || domain"></span></h3>
           <div class="flex items-center gap-2">
             <span class="pill pill-outline text-[10px]" :class="getDataQuality().className" x-text="getDataQuality().label"></span>
-            <span class="text-[10px] text-[#8b949e]" x-text="getDataQuality().summary"></span>
+            <span class="text-[10px] text-[color:var(--muted)]" x-text="getDataQuality().summary"></span>
           </div>
         </div>
         <div class="result-actions self-start">
@@ -73,7 +71,7 @@
                   @click="copyAllResults(); copied = true; setTimeout(() => copied = false, 2000)"
                   title="Copy all results"
                   class="pill pill-outline pill-blue transition-all duration-200"
-                  :class="copied ? 'bg-[#58a6ff] text-white border-[#58a6ff]' : ''">
+                  :class="copied ? 'bg-[var(--accent-fill)] text-white border-[var(--accent)]' : ''">
             <i class="fas" :class="copied ? 'fa-check' : 'fa-copy'"></i>
             <span class="action-label" aria-live="polite" x-text="copied ? 'Copied!' : 'Copy All'"></span>
           </button>
@@ -84,71 +82,71 @@
       <!-- Registration Overview -->
       <div x-show="isDomainResult()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         <!-- Registrar -->
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registrar</p>
-          <p class="text-sm font-semibold text-[#c9d1d9] truncate" x-text="result?.registrar?.name || 'N/A'" :title="result?.registrar?.name"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registrar</p>
+          <p class="text-sm font-semibold text-[color:var(--text)] truncate" x-text="result?.registrar?.name || 'N/A'" :title="result?.registrar?.name"></p>
         </div>
         <!-- Domain ID -->
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Domain ID</p>
-          <p class="text-sm font-semibold text-[#c9d1d9] font-mono truncate" x-text="result?.handle || '—'" :title="result?.handle || 'Unavailable'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Domain ID</p>
+          <p class="text-sm font-semibold text-[color:var(--text)] font-mono truncate" x-text="result?.handle || '—'" :title="result?.handle || 'Unavailable'"></p>
         </div>
         <!-- Registered -->
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registered</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.registration)"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registered</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.registration)"></p>
         </div>
         <!-- Expires -->
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Expires</p>
-          <p class="text-sm font-semibold" 
-             :class="result?.keyDates?.expiration && new Date(result.keyDates.expiration) < new Date(Date.now() + 30*86400000) ? 'text-[#f85149]' : 'text-[#c9d1d9]'"
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Expires</p>
+          <p class="text-sm font-semibold"
+             :class="result?.keyDates?.expiration && new Date(result.keyDates.expiration) < new Date(Date.now() + 30*86400000) ? 'text-[color:var(--danger)]' : 'text-[color:var(--text)]'"
              x-text="formatDate(result?.keyDates?.expiration)"></p>
         </div>
         <!-- Last Updated -->
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Last Updated</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.lastChanged)"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Last Updated</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.lastChanged)"></p>
         </div>
       </div>
 
       <div x-show="isIpResult()" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Network Name</p>
-          <p class="text-sm font-semibold text-[#c9d1d9] truncate" x-text="result?.networkName || '—'" :title="result?.networkName || 'Unavailable'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Network Name</p>
+          <p class="text-sm font-semibold text-[color:var(--text)] truncate" x-text="result?.networkName || '—'" :title="result?.networkName || 'Unavailable'"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">IP Range</p>
-          <p class="text-sm font-semibold text-[#c9d1d9] font-mono" x-text="(result?.startAddress && result?.endAddress) ? `${result.startAddress} - ${result.endAddress}` : '—'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">IP Range</p>
+          <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="(result?.startAddress && result?.endAddress) ? `${result.startAddress} - ${result.endAddress}` : '—'"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">CIDR</p>
-          <p class="text-sm font-semibold text-[#c9d1d9] font-mono" x-text="(result?.cidrBlocks || []).join(', ') || '—'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">CIDR</p>
+          <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="(result?.cidrBlocks || []).join(', ') || '—'"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Country</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="result?.country || '—'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Country</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.country || '—'"></p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1" x-text="isIpResult() ? 'Parent Handle' : 'Registrar ID'"></p>
-          <p class="text-sm font-semibold text-[#c9d1d9] font-mono" x-text="isIpResult() ? (result?.parentHandle || '—') : (result?.registrar?.handle || '—')"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1" x-text="isIpResult() ? 'Parent Handle' : 'Registrar ID'"></p>
+          <p class="text-sm font-semibold text-[color:var(--text)] font-mono" x-text="isIpResult() ? (result?.parentHandle || '—') : (result?.registrar?.handle || '—')"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Last RDAP DB Update</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.lastRdapUpdate)"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Last RDAP DB Update</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.lastRdapUpdate)"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Transferred</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="formatDate(result?.keyDates?.transfer)"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Transferred</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="formatDate(result?.keyDates?.transfer)"></p>
         </div>
       </div>
 
       <!-- Status Codes -->
       <div x-show="result?.status?.length > 0" class="mb-4">
-        <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2" x-text="isIpResult() ? 'Object Status' : 'Domain Status'"></p>
+        <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-2" x-text="isIpResult() ? 'Object Status' : 'Domain Status'"></p>
         <div class="flex flex-wrap gap-1.5">
           <template x-for="s in result?.status || []" :key="s">
             <span class="pill pill-outline text-[10px]" :class="statusClass(s)" x-text="s"></span>
@@ -157,18 +155,18 @@
       </div>
 
       <div x-show="isIpResult()" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Registrant</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="result?.roles?.registrant?.name || '—'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Registrant</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.roles?.registrant?.name || '—'"></p>
         </div>
-        <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-1">Abuse Contact</p>
-          <p class="text-sm font-semibold text-[#c9d1d9]" x-text="result?.roles?.abuse?.name || '—'"></p>
+        <div class="bg-[var(--canvas)] rounded-lg p-3">
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-1">Abuse Contact</p>
+          <p class="text-sm font-semibold text-[color:var(--text)]" x-text="result?.roles?.abuse?.name || '—'"></p>
         </div>
       </div>
 
       <div x-show="result?.rdapConformance?.length > 0" class="mb-4">
-        <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2">RDAP Profiles</p>
+        <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-2">RDAP Profiles</p>
         <div class="flex flex-wrap gap-1.5">
           <template x-for="profile in result?.rdapConformance || []" :key="profile">
             <span class="pill pill-outline pill-blue text-[10px]" x-text="profile"></span>
@@ -177,7 +175,7 @@
       </div>
 
       <!-- RDAP Server Info -->
-      <div class="text-[10px] text-[#6e7681]">
+      <div class="text-[10px] text-[color:var(--subtle)]">
         <i class="fas fa-server mr-1"></i> Queried: <span x-text="serverUrl || 'Unknown server'"></span>
       </div>
     </div>
@@ -185,13 +183,13 @@
     <!-- Nameservers -->
     <div x-show="isDomainResult() && result?.nameservers?.length > 0" class="panel rounded-xl p-4">
       <div class="flex items-center justify-between mb-3">
-        <h4 class="text-sm font-semibold text-[#c9d1d9]"><i class="fas fa-server mr-2 text-[#58a6ff]"></i>Nameservers</h4>
-        <span x-show="resolvingNameservers" style="display: none;" class="text-[10px] text-[#8b949e]"><i class="fas fa-spinner fa-spin mr-1"></i>Resolving A/AAAA fallback</span>
+        <h4 class="text-sm font-semibold text-[color:var(--text)]"><i class="fas fa-server mr-2 text-[color:var(--accent)]"></i>Nameservers</h4>
+        <span x-show="resolvingNameservers" style="display: none;" class="text-[10px] text-[color:var(--muted)]"><i class="fas fa-spinner fa-spin mr-1"></i>Resolving A/AAAA fallback</span>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-xs responsive-table">
           <thead>
-            <tr class="border-b border-[#30363d] text-[#8b949e]">
+            <tr class="border-b border-[var(--border)] text-[color:var(--muted)]">
               <th class="text-left py-2 px-3">Hostname</th>
               <th class="text-left py-2 px-3">IPv4</th>
               <th class="text-left py-2 px-3">IPv6</th>
@@ -199,21 +197,21 @@
           </thead>
           <tbody>
             <template x-for="ns in result?.nameservers || []" :key="ns.ldhName">
-              <tr class="border-b border-[#30363d] hover:bg-[#161b22] group">
+              <tr class="border-b border-[var(--border)] hover:bg-[var(--surface)] group">
                 <td class="py-2 px-3 font-mono text-[11px]" data-label="Hostname">
                   <div class="flex items-center justify-between">
                     <span x-text="ns.ldhName"></span>
                     <button x-data="{ copied: false }"
                             @click="copyToClipboard(ns.ldhName); copied = true; setTimeout(() => copied = false, 1000)"
                             aria-label="Copy nameserver hostname" title="Copy nameserver hostname"
-                            class="text-[#8b949e] hover:text-[#58a6ff] transition-all duration-200 ml-2"
-                            :class="copied ? 'text-[#3fb950]! opacity-100' : 'opacity-0 group-hover:opacity-100'">
+                            class="text-[color:var(--muted)] hover:text-[color:var(--accent)] transition-all duration-200 ml-2"
+                            :class="copied ? 'text-[color:var(--success)]! opacity-100' : 'opacity-0 group-hover:opacity-100'">
                       <i class="fas text-[10px]" :class="copied ? 'fa-check' : 'fa-copy'"></i>
                     </button>
                   </div>
                 </td>
-                <td class="py-2 px-3 font-mono text-[11px] text-[#8b949e]" data-label="IPv4" x-text="ns.ipv4.join(', ') || '—'"></td>
-                <td class="py-2 px-3 font-mono text-[11px] text-[#8b949e]" data-label="IPv6" x-text="ns.ipv6.join(', ') || '—'"></td>
+                <td class="py-2 px-3 font-mono text-[11px] text-[color:var(--muted)]" data-label="IPv4" x-text="ns.ipv4.join(', ') || '—'"></td>
+                <td class="py-2 px-3 font-mono text-[11px] text-[color:var(--muted)]" data-label="IPv6" x-text="ns.ipv6.join(', ') || '—'"></td>
               </tr>
             </template>
           </tbody>
@@ -223,7 +221,7 @@
 
     <!-- DNSSEC -->
     <div x-show="isDomainResult() && result?.secureDNS" class="panel rounded-xl p-4">
-      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-lock mr-2 text-[#58a6ff]"></i>DNSSEC</h4>
+      <h4 class="text-sm font-semibold text-[color:var(--text)] mb-3"><i class="fas fa-lock mr-2 text-[color:var(--accent)]"></i>DNSSEC</h4>
       <div class="flex items-center gap-2 mb-2">
         <span class="pill pill-outline" :class="result?.secureDNS?.delegationSigned ? 'pill-green' : 'pill-orange'"
               x-text="result?.secureDNS?.delegationSigned ? 'Delegation Signed' : 'Unsigned'"></span>
@@ -234,14 +232,14 @@
       <!-- DS Records -->
       <template x-if="result?.secureDNS?.dsData?.length > 0">
         <div class="mt-3">
-          <p class="text-[10px] text-[#8b949e] uppercase tracking-wider mb-2">DS Records</p>
+          <p class="text-[10px] text-[color:var(--muted)] uppercase tracking-wider mb-2">DS Records</p>
           <div class="space-y-1">
             <template x-for="ds in result.secureDNS.dsData" :key="ds.keyTag + '-' + ds.digestType">
-              <div class="bg-[#0d1117] rounded-lg p-2 border border-[#30363d] text-[11px] font-mono text-[#8b949e]">
-                Key Tag: <span class="text-[#c9d1d9]" x-text="ds.keyTag"></span> &middot;
-                Algorithm: <span class="text-[#c9d1d9]" x-text="ds.algorithm"></span> &middot;
-                Digest Type: <span class="text-[#c9d1d9]" x-text="ds.digestType"></span> &middot;
-                Digest: <span class="text-[#c9d1d9] break-all" x-text="ds.digest || '—'"></span>
+              <div class="bg-[var(--canvas)] rounded-lg p-2 text-[11px] font-mono text-[color:var(--muted)]">
+                Key Tag: <span class="text-[color:var(--text)]" x-text="ds.keyTag"></span> &middot;
+                Algorithm: <span class="text-[color:var(--text)]" x-text="ds.algorithm"></span> &middot;
+                Digest Type: <span class="text-[color:var(--text)]" x-text="ds.digestType"></span> &middot;
+                Digest: <span class="text-[color:var(--text)] break-all" x-text="ds.digest || '—'"></span>
               </div>
             </template>
           </div>
@@ -251,18 +249,18 @@
 
     <!-- Notices / Remarks -->
     <div x-show="(result?.notices?.length || 0) > 0 || (result?.remarks?.length || 0) > 0" class="panel rounded-xl p-4">
-      <h4 class="text-sm font-semibold text-[#c9d1d9] mb-3"><i class="fas fa-file-circle-info mr-2 text-[#58a6ff]"></i>Registry Notes</h4>
+      <h4 class="text-sm font-semibold text-[color:var(--text)] mb-3"><i class="fas fa-file-circle-info mr-2 text-[color:var(--accent)]"></i>Registry Notes</h4>
       <div class="space-y-2">
         <template x-for="(note, idx) in result?.notices || []" :key="'notice-' + idx">
-          <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-            <p class="text-[11px] font-semibold text-[#c9d1d9]" x-text="note.title || 'Notice'"></p>
-            <p class="text-[11px] text-[#8b949e] mt-1" x-text="note.text || 'No additional details provided by the registry.'"></p>
+          <div class="bg-[var(--canvas)] rounded-lg p-3">
+            <p class="text-[11px] font-semibold text-[color:var(--text)]" x-text="note.title || 'Notice'"></p>
+            <p class="text-[11px] text-[color:var(--muted)] mt-1" x-text="note.text || 'No additional details provided by the registry.'"></p>
           </div>
         </template>
         <template x-for="(remark, idx) in result?.remarks || []" :key="'remark-' + idx">
-          <div class="bg-[#0d1117] rounded-lg p-3 border border-[#30363d]">
-            <p class="text-[11px] font-semibold text-[#c9d1d9]" x-text="remark.title || 'Remark'"></p>
-            <p class="text-[11px] text-[#8b949e] mt-1" x-text="remark.text || 'No additional details provided by the registry.'"></p>
+          <div class="bg-[var(--canvas)] rounded-lg p-3">
+            <p class="text-[11px] font-semibold text-[color:var(--text)]" x-text="remark.title || 'Remark'"></p>
+            <p class="text-[11px] text-[color:var(--muted)] mt-1" x-text="remark.text || 'No additional details provided by the registry.'"></p>
           </div>
         </template>
       </div>
@@ -270,24 +268,24 @@
 
     <!-- Raw RDAP JSON Toggle -->
     <div class="panel rounded-xl p-4">
-      <button @click="showRaw = !showRaw" class="flex items-center gap-2 text-xs font-semibold text-[#8b949e] hover:text-[#c9d1d9] transition-colors">
+      <button @click="showRaw = !showRaw" class="flex items-center gap-2 text-xs font-semibold text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
         <i class="fas" :class="showRaw ? 'fa-chevron-down' : 'fa-chevron-right'"></i>
         <span x-text="showRaw ? 'Hide Raw RDAP Response' : 'Show Raw RDAP Response'"></span>
       </button>
       <div x-show="showRaw" x-transition style="display: none;" class="mt-3">
-        <pre class="bg-[#0d1117] border border-[#30363d] rounded-lg p-3 text-[11px] font-mono text-[#8b949e] overflow-auto max-h-96" x-text="JSON.stringify(result?.raw, null, 2)"></pre>
+        <pre class="bg-[var(--canvas)] rounded-lg p-3 text-[11px] font-mono text-[color:var(--muted)] overflow-auto max-h-96" x-text="JSON.stringify(result?.raw, null, 2)"></pre>
       </div>
     </div>
   </div>
 
   <!-- No result / domain not found -->
-  <div x-show="searchPerformed && !loading && !error && !result && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
-    <p class="text-xs text-[#8b949e]"><i class="fas fa-info-circle mr-2"></i>No registration data found for <span x-text="domain"></span>.</p>
+  <div x-show="searchPerformed && !loading && !error && !result && domain.trim()" x-transition style="display: none;" class="panel p-4 border border-[var(--border)] rounded-xl">
+    <p class="text-xs text-[color:var(--muted)]"><i class="fas fa-info-circle mr-2"></i>No registration data found for <span x-text="domain"></span>.</p>
   </div>
 
   <!-- Error -->
-  <div x-show="error && error.length > 0" x-transition style="display: none;" class="panel p-4 border border-[#30363d] rounded-xl">
-    <p class="text-xs text-[#f85149]"><i class="fas fa-exclamation-triangle mr-2"></i><span x-text="error"></span></p>
+  <div x-show="error && error.length > 0" x-transition style="display: none;" class="panel p-4 border border-[var(--border)] rounded-xl">
+    <p class="text-xs text-[color:var(--danger)]"><i class="fas fa-exclamation-triangle mr-2"></i><span x-text="error"></span></p>
   </div>
 </div>
 {% endblock %}

@@ -27,10 +27,7 @@ if (dnsClientModule) {
 const registerComponents = () => {
     const Alpine = window.Alpine;
     Alpine.store('settings', {
-        open: false,
         config: loadSettings(),
-        toggle() { this.open = !this.open; },
-        close() { this.open = false; },
         updateProvider(provider, enabled) {
             const current = new Set(this.config.providers);
             if (enabled) current.add(provider);
