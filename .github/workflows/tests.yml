@@ -37,3 +37,13 @@ jobs:
 
     - name: Run JavaScript tests
       run: node --experimental-default-type=module --test
+
+    - name: Build UI SDK and static site
+      run: |
+        npm ci
+        npm run build
+        python generate_static.py
+
+    - name: Verify published SDK asset
+      run: |
+        python -c "from pathlib import Path; source = Path('static/js/ui-sdk.bundle.js').read_bytes(); assert source; assert Path('dist/static/js/ui-sdk.bundle.js').read_bytes() == source; assert 'static/js/ui-sdk.bundle.js' in Path('dist/dashboard.html').read_text()"

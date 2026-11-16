@@ -1,5 +1,7 @@
 from html.parser import HTMLParser
 
+import pytest
+
 from app import app
 
 
@@ -15,7 +17,10 @@ class PaginationParser(HTMLParser):
         if tag == "template":
             if self.template_depth:
                 self.template_depth += 1
-            elif attrs.get("x-for", "").startswith("concept in "):
+            elif any(
+                collection in attrs.get("x-for", "")
+                for collection in ("paginatedConcepts", "paginatedHistory")
+            ):
                 self.template_depth = 1
         if attrs.get("aria-label") == "Pagination":
             self.pagination_count += 1
@@ -27,8 +32,9 @@ class PaginationParser(HTMLParser):
             self.template_depth -= 1
 
 
-def test_intelligence_pagination_is_outside_concept_cards():
-    response = app.test_client().get("/intel")
+@pytest.mark.parametrize("route", ["/intel", "/history"])
+def test_pagination_is_outside_repeated_entries(route):
+    response = app.test_client().get(route)
     parser = PaginationParser()
     parser.feed(response.get_data(as_text=True))
     assert parser.pagination_count == 1

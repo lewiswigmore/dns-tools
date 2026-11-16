@@ -142,9 +142,6 @@
                     <template x-for="(type, typeIndex) in item.recordTypes" :key="'type-' + i + '-' + typeIndex">
                       <span class="px-1.5 py-0.5 bg-[var(--canvas)] border border-[var(--border)] rounded text-[color:var(--text)]" x-text="type"></span>
                     </template>
-                    <div x-show="totalPages > 1" class="flex justify-end pt-3">
-                      {{ ui.pagination('goToPage(1)', 'goToPage(currentPage - 1)', 'goToPage(currentPage + 1)', 'goToPage(totalPages)') }}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -165,6 +162,9 @@
           </div>
         </div>
       </template>
+      <div x-show="totalPages > 1" class="flex justify-end pt-3">
+        {{ ui.pagination('goToPage(1)', 'goToPage(currentPage - 1)', 'goToPage(currentPage + 1)', 'goToPage(totalPages)') }}
+      </div>
     </div>
   </div>
 
