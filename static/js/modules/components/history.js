@@ -1,4 +1,4 @@
-import { loadHistory, saveHistory, copyTextToClipboard, exportJSON } from '../utils.js';
+import { loadHistory, saveHistory, copyTextToClipboard as copyToClipboard, exportJSON } from '../utils.js';
 
 export function HistoryPage() {
     return {
@@ -247,9 +247,7 @@ export function HistoryPage() {
         return item.query || '';
       },
 
-      async copyToClipboard(text) {
-        return copyTextToClipboard(text);
-      },
+      copyToClipboard,
 
       exportResults() {
         if (this.previewData && this.previewData.results) {

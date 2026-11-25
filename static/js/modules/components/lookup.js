@@ -1,7 +1,6 @@
-import { presetDomains, presetRecordTypes, addHistory, copyTextToClipboard, exportJSON, autoGrow } from '../utils.js';
-import { queryDomain } from '../rdap-client.js';
-import { DNSClient } from '../dns-client.js';
-import { buildFraudIndicators, computeRiskLevel, riskLabel, riskIcon, riskColorClass } from '../fraud-indicators.js';
+import { presetDomains, presetRecordTypes, addHistory, copyTextToClipboard as copyToClipboard, exportJSON, autoGrow } from '../utils.js';
+import { assessDomainFraudRisk } from '../fraud-assessment.js';
+import { riskLabel, riskIcon, riskColorClass } from '../fraud-indicators.js';
 
 export function LookupPage() {
     return {
@@ -138,35 +137,14 @@ export function LookupPage() {
         };
 
         try {
-          const dnsClient = new DNSClient();
-
-          const [rdapResult, aRecords, aaaaRecords, mxRecords, nsRecords, txtRecords, dmarcRecords] = await Promise.all([
-            queryDomain(key).then(r => r.result).catch(() => null),
-            dnsClient.queryDNS(key, 'A'),
-            dnsClient.queryDNS(key, 'AAAA'),
-            dnsClient.queryDNS(key, 'MX'),
-            dnsClient.queryDNS(key, 'NS'),
-            dnsClient.queryDNS(key, 'TXT'),
-            dnsClient.queryDNS(`_dmarc.${key}`, 'TXT')
-          ]);
-
-          const indicators = buildFraudIndicators({
-            domain: key,
-            rdap: rdapResult,
-            a: aRecords,
-            aaaa: aaaaRecords,
-            mx: mxRecords,
-            ns: nsRecords,
-            txt: txtRecords,
-            dmarcTxt: dmarcRecords
-          });
+          const assessment = await assessDomainFraudRisk(key);
 
           this.fraud = {
             ...this.fraud,
             [key]: {
               loading: false,
               error: null,
-              data: { indicators, riskLevel: computeRiskLevel(indicators), checkedAt: Date.now() }
+              data: { ...assessment, checkedAt: Date.now() }
             }
           };
         } catch (error) {
@@ -261,9 +239,7 @@ export function LookupPage() {
         await this.copyToClipboard(shareUrl);
       },
       
-      async copyToClipboard(text) {
-        return copyTextToClipboard(text);
-      },
+      copyToClipboard,
 
       async copyAllResults() {
         const data = this.compareMode ? this.comparisonResults : this.results;

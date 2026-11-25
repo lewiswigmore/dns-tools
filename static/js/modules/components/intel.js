@@ -1,7 +1,6 @@
 import { safeStorage, addHistory } from '../utils.js';
-import { queryDomain } from '../rdap-client.js';
-import { DNSClient } from '../dns-client.js';
-import { buildFraudIndicators, computeRiskLevel, riskLabel, riskIcon, riskBannerClass } from '../fraud-indicators.js';
+import { assessDomainFraudRisk } from '../fraud-assessment.js';
+import { riskLabel, riskIcon, riskBannerClass } from '../fraud-indicators.js';
 
 export function IntelPage() {
     return {
@@ -186,35 +185,13 @@ export function IntelPage() {
             this.fraud.data = null;
 
             try {
-                const dnsClient = new DNSClient();
-
-                const [rdapResult, aRecords, aaaaRecords, mxRecords, nsRecords, txtRecords, dmarcRecords] = await Promise.all([
-                    queryDomain(domain).then(r => r.result).catch(() => null),
-                    dnsClient.queryDNS(domain, 'A'),
-                    dnsClient.queryDNS(domain, 'AAAA'),
-                    dnsClient.queryDNS(domain, 'MX'),
-                    dnsClient.queryDNS(domain, 'NS'),
-                    dnsClient.queryDNS(domain, 'TXT'),
-                    dnsClient.queryDNS(`_dmarc.${domain}`, 'TXT')
-                ]);
+                const assessment = await assessDomainFraudRisk(domain);
 
                 if (!isCurrent()) return;
 
-                const indicators = buildFraudIndicators({
-                    domain,
-                    rdap: rdapResult,
-                    a: aRecords,
-                    aaaa: aaaaRecords,
-                    mx: mxRecords,
-                    ns: nsRecords,
-                    txt: txtRecords,
-                    dmarcTxt: dmarcRecords
-                });
-
                 this.fraud.data = {
                     domain,
-                    indicators,
-                    riskLevel: computeRiskLevel(indicators),
+                    ...assessment,
                     checkedAt: Date.now()
                 };
             } catch (error) {
