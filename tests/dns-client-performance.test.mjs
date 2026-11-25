@@ -58,3 +58,34 @@ test('bulk DNS comparison bounds concurrent requests and keeps provider results'
   assert.equal(results[3].comparisons.TXT.Cloudflare.records[0].value,
     'four.example:TXT:https://cloudflare-dns.com/dns-query');
 });
+
+test('MX provider comparison preserves success and error result shapes', async () => {
+  const client = new DNSClient();
+  client.updateSettings({ primaryProvider: 'Google', providers: ['Google', 'Cloudflare'] });
+  const requests = [];
+  const records = [{ priority: 10, exchange: 'mail.example.com' }];
+
+  client.queryDNS = async (domain, recordType, providerUrl) => {
+    requests.push({ domain, recordType, providerUrl });
+    if (providerUrl.includes('cloudflare')) {
+      throw new Error('Cloudflare unavailable');
+    }
+    return records;
+  };
+
+  const { comparison } = await client.performMXComparison(' example.com ');
+
+  assert.deepEqual(requests, [
+    { domain: 'example.com', recordType: 'MX', providerUrl: 'https://dns.google/resolve' },
+    { domain: 'example.com', recordType: 'MX', providerUrl: 'https://cloudflare-dns.com/dns-query' },
+  ]);
+  assert.equal(comparison.Google.status, 'success');
+  assert.deepEqual(comparison.Google.records, records);
+  assert.ok(Number.isInteger(comparison.Google.latency));
+  assert.deepEqual(comparison.Cloudflare, {
+    provider: 'Cloudflare',
+    records: [],
+    error: 'Cloudflare unavailable',
+    status: 'error',
+  });
+});

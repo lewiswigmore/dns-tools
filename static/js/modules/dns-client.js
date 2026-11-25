@@ -257,10 +257,7 @@ export class DNSClient {
 
     async performComparison(domains, recordTypes) {
       const domainsArray = this.parseDomainList(domains);
-      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
-        name: name,
-        url: PROVIDER_URLS[name]
-      })).filter(p => p.url);
+      const activeProviders = this.getActiveProviders();
       const results = domainsArray.map(domain => ({
         domain,
         comparisons: Object.fromEntries(recordTypes.map(recordType => [recordType, {}]))
@@ -302,6 +299,35 @@ export class DNSClient {
       }
 
       return { results };
+    }
+
+    getActiveProviders() {
+      return (this.settings.providers || ['Google', 'Cloudflare'])
+        .map(name => ({ name, url: PROVIDER_URLS[name] }))
+        .filter(provider => provider.url);
+    }
+
+    async compareProviderRecords(domain, recordType, getSuccessDetails, getErrorDetails) {
+      const results = await Promise.all(this.getActiveProviders().map(async provider => {
+        try {
+          const start = performance.now();
+          const records = await this.queryDNS(domain, recordType, provider.url);
+          return {
+            provider: provider.name,
+            ...getSuccessDetails(records),
+            latency: Math.round(performance.now() - start),
+            status: 'success',
+          };
+        } catch (error) {
+          return {
+            provider: provider.name,
+            ...getErrorDetails(error),
+            status: 'error',
+          };
+        }
+      }));
+
+      return Object.fromEntries(results.map(result => [result.provider, result]));
     }
     
     async queryDNS(domain, recordType, providerUrl = null) {
@@ -353,86 +379,31 @@ export class DNSClient {
     }
     
     async performMXComparison(domain) {
-      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
-        name: name,
-        url: PROVIDER_URLS[name]
-      })).filter(p => p.url);
-
-      const comparison = {};
-      
-      const providerPromises = activeProviders.map(async (provider) => {
-        try {
-          const start = performance.now();
-          const records = await this.queryDNS(domain.trim(), 'MX', provider.url);
-          const duration = Math.round(performance.now() - start);
-          return {
-            provider: provider.name,
-            records: records,
-            latency: duration,
-            status: 'success'
-          };
-        } catch (error) {
-          return {
-            provider: provider.name,
-            records: [],
-            error: error.message,
-            status: 'error'
-          };
-        }
-      });
-
-      const results = await Promise.all(providerPromises);
-      results.forEach(res => {
-        comparison[res.provider] = res;
-      });
-
+      const comparison = await this.compareProviderRecords(
+        domain.trim(),
+        'MX',
+        records => ({ records }),
+        error => ({ records: [], error: error.message })
+      );
       return { comparison };
     }
 
     async performDMARCComparison(domain) {
-      const activeProviders = (this.settings.providers || ['Google', 'Cloudflare']).map(name => ({
-        name: name,
-        url: PROVIDER_URLS[name]
-      })).filter(p => p.url);
-
-      const comparison = {};
       const dmarcDomain = `_dmarc.${domain.trim()}`;
-      
-      const providerPromises = activeProviders.map(async (provider) => {
-        try {
-          const start = performance.now();
-          const records = await this.queryDNS(dmarcDomain, 'TXT', provider.url);
-          const duration = Math.round(performance.now() - start);
-          
+
+      const comparison = await this.compareProviderRecords(
+        dmarcDomain,
+        'TXT',
+        records => {
           const dmarcRecord = findDMARCRecord(records);
-          let parsed = null;
-          
-          if (dmarcRecord) {
-             parsed = this.parseDMARCPolicy(dmarcRecord.value);
-          }
-
+          const parsed = dmarcRecord ? this.parseDMARCPolicy(dmarcRecord.value) : null;
           return {
-            provider: provider.name,
-            records: records,
+            records,
             dmarc: dmarcRecord ? { ...parsed, raw: dmarcRecord.raw } : null,
-            latency: duration,
-            status: 'success'
           };
-        } catch (error) {
-          return {
-            provider: provider.name,
-            dmarc: null,
-            error: error.message,
-            status: 'error'
-          };
-        }
-      });
-
-      const results = await Promise.all(providerPromises);
-      results.forEach(res => {
-        comparison[res.provider] = res;
-      });
-
+        },
+        error => ({ dmarc: null, error: error.message })
+      );
       return { comparison };
     }
     

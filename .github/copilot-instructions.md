@@ -72,6 +72,7 @@ templates/                    Jinja2 HTML templates
 static/js/modules/            Vanilla JS ES module frontend
   components/                 Page-level UI components (lookup, whois, dmarc, etc.)
   utils.js                    Shared browser utilities and single-domain page setup
+  fraud-assessment.js         Shared RDAP/DNS collection for domain fraud indicators
   rdap-client.js              RDAP domain lookup client (IANA bootstrap, no proxy)
   data/                       Static knowledge base data
 tests/                        Pytest security checks and Node.js regression tests
@@ -87,9 +88,10 @@ docs/research/                Sourced research notes
 - SDK dialogs driven by Alpine state synchronize the element's `open` property with `x-effect` and clear that state on `openchange` so Escape and outside dismissal remain in sync.
 - Shared theme colors are CSS custom properties in `templates/base.html`; use the neutral palette for surfaces and decoration, and reserve semantic colors for status and risk. Keep chart colors aligned with the palette.
 - Keep operational UI flat and restrained: separate sections with spacing and surfaces, not nested borders or framed decorative icons; distinguish the sidebar and mobile result rows with surface shading. Retain input outlines and visible keyboard focus. Reuse the loading, pagination and provider-toggle macros in `components.html`; skeletons must match the content shape without implying actual results.
-- `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on lookup/MX/DMARC pages, and load command-palette knowledge-base data only when the palette is opened
-- Page-level clipboard actions keep their `copyToClipboard` methods for template bindings and delegate the browser clipboard operation to `copyTextToClipboard()` in `utils.js`
+- `main.js` loads only the Alpine component for the page named by `body[data-page]`; keep page modules out of static app-wide imports, load the shared DNS client only on pages that need DNS lookups (lookup/MX/DMARC, Intel fraud checks, and WHOIS nameserver fallback), and load command-palette knowledge-base data only when the palette is opened
+- Page-level clipboard actions expose `copyToClipboard` for template bindings and reuse `copyTextToClipboard()` in `utils.js`; add a page-specific wrapper only when it needs a different error message
 - MX and DMARC pages share the `commonDomainPresets()` and `initializeDomainLookup()` helpers in `utils.js` for consistent presets and URL-driven auto-lookups
+- MX and DMARC provider comparisons in `dns-client.js` share provider selection, timing, and error handling; keep record-specific result data in their success and error mappers
 - Responsive layout is shared in `templates/base.html`: result headers use `result-toolbar` / `result-actions`; secondary copy/share/export text uses `action-label` (visually hidden on phones, retained for screen readers). Keep primary and destructive actions labelled, and retain 44px mobile touch targets.
 - All API calls in `dns-client.js` target public DNS-over-HTTPS resolvers
 - Keep DNS request fan-out bounded in both DNS clients; page components should dynamically import the knowledge base only when that page or feature needs it
@@ -99,7 +101,7 @@ docs/research/                Sourced research notes
 - Security headers are set in `app.py` `after_request` hook
 - Mutating Flask API routes (`POST`/`PUT`/`PATCH`/`DELETE`) require a valid CSRF token via `X-CSRF-Token` (or `csrf_token` in JSON body), with token issued by `/api/csrf-token`
 - Content Library pagination state is URL-driven (`q`, `complexity`, `page`, `size`) via `resources.js` so filtered views are shareable
-- The Threat Intelligence page (`intel.html`/`intel.js`) includes a client-side "Fraud Risk Indicators" panel for domains: it combines RDAP registration/status data with DNS presence and mail-auth (SPF/DMARC) checks into heuristic, non-authoritative signals. It runs only on explicit user action (not automatically) and never performs browser-side HTTP reachability checks (unreliable due to CORS)
+- Lookup and Threat Intelligence fraud checks use `fraud-assessment.js` to collect RDAP/DNS data and `fraud-indicators.js` for pure heuristic evaluation. The signals are non-authoritative, run only on explicit user action, and never perform browser-side HTTP reachability checks (unreliable due to CORS); request freshness and UI state remain page-owned.
 
 ## Known gotchas
 

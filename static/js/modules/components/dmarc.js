@@ -1,4 +1,4 @@
-import { addHistory, commonDomainPresets, copyTextToClipboard, exportJSON, initializeDomainLookup } from '../utils.js';
+import { addHistory, commonDomainPresets, copyTextToClipboard as copyToClipboard, exportJSON, initializeDomainLookup } from '../utils.js';
 
 export function DMARCPage() {
     return {
@@ -87,9 +87,7 @@ export function DMARCPage() {
         this.domain = value;
       },
 
-      async copyToClipboard(text) {
-        return copyTextToClipboard(text);
-      },
+      copyToClipboard,
 
       exportResults() {
         if (this.compareMode && this.comparisonResult) {
